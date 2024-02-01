@@ -1,0 +1,455 @@
+<!DOCTYPE html>
+<html lang="en" class="h-100">
+<head>
+    <meta charset="UTF-8">
+    <title>Get wordy :: Cards</title>
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.9.1/font/bootstrap-icons.css">
+    <!-- Optional theme -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="common.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Lato:wght@400;700;900&display=swap');
+    </style>
+
+    <script type="text/javascript">
+
+        addEventListener('load', loadCards, false);
+
+        function loadCards() {
+            let caption = getQueryVariable('dictionaryName');
+            let dictionaryId = getQueryVariable('dictionaryId');
+            if (!caption) {
+                caption = "Cards";
+            }
+            document.getElementById('caption').textContent = caption;
+
+            let reqHeader = new Headers();
+            reqHeader.append('Content-Type', 'text/json');
+
+            let initObject = {
+                method: 'GET', headers: reqHeader,
+            };
+
+            let cardsRequest = new Request("Cards?dictionaryId=" + dictionaryId, initObject);
+
+            fetch(cardsRequest)
+                .then(response => response.json())
+                .then(data => displayCards(data))
+                .catch(err => console.log("HTTP error: ", err));
+        }
+
+        function displayCards(responseJson) {
+            // hide other tabs
+            hidePanel('play-game-panel');
+            hidePanel('generate-cards-panel');
+            hidePanel('add-card-panel');
+
+            // clear the previous content
+            let content = document.getElementById('all-cards-panel');
+            content.innerHTML = "";
+            // show table div
+            showPanel('all-cards-panel');
+            let items = responseJson; // array is expected here
+            // create a table of cards
+            let table = document.createElement('table');
+            table.className = 'table';
+            let header = document.createElement('thead');
+            let body = document.createElement('tbody');
+            let headerRow = document.createElement('tr');
+            header.appendChild(headerRow);
+            const headers = ["Word", "Transcription", "Meaning", "Status", "Score", "Context", "Collocations"];
+            appendHeaderRow(headerRow, headers);
+            table.appendChild(header);
+            table.appendChild(body);
+
+            for (let i = 0; i < items.length; i++) {
+                let tableRow = document.createElement("tr");
+                appendRow(tableRow, items[i]);
+                body.appendChild(tableRow);
+            }
+            content.appendChild(table);
+        }
+
+        function appendHeaderRow(headerRow, items) {
+            for (let i = 0; i < items.length; i++) {
+                let columnName = document.createElement('th');
+                columnName.appendChild(document.createTextNode(items[i]));
+                headerRow.appendChild(columnName);
+            }
+        }
+
+        function appendRow(tableRow, cardElement) {
+            let w = cardElement.word;
+            let word = w.value;
+            let partOfSpeech = w.partOfSpeech;
+            let transcription = w.transcription;
+            let meaning = w.meaning;
+            let status = cardElement.status;
+            let rating = cardElement.score;
+            let contexts = cardElement.contexts;
+            let collocations = cardElement.collocations;
+
+            tableRow.addEventListener("click", function () {
+                loadDetails(cardElement);
+            }, false);
+            appendTextCell(tableRow, word + " (" + partOfSpeech + ")");
+            appendTextCell(tableRow, fixNullValue(transcription));
+            appendTextCell(tableRow, meaning);
+            appendTextCell(tableRow, status);
+            appendTextCell(tableRow, rating);
+            appendListCell(tableRow, contexts);
+            appendListCell(tableRow, collocations);
+        }
+
+        function appendTextCell(row, textValue) {
+            let cell = document.createElement("td");
+            cell.appendChild(document.createTextNode(textValue));
+            row.appendChild(cell);
+        }
+
+        function appendListCell(row, items) {
+            let cell = document.createElement("td");
+            if (!items) {
+                row.appendChild(cell);
+                return;
+            }
+            let ul = document.createElement("ul");
+            ul.className = 'list-unstyled';
+            for (let i = 0; i < items.length; i++) {
+                appendListElement(ul, items[i].example)
+            }
+            cell.appendChild(ul);
+            row.appendChild(cell);
+        }
+
+        function appendListElement(list, element) {
+            let e = document.createElement("li");
+            let textNode = document.createTextNode(element);
+            e.appendChild(textNode);
+            list.appendChild(e);
+        }
+
+        function fixNullValue(textValue) {
+            if (!textValue) {
+                return "";
+            }
+            return textValue;
+        }
+
+        function loadDetails(card) {
+
+            let reqHeader = new Headers();
+            reqHeader.append('Content-Type', 'text/json');
+
+            let initObject = {
+                method: 'GET', headers: reqHeader,
+            };
+
+            let cardRequest = new Request("Cards?cardId=" + card.id, initObject);
+
+            fetch(cardRequest)
+                .then(response => response.json())
+                .then(data => displayCards(data))
+                .catch(err => console.log("HTTP error: ", err));
+        }
+
+        function showCard(cardElement) {
+            let details = document.getElementById('all-cards-panel');
+            details.innerHTML = "";
+
+            let w = cardElement.word;
+            let word = w.value;
+            let partOfSpeech = w.partOfSpeech;
+            let transcription = w.transcription;
+            let meaning = w.meaning;
+            let status = cardElement.status;
+            let rating = cardElement.score;
+            let contexts = cardElement.contexts;
+            let collocations = cardElement.collocations;
+        }
+
+        function play() {
+            // hide other tabs
+            hidePanel('all-cards-panel');
+            hidePanel('generate-cards-panel');
+            hidePanel('add-card-panel');
+            hidePanel('custom-alert-panel');
+            // show form
+            showPanel('play-game-panel');
+        }
+
+        function generate() {
+            // hide other tabs
+            hidePanel('all-cards-panel');
+            hidePanel('play-game-panel');
+            hidePanel('add-card-panel');
+            hidePanel('custom-alert-panel');
+            // show form
+            showPanel('generate-cards-panel');
+        }
+
+        function addCard() {
+            // clear the previous content
+            hidePanel('all-cards-panel');
+            hidePanel('play-game-panel');
+            hidePanel('generate-cards-panel');
+            hidePanel('custom-alert-panel');
+            // show form
+            showPanel("add-card-panel");
+        }
+
+        function showPanel(panelId) {
+            let content = document.getElementById(panelId);
+            content.style.display = "";
+        }
+
+        function hidePanel(panelId) {
+            let div = document.getElementById(panelId);
+            div.style.display = "none";
+        }
+
+        function customAlert(flag) {
+            if (flag) {
+                showPanel('custom-alert-panel');
+            } else {
+                alert("Word not added");
+            }
+        }
+        function postWordsForm() {
+            var form = document.getElementById('generate-cards-form');
+            var formData = new FormData(form);
+            const valuesArr = formData.get('words').split('\n');
+
+            let reqHeader = new Headers();
+            reqHeader.append('Content-Type', 'application/json');
+
+            try {
+                let initObject = {
+                    method: 'POST',
+                    headers: reqHeader,
+                    body: JSON.stringify(valuesArr),
+                };
+                let dictionaryId = getQueryVariable('dictionaryId');
+
+                let params = {
+                    "dictionaryId": dictionaryId,
+                    "action": "generate"
+                };
+
+                let query = Object.keys(params)
+                    .map(k => encodeURIComponent(k) + '=' + encodeURIComponent(params[k]))
+                    .join('&');
+
+                let generateRequest = new Request("Cards?" + query, initObject);
+                fetch(generateRequest)
+                    .then(response => response.json())
+                    .then(data => displayCards(data))
+                    .catch(err => console.log("HTTP error: ", err));
+
+              } catch (err) {
+                console.log(err.message);
+              }
+        }
+
+        function postCardForm() {
+            let dictionaryId = getQueryVariable('dictionaryId');
+            var form = document.getElementById('add-card-form');
+            var formData = new FormData(form);
+            const word = formData.get('word');
+            const meaning = formData.get('meaning');
+            const transcription = formData.get('transcription');
+            const pos = formData.get('posradio');
+            const contextArr = formData.get('context').split('\n');
+            const collocationArr = formData.get('collocations').split('\n');
+
+            let reqHeader = new Headers();
+            reqHeader.append('Content-Type', 'application/json');
+
+            let wordRequest = {
+                value: word,
+                partOfSpeech: pos,
+                transcription: transcription,
+                meaning: meaning
+            };
+
+            let cardRequest = {
+                word: wordRequest,
+                contexts: contextArr,
+                collocations: collocationArr
+            };
+
+            try {
+                let initObject = {
+                    method: 'POST',
+                    headers: reqHeader,
+                    body: JSON.stringify(cardRequest),
+                };
+
+                let params = {
+                    "dictionaryId": dictionaryId,
+                    "action": "add-card"
+                };
+
+                let query = Object.keys(params)
+                    .map(k => encodeURIComponent(k) + '=' + encodeURIComponent(params[k]))
+                    .join('&');
+
+                let generateRequest = new Request("Cards?" + query, initObject);
+                fetch(generateRequest)
+                    .then(response => response.json())
+                    .then(success => customAlert(success))
+                    .catch(err => console.log("HTTP error: ", err));
+
+              } catch (err) {
+                console.log(err.message);
+              }
+        }
+
+    </script>
+</head>
+
+<body class="d-flex flex-column h-100">
+<header class="text-muted bg-light">
+    <div class="container p-2">
+        <h4 id="caption"></h4>
+    </div>
+</header>
+
+<main>
+    <div class="container" id="action-buttons">
+        <div class="row p-5 text-center">
+            <div class="col-sm-12">
+                <a href="#" class="btn btn-default btn-lg" onclick="loadCards();return false;">
+                    <i class="bi bi-card-list"></i> All cards
+                </a>
+                <a href="#" class="btn btn-default btn-lg" onclick="play();return false;">
+                    <i class="bi bi-emoji-smile-upside-down"></i> Try game
+                </a>
+                <a href="#" class="btn btn-default btn-lg" onclick="generate();return false;">
+                    <i class="bi bi-bricks"></i> Generate
+                </a>
+                <a href="#" class="btn btn-default btn-lg" onclick="addCard();return false;">
+                    <i class="bi bi-plus-circle-dotted"></i> Add manually
+                </a>
+            </div>
+        </div>
+    </div>
+    <div class="container mb-3" id="all-cards-panel" style="display:none">
+        <table class="table">
+            <thead>
+            <tr>
+                <th>Word</th>
+                <th>Transcription</th>
+                <th>Meaning</th>
+                <th>Status</th>
+                <th>Score</th>
+                <th>Context</th>
+                <th>Collocations</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr>
+                <td>Example (noun)</td>
+                <td>ɪgˈzɑːmpl</td>
+                <td>
+                    <mark>One that is representative of a group as a whole</mark>
+                </td>
+                <td>TO_LEARN</td>
+                <td>65</td>
+                <td>Wear something simple; for example, a skirt and blouse.</td>
+                <td>for example</td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+    <div class="container" id="generate-cards-panel" style="display:none">
+        <p class="mb-3">This page is designed to auto generate cards per each inputted word</p>
+        <form action="" id="generate-cards-form" onsubmit="postWordsForm();return false;">
+            <div class="row mb-3">
+                <label for="text" class="form-label">Input your words:</label>
+                <textarea class="form-control" rows="5" id="text" name="words"></textarea>
+            </div>
+            <button type="submit" class="btn btn-primary">Submit</button>
+        </form>
+    </div>
+    <div class="container text-center" id="play-game-panel" style="display:none">
+        <p class="mb-3">You wanna play? let's play</p>
+    </div>
+    <div class="container" id="add-card-panel" style="display:none">
+        <p class="mb-3">This page is designed to add a card manually</p>
+        <form action="" id="add-card-form" onsubmit="postCardForm();return false;">
+            <div class="row mb-3">
+                <div class="col">
+                    <label for="word" class="form-label">Word:</label>
+                    <input type="text" class="form-control" placeholder="Enter word" name="word" id="word">
+                </div>
+                <div class="col">
+                    <label for="radioGrp" class="form-label">Part of speech:</label>
+                    <div id="radioGrp">
+                        <div class="form-check">
+                            <input type="radio" class="form-check-input" id="radio1" name="posradio" value="noun">
+                            noun
+                            <label class="form-check-label" for="radio1"></label>
+                        </div>
+                        <div class="form-check">
+                            <input type="radio" class="form-check-input" id="radio2" name="posradio" value="verb">
+                            verb
+                            <label class="form-check-label" for="radio2"></label>
+                        </div>
+                        <div class="form-check">
+                            <input type="radio" class="form-check-input" id="radio3" name="posradio" value="adjective">
+                            adjective
+                            <label class="form-check-label" for="radio3"></label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row mb-3">
+                <div class="col">
+                    <label for="transcription" class="form-label">Transcription:</label>
+                    <input type="text" class="form-control" placeholder="Enter transcription" name="transcription"
+                           id="transcription">
+                </div>
+            </div>
+            <div class="row mb-3">
+                <div class="col">
+                    <label for="meaning" class="form-label">Meaning:</label>
+                    <input type="text" class="form-control" placeholder="Enter meaning" name="meaning" id="meaning">
+                </div>
+            </div>
+            <div class="row mb-3">
+                <div class="col">
+                    <label for="context" class="form-label">Input your example(s) line by line:</label>
+                    <textarea class="form-control" rows="3" id="context" name="context"
+                              placeholder="Enter examples"></textarea>
+                </div>
+            </div>
+            <div class="row mb-3">
+                <div class="col">
+                    <label for="collocations" class="form-label">Input your collocation(s) line by line:</label>
+                    <textarea class="form-control" rows="3" id="collocations" name="collocations"
+                              placeholder="Enter collocations"></textarea>
+                </div>
+            </div>
+            <button type="submit" class="btn btn-primary mb-5" onclick="">Submit</button>
+        </form>
+    </div>
+    <div class="container" id="custom-alert-panel" style="display:none">
+        <div class="alert alert-success d-flex align-items-center" role="alert">
+            <i class="bi bi-check-circle-fill"></i> Successfully added
+        </div>
+    </div>
+</main>
+<footer class="footer mt-auto text-muted bg-light">
+    <div class="container p-5 text-center">
+        <p>
+            <a href="#">Back to top</a>
+        </p>
+        <p>Get Wordy :: Admin Web</p>
+    </div>
+</footer>
+</body>
+
+</html>
