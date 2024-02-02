@@ -27,7 +27,7 @@ class DictionariesServletTest {
     public void getDictionariesRequestUsingHttpClient() throws URISyntaxException, IOException, InterruptedException {
         try (HttpClient httpClient = HttpClient.newHttpClient()) {
             HttpRequest httpRequest = HttpRequest.newBuilder()
-                    .uri(new URI("http://localhost:8080/GetWordyAdmin/Dictionaries"))
+                    .uri(new URI("http://localhost:8080/GetWordyAdmin/api/v1/dictionaries"))
                     .GET()
                     .build();
 

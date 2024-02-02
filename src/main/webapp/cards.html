@@ -218,9 +218,10 @@
                 alert("Word not added");
             }
         }
+
         function postWordsForm() {
-            var form = document.getElementById('generate-cards-form');
-            var formData = new FormData(form);
+            let form = document.getElementById('generate-cards-form');
+            let formData = new FormData(form);
             const valuesArr = formData.get('words').split('\n');
 
             let reqHeader = new Headers();
@@ -249,15 +250,15 @@
                     .then(data => displayCards(data))
                     .catch(err => console.log("HTTP error: ", err));
 
-              } catch (err) {
+            } catch (err) {
                 console.log(err.message);
-              }
+            }
         }
 
         function postCardForm() {
             let dictionaryId = getQueryVariable('dictionaryId');
-            var form = document.getElementById('add-card-form');
-            var formData = new FormData(form);
+            let form = document.getElementById('add-card-form');
+            let formData = new FormData(form);
             const word = formData.get('word');
             const meaning = formData.get('meaning');
             const transcription = formData.get('transcription');
@@ -303,11 +304,72 @@
                     .then(success => customAlert(success))
                     .catch(err => console.log("HTTP error: ", err));
 
-              } catch (err) {
+            } catch (err) {
                 console.log(err.message);
-              }
+            }
         }
 
+        function printFiboNumbers() {
+            const fiboNumbers = [2, 3, 5, 8, 13, 21];
+            let playGamePanel = document.getElementById('play-game-panel');
+            playGamePanel.innerHTML = "";
+            let btnGrpDiv = document.createElement("div");
+            btnGrpDiv.className = "col-sm-12 text-center p-5"
+            btnGrpDiv.setAttribute("role", "group");
+            btnGrpDiv.setAttribute("aria-label", "Fibonacci Buttons");
+            for (let i = 0; i < fiboNumbers.length; i++) {
+                let btn = document.createElement("button");
+                btn.type = "button";
+                btn.className = "btn btn-outline-info";
+                btn.innerHTML = fiboNumbers[i].toString();
+                btn.style.marginLeft = "2px";
+                btn.style.marginRight = "2px";
+                btn.onclick = function () {
+                    alert('Test Fibonacci Buttons: ' + fiboNumbers[i].toString());
+                }
+                btnGrpDiv.appendChild(btn);
+            }
+            playGamePanel.appendChild(btnGrpDiv);
+        }
+
+        function rollDice() {
+            const min = 1;
+            const max = 6;
+            const die1 = Math.floor(Math.random() * (max - min + 1)) + min;
+            const die2 = Math.floor(Math.random() * (max - min + 1)) + min;
+
+            let playGamePanel = document.getElementById('play-game-panel');
+            playGamePanel.innerHTML = "";
+
+            let diceGrpDiv = document.createElement("div");
+            diceGrpDiv.className = "col-sm-12 text-center p-5"
+            let i1 = document.createElement("i");
+            i1.className = "bi bi-dice-" + die1 + " h2";
+            i1.style.marginRight = "3px";
+            let i2 = document.createElement("i");
+            i2.className = "bi bi-dice-" + die2 + " h2";
+            i2.style.marginLeft = "3px";
+            diceGrpDiv.appendChild(i1);
+            diceGrpDiv.appendChild(i2);
+            playGamePanel.appendChild(diceGrpDiv);
+
+            let youRolled = document.createElement("div");
+            youRolled.className = "col-sm-12 text-center"
+            youRolled.innerHTML = "You rolled " + (die1 + die2);
+            playGamePanel.appendChild(youRolled);
+
+            let playAgain = document.createElement("div");
+            playAgain.className = "col-sm-12 text-center p-5"
+            let btn = document.createElement("button");
+            playAgain.appendChild(btn);
+            btn.type = "button";
+            btn.className = "btn btn-outline-info";
+            btn.innerHTML = "Play again";
+            btn.onclick = function () {
+                rollDice();
+            }
+            playGamePanel.appendChild(playAgain);
+        }
     </script>
 </head>
 
@@ -377,6 +439,16 @@
     </div>
     <div class="container text-center" id="play-game-panel" style="display:none">
         <p class="mb-3">You wanna play? let's play</p>
+        <div class="d-flex align-items-center">
+            <div class="col-sm-12">
+                <a href="#" class="btn btn-default btn-lg" onclick="printFiboNumbers();return false;">
+                    <i class="bi bi-123"></i> Fibonacci Series
+                </a>
+                <a href="#" class="btn btn-default btn-lg" onclick="rollDice();return false;">
+                    <i class="bi bi-dice-5"></i> Roll Dice
+                </a>
+            </div>
+        </div>
     </div>
     <div class="container" id="add-card-panel" style="display:none">
         <p class="mb-3">This page is designed to add a card manually</p>

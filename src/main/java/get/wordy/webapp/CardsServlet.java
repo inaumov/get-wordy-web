@@ -17,10 +17,11 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-@WebServlet(urlPatterns = "/Cards")
+@WebServlet(urlPatterns = {"/api/v1/cards", "/api/v1/cards/exercise"})
 public class CardsServlet extends HttpServlet {
 
     private IDictionaryService dictionaryService;
@@ -46,6 +47,19 @@ public class CardsServlet extends HttpServlet {
         String cardIdParam = request.getParameter("cardId");
 
         String responseStr = "{}";
+
+        if (request.getRequestURI().contains("exercise") && dictionaryIdParam != null) {
+            String cardsNumberParam = request.getParameter("limit");
+            int dictionaryId = Integer.parseInt(dictionaryIdParam);
+            int cardsNumber = Integer.parseInt(cardsNumberParam);
+            System.out.println("POST: Exercise action has been received");
+            List<Card> cards = dictionaryService.getCardsForExercise(dictionaryId, cardsNumber);
+            responseStr = jsonMapper.writeValueAsString(cards);
+            // write to response
+            resp.setContentType("application/json");
+            resp.getWriter().write(responseStr);
+            return;
+        }
 
         if (dictionaryIdParam != null) {
             int dictionaryId = Integer.parseInt(dictionaryIdParam);

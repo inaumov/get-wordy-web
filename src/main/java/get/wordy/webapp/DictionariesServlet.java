@@ -13,7 +13,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.List;
 
-@WebServlet(urlPatterns = "/Dictionaries", loadOnStartup = 1)
+@WebServlet(urlPatterns = "/api/v1/dictionaries", loadOnStartup = 1)
 public class DictionariesServlet extends HttpServlet {
 
     private IDictionaryService dictionaryService;
