@@ -190,6 +190,31 @@ function addCard() {
     hidePanel('custom-alert-panel');
     // show form
     showPanel("add-card-panel");
+
+    let radioGrp = document.getElementById('radioGrp');
+    radioGrp.innerHTML = "";
+
+    const partOfSpeechArr = ["noun", "pronoun", "verb", "adjective", "adverb", "phrasal verb"];
+    for (let i = 0; i < partOfSpeechArr.length; i++) {
+        let div = document.createElement("div");
+        div.className = "form-check";
+        let partOfSpeech = partOfSpeechArr[i];
+        let inputId = "radio" + i;
+        let input = document.createElement("input");
+        input.type = "radio";
+        input.className = "form-check-input";
+        input.id = inputId;
+        input.name = "pos_radios";
+        input.value = partOfSpeech;
+        let label = document.createElement("label");
+        label.innerHTML = partOfSpeech;
+        label.className = "form-check-label";
+        label.setAttribute("for", inputId)
+        div.appendChild(input);
+        div.appendChild(label);
+        radioGrp.appendChild(div);
+    }
+
 }
 
 function showPanel(panelId) {
@@ -253,7 +278,7 @@ function postCardForm() {
     const word = formData.get('word');
     const meaning = formData.get('meaning');
     const transcription = formData.get('transcription');
-    const pos = formData.get('posradio');
+    const pos = formData.get('pos_radios');
     const contextArr = formData.get('context').split('\n');
     const collocationArr = formData.get('collocations').split('\n');
 
