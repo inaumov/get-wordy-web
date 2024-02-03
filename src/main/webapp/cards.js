@@ -28,6 +28,7 @@ function loadCards() {
 function displayCards(responseJson) {
     // hide other tabs
     hidePanel('play-game-panel');
+    hidePanel('play-game-panel-inner');
     hidePanel('generate-cards-panel');
     hidePanel('add-card-panel');
     hidePanel('custom-alert-panel');
@@ -73,7 +74,7 @@ function appendRow(tableRow, cardElement) {
     let transcription = w.transcription;
     let meaning = w.meaning;
     let status = cardElement.status;
-    let rating = cardElement.score;
+    let score = cardElement.score;
     let contexts = cardElement.contexts;
     let collocations = cardElement.collocations;
 
@@ -84,7 +85,7 @@ function appendRow(tableRow, cardElement) {
     appendTextCell(tableRow, fixNullValue(transcription));
     appendTextCell(tableRow, meaning);
     appendTextCell(tableRow, status);
-    appendTextCell(tableRow, rating);
+    appendTextCell(tableRow, score);
     appendListCell(tableRow, contexts);
     appendListCell(tableRow, collocations);
 }
@@ -151,7 +152,7 @@ function showCard(cardElement) {
     let transcription = w.transcription;
     let meaning = w.meaning;
     let status = cardElement.status;
-    let rating = cardElement.score;
+    let score = cardElement.score;
     let contexts = cardElement.contexts;
     let collocations = cardElement.collocations;
 }
@@ -162,6 +163,8 @@ function play() {
     hidePanel('generate-cards-panel');
     hidePanel('add-card-panel');
     hidePanel('custom-alert-panel');
+    hidePanel('play-game-panel-inner');
+
     // show form
     showPanel('play-game-panel');
 }
@@ -170,6 +173,7 @@ function generate() {
     // hide other tabs
     hidePanel('all-cards-panel');
     hidePanel('play-game-panel');
+    hidePanel('play-game-panel-inner');
     hidePanel('add-card-panel');
     hidePanel('custom-alert-panel');
     // show form
@@ -180,6 +184,8 @@ function addCard() {
     // clear the previous content
     hidePanel('all-cards-panel');
     hidePanel('play-game-panel');
+    hidePanel('play-game-panel-inner');
+
     hidePanel('generate-cards-panel');
     hidePanel('custom-alert-panel');
     // show form
@@ -295,8 +301,11 @@ function postCardForm() {
 }
 
 function printFiboNumbers() {
+    hidePanel('play-game-panel');
+
     const fiboNumbers = [2, 3, 5, 8, 13, 21];
-    let playGamePanel = document.getElementById('play-game-panel');
+    let playGamePanel = document.getElementById('play-game-panel-inner');
+    playGamePanel.style.display = "";
     playGamePanel.innerHTML = "";
     let btnGrpDiv = document.createElement("div");
     btnGrpDiv.className = "col-sm-12 text-center p-5"
@@ -318,12 +327,15 @@ function printFiboNumbers() {
 }
 
 function rollDice() {
+    hidePanel('play-game-panel');
+
     const min = 1;
     const max = 6;
     const die1 = Math.floor(Math.random() * (max - min + 1)) + min;
     const die2 = Math.floor(Math.random() * (max - min + 1)) + min;
 
-    let playGamePanel = document.getElementById('play-game-panel');
+    let playGamePanel = document.getElementById('play-game-panel-inner');
+    playGamePanel.style.display = "";
     playGamePanel.innerHTML = "";
 
     let diceGrpDiv = document.createElement("div");
