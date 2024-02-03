@@ -14,6 +14,7 @@
     </style>
 
     <script type="text/javascript">
+        const cardsAPI = "api/v1/cards?";
 
         addEventListener('load', loadCards, false);
 
@@ -32,7 +33,7 @@
                 method: 'GET', headers: reqHeader,
             };
 
-            let cardsRequest = new Request("Cards?dictionaryId=" + dictionaryId, initObject);
+            let cardsRequest = new Request(cardsAPI + "dictionaryId=" + dictionaryId, initObject);
 
             fetch(cardsRequest)
                 .then(response => response.json())
@@ -148,7 +149,7 @@
                 method: 'GET', headers: reqHeader,
             };
 
-            let cardRequest = new Request("Cards?cardId=" + card.id, initObject);
+            let cardRequest = new Request(cardsAPI + "cardId=" + card.id, initObject);
 
             fetch(cardRequest)
                 .then(response => response.json())
@@ -244,7 +245,7 @@
                     .map(k => encodeURIComponent(k) + '=' + encodeURIComponent(params[k]))
                     .join('&');
 
-                let generateRequest = new Request("Cards?" + query, initObject);
+                let generateRequest = new Request(cardsAPI + query, initObject);
                 fetch(generateRequest)
                     .then(response => response.json())
                     .then(data => displayCards(data))
@@ -298,7 +299,7 @@
                     .map(k => encodeURIComponent(k) + '=' + encodeURIComponent(params[k]))
                     .join('&');
 
-                let generateRequest = new Request("Cards?" + query, initObject);
+                let generateRequest = new Request(cardsAPI + query, initObject);
                 fetch(generateRequest)
                     .then(response => response.json())
                     .then(success => customAlert(success))

@@ -1,3 +1,5 @@
+const dictionariesAPI = "api/v1/dictionaries";
+
 addEventListener('load', dictionaries, false);
 
 function dictionaries() {
@@ -8,7 +10,7 @@ function dictionaries() {
         method: 'GET', headers: reqHeader,
     };
 
-    let dictionariesRequest = new Request("Dictionaries", initObject);
+    let dictionariesRequest = new Request(dictionariesAPI, initObject);
 
     fetch(dictionariesRequest)
         .then(response => response.json())
