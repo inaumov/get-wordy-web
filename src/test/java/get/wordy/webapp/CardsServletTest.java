@@ -15,7 +15,7 @@ import java.net.http.HttpResponse;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-class DictionariesServletTest {
+class CardsServletTest {
 
     private final ObjectMapper objectMapper = new ObjectMapper();
 
@@ -25,10 +25,10 @@ class DictionariesServletTest {
     }
 
     @Test
-    public void getDictionariesRequestUsingHttpClient() throws URISyntaxException, IOException, InterruptedException {
+    public void getCardsByDictionaryIdRequestUsingHttpClient() throws URISyntaxException, IOException, InterruptedException {
         try (HttpClient httpClient = HttpClient.newHttpClient()) {
             HttpRequest httpRequest = HttpRequest.newBuilder()
-                    .uri(new URI("http://localhost:8080/GetWordyAdmin/api/v1/dictionaries"))
+                    .uri(new URI("http://localhost:8080/GetWordyAdmin/api/v1/cards?dictionaryId=1"))
                     .build();
 
             HttpResponse<String> httpResponse = httpClient.send(httpRequest, HttpResponse.BodyHandlers.ofString());
@@ -42,7 +42,6 @@ class DictionariesServletTest {
 
             var jsonNode = objectMapper.readTree(responseBody);
             assertTrue(jsonNode.isArray(), "is not an array");
-
             System.out.println("Dictionaries response status code: " + statusCode);
             System.out.println("Dictionaries response headers: " + httpResponse.headers());
             System.out.println("Dictionaries response body: \n" + responseBody);
