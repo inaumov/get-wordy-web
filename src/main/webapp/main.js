@@ -32,7 +32,8 @@ function displayDictionaries(responseJson) {
             cardsTotal = Math.floor(Math.random() * (125 - 25) + 25);
         }
         let cardElement = document.createElement("div");
-        cardElement.className = 'animate__animated animate bounce card';
+        cardElement.id = 'dictionary';
+        cardElement.className = 'card text-center';
         cardElement.width = '18rem';
 
         appendLogo(cardElement, logo);
@@ -55,7 +56,7 @@ function appendCaption(card, dicId, caption, cardsTotal) {
 
     let header = document.createElement("h5");
     let t = document.createTextNode(caption);
-    header.className = 'card-title text-center';
+    header.className = 'card-title';
     header.appendChild(t);
 
     let a = document.createElement("a");

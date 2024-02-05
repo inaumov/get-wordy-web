@@ -6,12 +6,13 @@
 
     <!-- Latest compiled and minified CSS -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.9.1/font/bootstrap-icons.css">
 
     <!-- Optional theme -->
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Lato:wght@400;700;900&display=swap');
 
-        .card {
+        div#dictionary.card {
             border-radius: 40px;
             overflow: hidden;
             border: 0;
@@ -21,43 +22,21 @@
             display: inline-block;
         }
 
-        .card:hover {
+        div#dictionary.card:hover {
             box-shadow: 0 6px 30px rgba(0, 0, 0, 0.1),
             0 10px 8px rgba(0, 0, 0, 0.015);
         }
 
-        .card-body .card-title {
-            font-family: 'Lato', sans-serif;
-            font-weight: 700;
-            letter-spacing: 0.3px;
+        div#dictionary.card .card-body .card-title {
+            font-weight: 600;
             font-size: 24px;
-            color: #121212;
         }
 
-        .card-text {
-            font-family: 'Lato', sans-serif;
-            font-weight: 400;
-            font-size: 15px;
-            letter-spacing: 0.3px;
-            color: #4E4E4E;
-
-        }
-
-        .card .container {
-            width: 88%;
-            background: #F0EEF8;
-            border-radius: 30px;
-            height: 140px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .card:hover > img {
+        div#dictionary.card:hover > img {
             transform: scale(1.2);
         }
 
-        .card img {
+        div#dictionary.card img {
             padding: 75px;
             margin-top: -40px;
             margin-bottom: -40px;
@@ -67,10 +46,10 @@
             height: auto;
         }
 
-        .btn {
-            background: #EEECF7;
+        div#dictionary.card .btn {
+            background: #e9ecef;
             border: 0;
-            color: #5535F0;
+            color: #5535f0;
             width: 98%;
             font-weight: bold;
             border-radius: 20px;
@@ -78,13 +57,15 @@
             transition: all 0.2s ease;
         }
 
-        .btn:hover {
-            background: #441CFF;
+        div#dictionary.card .btn:hover {
+            background: #d63384;
+            color: #e9ecef;
         }
 
-        .btn:focus {
-            background: #441CFF;
+        div#dictionary.card .btn:focus {
+            background: #d63384;
             outline: 0;
+            color: #e9ecef;
         }
     </style>
     <!-- Latest compiled and minified JavaScript -->
@@ -97,24 +78,25 @@
 <body class="d-flex flex-column h-100">
 <header class="text-muted bg-light">
     <div class="container p-2">
-        <h4>My dictionaries</h4>
+        <div class="row p-2">
+            <div class="col">
+                <h4>My Dictionaries</h4>
+            </div>
+            <div class="col">
+                <a href="#" class="btn btn-default btn-lg float-end" onclick="return false;">
+                    <i class="bi bi-gear"></i>
+                </a>
+            </div>
+        </div>
     </div>
 </header>
 <main>
     <div class="container center" id="content">
-        <div class="animate__animated animate bounce card" style="width: 18rem;">
-            <img src="https://i.ibb.co/gRpP2Lm/icons8-online-128.png" class="card-img-top " alt="...">
+        <div id="dictionary" class="card text-center" style="width: 18rem;">
+            <img src="https://i.ibb.co/gRpP2Lm/icons8-online-128.png" class="card-img-top" alt="...">
             <div class="card-body">
                 <h5 class="card-title">Walking dead</h5>
                 <a href="https://freesnippetcode.blogspot.com/" target="_blank" class="btn btn-primary">53</a>
-            </div>
-        </div>
-
-        <div class="animate__animated animate bounce card" style="width: 18rem;">
-            <img src="https://i.ibb.co/gRpP2Lm/icons8-online-128.png" class="card-img-top " alt="...">
-            <div class="card-body">
-                <h5 class="card-title">Warcraft</h5>
-                <a href="https://freesnippetcode.blogspot.com/" target="_blank" class="btn btn-primary">125</a>
             </div>
         </div>
     </div>

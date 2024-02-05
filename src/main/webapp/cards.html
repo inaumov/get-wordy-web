@@ -6,10 +6,12 @@
 
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.9.1/font/bootstrap-icons.css">
-    <!-- Optional theme -->
+    <!-- Latest compiled and minified JavaScript -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
     <script src="common.js"></script>
     <script src="cards.js"></script>
+    <!-- Optional theme -->
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Lato:wght@400;700;900&display=swap');
     </style>
@@ -18,7 +20,16 @@
 <body class="d-flex flex-column h-100">
 <header class="text-muted bg-light">
     <div class="container p-2">
-        <h4 id="caption"></h4>
+        <div class="row p-2">
+            <div class="col">
+                <h4 id="caption"></h4>
+            </div>
+            <div class="col">
+                <a href="#" class="btn btn-default btn-lg float-end" onclick="return false;">
+                    <i class="bi bi-gear"></i>
+                </a>
+            </div>
+        </div>
     </div>
 </header>
 
