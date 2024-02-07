@@ -1,2 +1,2 @@
 # get-wordy-web
-Admin client for Get Wordy application
+Web client for Get Wordy application

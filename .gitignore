@@ -42,3 +42,6 @@ bin
 build
 out
 log
+
+# Docker env vars #
+.env

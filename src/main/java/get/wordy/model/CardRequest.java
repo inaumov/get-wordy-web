@@ -1,4 +1,4 @@
-package get.wordy.webapp;
+package get.wordy.model;
 
 import get.wordy.core.bean.Word;
 

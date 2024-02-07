@@ -1,13 +1,13 @@
-package get.wordy.web;
+package get.wordy;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class GetWordyWebappApplication {
+public class GetWordyApplication {
 
 	public static void main(String[] args) {
-		SpringApplication.run(GetWordyWebappApplication.class, args);
+		SpringApplication.run(GetWordyApplication.class, args);
 	}
 
 }

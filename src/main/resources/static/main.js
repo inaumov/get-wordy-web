@@ -62,7 +62,7 @@ function appendCaption(card, dicId, caption, cardsTotal) {
     let a = document.createElement("a");
     a.className = 'btn btn-primary';
     a.target = '_blank';
-    a.setAttribute('href', '/GetWordyAdmin/cards.html?dictionaryId=' + encodeURIComponent(dicId) + '&dictionaryName=' + encodeURIComponent(caption));
+    a.setAttribute('href', '/GetWordyApp/cards.html?dictionaryId=' + encodeURIComponent(dicId) + '&dictionaryName=' + encodeURIComponent(caption));
     a.innerHTML = cardsTotal;
 
     cardBody.appendChild(header);

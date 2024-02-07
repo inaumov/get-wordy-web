@@ -1,4 +1,4 @@
-const cardsAPI = "api/v1/cards?";
+const cardsAPI = "api/v1/dictionaries";
 
 addEventListener('load', loadCards, false);
 
@@ -17,7 +17,7 @@ function loadCards() {
         method: 'GET', headers: reqHeader,
     };
 
-    let cardsRequest = new Request(cardsAPI + "dictionaryId=" + dictionaryId, initObject);
+    let cardsRequest = new Request(cardsAPI + "/" + dictionaryId + "/cards", initObject);
 
     fetch(cardsRequest)
         .then(response => response.json())
@@ -134,7 +134,7 @@ function loadDetails(card) {
         method: 'GET', headers: reqHeader,
     };
 
-    let cardRequest = new Request(cardsAPI + "cardId=" + card.id, initObject);
+    let cardRequest = new Request(cardsAPI + "/" + dictionaryId + "/cards/" + card.id, initObject);
 
     fetch(cardRequest)
         .then(response => response.json())
@@ -250,17 +250,7 @@ function postWordsForm() {
             body: JSON.stringify(valuesArr),
         };
         let dictionaryId = getQueryVariable('dictionaryId');
-
-        let params = {
-            "dictionaryId": dictionaryId,
-            "action": "generate"
-        };
-
-        let query = Object.keys(params)
-            .map(k => encodeURIComponent(k) + '=' + encodeURIComponent(params[k]))
-            .join('&');
-
-        let generateRequest = new Request(cardsAPI + query, initObject);
+        let generateRequest = new Request(cardsAPI + "/" + dictionaryId + "/generate", initObject);
         fetch(generateRequest)
             .then(response => response.json())
             .then(data => displayCards(data))
@@ -305,16 +295,7 @@ function postCardForm() {
             body: JSON.stringify(cardRequest),
         };
 
-        let params = {
-            "dictionaryId": dictionaryId,
-            "action": "add-card"
-        };
-
-        let query = Object.keys(params)
-            .map(k => encodeURIComponent(k) + '=' + encodeURIComponent(params[k]))
-            .join('&');
-
-        let generateRequest = new Request(cardsAPI + query, initObject);
+        let generateRequest = new Request(cardsAPI + "/" + dictionaryId + "/cards", initObject);
         fetch(generateRequest)
             .then(response => response.json())
             .then(success => customAlert(success))

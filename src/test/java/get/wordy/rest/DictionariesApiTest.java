@@ -1,11 +1,13 @@
-package get.wordy.webapp;
+package get.wordy.rest;
 
 import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.json.JsonMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
+import java.net.Authenticator;
+import java.net.PasswordAuthentication;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.http.HttpClient;
@@ -15,20 +17,29 @@ import java.net.http.HttpResponse;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-class DictionariesServletTest {
+class DictionariesApiTest {
 
-    private final ObjectMapper objectMapper = new ObjectMapper();
+    private final JsonMapper jsonMapper = new JsonMapper();
 
     @BeforeEach
     void setUp() {
-        objectMapper.enable(DeserializationFeature.FAIL_ON_READING_DUP_TREE_KEY);
+        jsonMapper.enable(DeserializationFeature.FAIL_ON_READING_DUP_TREE_KEY);
     }
 
     @Test
     public void getDictionariesRequestUsingHttpClient() throws URISyntaxException, IOException, InterruptedException {
-        try (HttpClient httpClient = HttpClient.newHttpClient()) {
+        try (HttpClient httpClient = HttpClient.newBuilder()
+                .authenticator(new Authenticator() {
+                    @Override
+                    protected PasswordAuthentication getPasswordAuthentication() {
+                        return new PasswordAuthentication(
+                                "admin",
+                                "admin".toCharArray());
+                    }
+                }).build()
+        ) {
             HttpRequest httpRequest = HttpRequest.newBuilder()
-                    .uri(new URI("http://localhost:8080/GetWordyAdmin/api/v1/dictionaries"))
+                    .uri(new URI("http://localhost:8080/GetWordyApp/api/v1/dictionaries"))
                     .build();
 
             HttpResponse<String> httpResponse = httpClient.send(httpRequest, HttpResponse.BodyHandlers.ofString());
@@ -40,7 +51,7 @@ class DictionariesServletTest {
 
             assertEquals(200, statusCode);
 
-            var jsonNode = objectMapper.readTree(responseBody);
+            var jsonNode = jsonMapper.readTree(responseBody);
             assertTrue(jsonNode.isArray(), "is not an array");
 
             System.out.println("Dictionaries response status code: " + statusCode);
