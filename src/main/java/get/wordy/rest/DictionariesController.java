@@ -28,12 +28,12 @@ public class DictionariesController {
 
     @RequestMapping(value = "/dictionaries", method = RequestMethod.GET)
     public ResponseEntity<List<Dictionary>> getUserDictionaries(Principal user) {
-        log.info("Getting dictionary list for the user {}", user.getName());
+        log.info("Getting dictionary list for the user = {}", user.getName());
 
         List<Dictionary> dictionaries = dictionaryService.getDictionaries();
 
         if (dictionaries.isEmpty()) {
-            log.info("No dictionaries found for the user {}.", user.getName());
+            log.info("No dictionaries found for the user = {}", user.getName());
             return new ResponseEntity<>(Collections.emptyList(), HttpStatus.OK);
         }
         return new ResponseEntity<>(dictionaries, HttpStatus.OK);

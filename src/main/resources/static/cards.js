@@ -38,7 +38,7 @@ function displayCards(responseJson) {
     content.innerHTML = "";
     // show table div
     showPanel('all-cards-panel');
-    let items = responseJson; // array is expected here
+    let items = responseJson; // array is expected
     // create a table of cards
     let table = document.createElement('table');
     table.className = 'table';
@@ -68,15 +68,15 @@ function appendHeaderRow(headerRow, items) {
 }
 
 function appendRow(tableRow, cardElement) {
-    let w = cardElement.word;
-    let word = w.value;
-    let partOfSpeech = w.partOfSpeech;
-    let transcription = w.transcription;
-    let meaning = w.meaning;
+    let wordElement = cardElement.word;
+    let word = wordElement.value;
+    let partOfSpeech = wordElement.partOfSpeech;
+    let transcription = wordElement.transcription;
+    let meaning = wordElement.meaning;
     let status = cardElement.status;
     let score = cardElement.score;
-    let contexts = cardElement.contexts;
-    let collocations = cardElement.collocations;
+    let contexts = cardElement.contexts; // arr is expected
+    let collocations = cardElement.collocations; // arr is expected
 
     tableRow.addEventListener("click", function () {
         loadDetails(cardElement);
@@ -105,7 +105,7 @@ function appendListCell(row, items) {
     let ul = document.createElement("ul");
     ul.className = 'list-unstyled';
     for (let i = 0; i < items.length; i++) {
-        appendListElement(ul, items[i].example)
+        appendListElement(ul, items[i])
     }
     cell.appendChild(ul);
     row.appendChild(cell);
