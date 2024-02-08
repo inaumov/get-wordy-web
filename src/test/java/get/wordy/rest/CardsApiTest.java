@@ -27,16 +27,10 @@ class CardsApiTest {
     }
 
     @Test
-    public void getCardsByDictionaryIdRequestUsingHttpClient() throws URISyntaxException, IOException, InterruptedException {
+    public void getCardsByDictionaryId() throws URISyntaxException, IOException, InterruptedException {
         try (HttpClient httpClient = HttpClient.newBuilder()
-                .authenticator(new Authenticator() {
-                    @Override
-                    protected PasswordAuthentication getPasswordAuthentication() {
-                        return new PasswordAuthentication(
-                                "admin",
-                                "admin".toCharArray());
-                    }
-                }).build()
+                .authenticator(getAdmin())
+                .build()
         ) {
             HttpRequest httpRequest = HttpRequest.newBuilder()
                     .uri(new URI("http://localhost:8080/GetWordyApp/api/v1/dictionaries/1/cards"))
@@ -57,6 +51,44 @@ class CardsApiTest {
             System.out.println("Dictionaries response headers: " + httpResponse.headers());
             System.out.println("Dictionaries response body: \n" + responseBody);
         }
+    }
+
+    @Test
+    public void getCardsForExerciseByDictionaryId() throws URISyntaxException, IOException, InterruptedException {
+        try (HttpClient httpClient = HttpClient.newBuilder()
+                .authenticator(getAdmin())
+                .build()
+        ) {
+            HttpRequest httpRequest = HttpRequest.newBuilder()
+                    .uri(new URI("http://localhost:8080/GetWordyApp/api/v1/dictionaries/1/exercise?limit=1"))
+                    .build();
+
+            HttpResponse<String> httpResponse = httpClient.send(httpRequest, HttpResponse.BodyHandlers.ofString());
+
+            int statusCode = httpResponse.statusCode();
+            String responseBody = httpResponse.body();
+
+            // all minimal checks
+
+            assertEquals(200, statusCode);
+
+            var jsonNode = jsonMapper.readTree(responseBody);
+            assertTrue(jsonNode.isArray(), "is not an array");
+            System.out.println("Dictionaries response status code: " + statusCode);
+            System.out.println("Dictionaries response headers: " + httpResponse.headers());
+            System.out.println("Dictionaries response body: \n" + responseBody);
+        }
+    }
+
+    private static Authenticator getAdmin() {
+        return new Authenticator() {
+            @Override
+            protected PasswordAuthentication getPasswordAuthentication() {
+                return new PasswordAuthentication(
+                        "admin",
+                        "admin".toCharArray());
+            }
+        };
     }
 
 }

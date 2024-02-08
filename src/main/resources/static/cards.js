@@ -325,7 +325,9 @@ function printFiboNumbers() {
         btn.style.marginLeft = "2px";
         btn.style.marginRight = "2px";
         btn.onclick = function () {
-            alert('Test Fibonacci Buttons: ' + fiboNumbers[i].toString());
+            let limit = fiboNumbers[i];
+            let dictionaryId = getQueryVariable('dictionaryId');
+            printCardsForExercise(limit, dictionaryId);
         }
         btnGrpDiv.appendChild(btn);
     }
@@ -367,9 +369,27 @@ function rollDice() {
     playAgain.appendChild(btn);
     btn.type = "button";
     btn.className = "btn btn-outline-info";
-    btn.innerHTML = "Play again";
+    btn.innerHTML = "Print cards";
     btn.onclick = function () {
-        rollDice();
+        let limit = die1 + die2;
+        let dictionaryId = getQueryVariable('dictionaryId');
+        printCardsForExercise(limit, dictionaryId);
     }
     playGamePanel.appendChild(playAgain);
+}
+
+function printCardsForExercise(limit, dictionaryId) {
+    let reqHeader = new Headers();
+    reqHeader.append('Content-Type', 'text/json');
+
+    let initObject = {
+        method: 'GET', headers: reqHeader,
+    };
+
+    let cardsRequest = new Request(cardsAPI + "/" + dictionaryId + "/exercise?limit=" + limit, initObject);
+
+    fetch(cardsRequest)
+        .then(response => response.json())
+        .then(data => alert("Words: " + data.map(card => card.word.value)))
+        .catch(err => console.log("HTTP error: ", err));
 }
