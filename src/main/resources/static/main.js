@@ -24,7 +24,7 @@ function displayDictionaries(responseJson) {
     content.innerHTML = "";
     let items = responseJson; // array is expected here
     for (let i = 0; i < items.length; i++) {
-        let dicId = items[i].id;
+        let dictionaryId = items[i].dictionaryId;
         let caption = items[i].name;
         let cardsTotal = items[i].cardsTotal;
         let logo = items[i].picture;
@@ -37,7 +37,7 @@ function displayDictionaries(responseJson) {
         cardElement.width = '18rem';
 
         appendLogo(cardElement, logo);
-        appendCaption(cardElement, dicId, caption, cardsTotal);
+        appendCaption(cardElement, dictionaryId, caption, cardsTotal);
         content.appendChild(cardElement);
     }
 }
@@ -50,7 +50,7 @@ function appendLogo(card, link) {
     card.appendChild(img);
 }
 
-function appendCaption(card, dicId, caption, cardsTotal) {
+function appendCaption(card, dictionaryId, caption, cardsTotal) {
     let cardBody = document.createElement("div");
     cardBody.className = 'card-body';
 
@@ -62,7 +62,7 @@ function appendCaption(card, dicId, caption, cardsTotal) {
     let a = document.createElement("a");
     a.className = 'btn btn-primary';
     a.target = '_blank';
-    a.setAttribute('href', '/GetWordyApp/cards.html?dictionaryId=' + encodeURIComponent(dicId) + '&dictionaryName=' + encodeURIComponent(caption));
+    a.setAttribute('href', '/GetWordyApp/cards.html?dictionaryId=' + encodeURIComponent(dictionaryId) + '&dictionaryName=' + encodeURIComponent(caption));
     a.innerHTML = cardsTotal;
 
     cardBody.appendChild(header);
