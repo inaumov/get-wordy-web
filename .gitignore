@@ -45,3 +45,7 @@ log
 
 # Docker env vars #
 .env
+
+# spring boot properties #
+*-local.properties
+*-dev.properties
