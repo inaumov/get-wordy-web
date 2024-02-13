@@ -1,8 +1,28 @@
 const cardsAPI = "api/v1/dictionaries";
 
-addEventListener('load', loadCards, false);
+const app = Vue.createApp({
+    data() {
+        return {
+            cards: []
+        }
+    },
+    methods: {
+        async getData() {
+            const response = await fetchCards();
+            this.cards = await response.json();
+        }
+    },
+    created() {
+        this.getData()
+    }
+});
+app.mount('#all-cards-panel');
 
 function loadCards() {
+    showPanel('all-cards-panel'); // temporarily
+}
+
+function fetchCards() {
     let caption = getQueryVariable('dictionaryName');
     let dictionaryId = getQueryVariable('dictionaryId');
     if (!caption) {
@@ -19,9 +39,7 @@ function loadCards() {
 
     let cardsRequest = new Request(cardsAPI + "/" + dictionaryId + "/cards", initObject);
 
-    fetch(cardsRequest)
-        .then(response => response.json())
-        .then(data => displayCards(data))
+    return fetch(cardsRequest)
         .catch(err => console.log("HTTP error: ", err));
 }
 
@@ -32,97 +50,12 @@ function displayCards(responseJson) {
     hidePanel('generate-cards-panel');
     hidePanel('add-card-panel');
     hidePanel('custom-alert-panel');
-
-    // clear the previous content
-    let content = document.getElementById('all-cards-panel');
-    content.innerHTML = "";
-    // show table div
-    showPanel('all-cards-panel');
-    let items = responseJson; // array is expected
-    // create a table of cards
-    let table = document.createElement('table');
-    table.className = 'table';
-    let header = document.createElement('thead');
-    let body = document.createElement('tbody');
-    let headerRow = document.createElement('tr');
-    header.appendChild(headerRow);
-    const headers = ["Word", "Transcription", "Meaning", "Status", "Score", "Context", "Collocations"];
-    appendHeaderRow(headerRow, headers);
-    table.appendChild(header);
-    table.appendChild(body);
-
-    for (let i = 0; i < items.length; i++) {
-        let tableRow = document.createElement("tr");
-        appendRow(tableRow, items[i]);
-        body.appendChild(tableRow);
-    }
-    content.appendChild(table);
-}
-
-function appendHeaderRow(headerRow, items) {
-    for (let i = 0; i < items.length; i++) {
-        let columnName = document.createElement('th');
-        columnName.appendChild(document.createTextNode(items[i]));
-        headerRow.appendChild(columnName);
-    }
 }
 
 function appendRow(tableRow, cardElement) {
-    let wordElement = cardElement.word;
-    let word = wordElement.value;
-    let partOfSpeech = wordElement.partOfSpeech;
-    let transcription = wordElement.transcription;
-    let meaning = wordElement.meaning;
-    let status = cardElement.status;
-    let score = cardElement.score;
-    let contexts = cardElement.contexts; // arr is expected
-    let collocations = cardElement.collocations; // arr is expected
-
     tableRow.addEventListener("click", function () {
         loadDetails(cardElement);
     }, false);
-    appendTextCell(tableRow, word + " (" + partOfSpeech + ")");
-    appendTextCell(tableRow, fixNullValue(transcription));
-    appendTextCell(tableRow, meaning);
-    appendTextCell(tableRow, status);
-    appendTextCell(tableRow, score);
-    appendListCell(tableRow, contexts);
-    appendListCell(tableRow, collocations);
-}
-
-function appendTextCell(row, textValue) {
-    let cell = document.createElement("td");
-    cell.appendChild(document.createTextNode(textValue));
-    row.appendChild(cell);
-}
-
-function appendListCell(row, items) {
-    let cell = document.createElement("td");
-    if (!items) {
-        row.appendChild(cell);
-        return;
-    }
-    let ul = document.createElement("ul");
-    ul.className = 'list-unstyled';
-    for (let i = 0; i < items.length; i++) {
-        appendListElement(ul, items[i])
-    }
-    cell.appendChild(ul);
-    row.appendChild(cell);
-}
-
-function appendListElement(list, element) {
-    let e = document.createElement("li");
-    let textNode = document.createTextNode(element);
-    e.appendChild(textNode);
-    list.appendChild(e);
-}
-
-function fixNullValue(textValue) {
-    if (!textValue) {
-        return "";
-    }
-    return textValue;
 }
 
 function loadDetails(card) {
@@ -138,7 +71,7 @@ function loadDetails(card) {
 
     fetch(cardRequest)
         .then(response => response.json())
-        .then(data => displayCards(data))
+        .then(data => showCard(data))
         .catch(err => console.log("HTTP error: ", err));
 }
 
@@ -155,6 +88,8 @@ function showCard(cardElement) {
     let score = cardElement.score;
     let contexts = cardElement.contexts;
     let collocations = cardElement.collocations;
+
+    console.log(cardElement);
 }
 
 function play() {
