@@ -1,6 +1,6 @@
 const cardsAPI = "api/v1/dictionaries";
 
-const app = Vue.createApp({
+const allCardsApp = Vue.createApp({
     data() {
         return {
             cards: []
@@ -16,7 +16,22 @@ const app = Vue.createApp({
         this.getData()
     }
 });
-app.mount('#all-cards-panel');
+allCardsApp.mount('#all-cards-panel');
+
+const generateCardsApp = Vue.createApp({
+    data() {
+        return {
+            formData: {
+                words: [],
+            },
+        }
+    },
+    methods: {
+        post_words_form : postGenerateCards
+    }
+});
+
+generateCardsApp.mount('#generate-cards-panel');
 
 function loadCards() {
     showPanel('all-cards-panel'); // temporarily
@@ -170,10 +185,9 @@ function customAlert(flag) {
     }
 }
 
-function postWordsForm() {
-    let form = document.getElementById('generate-cards-form');
-    let formData = new FormData(form);
-    const valuesArr = formData.get('words').split('\n');
+function postGenerateCards() {
+    let words = this.formData.words;
+    const valuesArr = words.split('\n');
 
     let reqHeader = new Headers();
     reqHeader.append('Content-Type', 'application/json');

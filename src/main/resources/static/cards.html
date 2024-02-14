@@ -91,10 +91,10 @@
     </div>
     <div class="container p-4" id="generate-cards-panel" style="display:none">
         <p class="mb-3">This page is designed to auto generate cards per each inputted word</p>
-        <form action="" id="generate-cards-form" onsubmit="postWordsForm();return false;">
+        <form action="" id="generate-cards-form" v-on:submit.prevent="post_words_form">
             <div class="mb-3">
                 <label for="text" class="form-label">Input your words:</label>
-                <textarea class="form-control" rows="5" id="text" name="words"></textarea>
+                <textarea class="form-control" rows="5" id="text" name="words" v-model.lazy="formData.words"></textarea>
             </div>
             <button type="submit" class="btn btn-primary">Submit</button>
         </form>
