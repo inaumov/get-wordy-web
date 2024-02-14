@@ -36,16 +36,16 @@
     <div class="container" id="action-buttons">
         <div class="row p-5 text-center">
             <div class="col-sm-12">
-                <a href="#" class="btn btn-default btn-lg" onclick="loadCards();return false;">
+                <a href="#" class="btn btn-default btn-lg" onclick="renderCardsPanel();return false;">
                     <i class="bi bi-card-list"></i> All cards
                 </a>
-                <a href="#" class="btn btn-default btn-lg" onclick="play();return false;">
+                <a href="#" class="btn btn-default btn-lg" onclick="renderPlayPanel();return false;">
                     <i class="bi bi-emoji-smile-upside-down"></i> Try game
                 </a>
-                <a href="#" class="btn btn-default btn-lg" onclick="generate();return false;">
+                <a href="#" class="btn btn-default btn-lg" onclick="renderGeneratePanel();return false;">
                     <i class="bi bi-bricks"></i> Generate
                 </a>
-                <a href="#" class="btn btn-default btn-lg" onclick="addCard();return false;">
+                <a href="#" class="btn btn-default btn-lg" onclick="renderAddCardPanel();return false;">
                     <i class="bi bi-plus-circle-dotted"></i> Add manually
                 </a>
             </div>
@@ -117,26 +117,18 @@
     </div>
     <div class="container p-4" id="add-card-panel" style="display:none">
         <p class="mb-3">This page is designed to add a card manually</p>
-        <form action="" id="add-card-form" onsubmit="postCardForm();return false;">
+        <form action="" id="add-card-form" v-on:submit.prevent="post_card_form">
             <div class="row mb-3">
                 <div class="col">
                     <label for="word" class="form-label">Word:</label>
-                    <input type="text" class="form-control" placeholder="Enter word" name="word" id="word">
+                    <input type="text" class="form-control" placeholder="Enter word" name="word" id="word" v-model.lazy="formData.word">
                 </div>
                 <div class="col">
                     <label for="radioGrp" class="form-label">Part of speech:</label>
                     <div id="radioGrp">
-                        <div class="form-check">
-                            <input type="radio" class="form-check-input" id="radio1" name="pos_radio" value="noun">
-                            <label class="form-check-label" for="radio1">noun</label>
-                        </div>
-                        <div class="form-check">
-                            <input type="radio" class="form-check-input" id="radio2" name="pos_radios" value="verb">
-                            <label class="form-check-label" for="radio2">verb</label>
-                        </div>
-                        <div class="form-check">
-                            <input type="radio" class="form-check-input" id="radio3" name="pos_radios" value="adjective">
-                            <label class="form-check-label" for="radio3">adjective</label>
+                        <div class="form-check" v-for="part in parts">
+                            <input type="radio" class="form-check-input" v-model="formData.partOfSpeech" v-bind:value="part" v-bind:id="part">
+                            <label class="form-check-label" v-bind:for="part">{{part}}</label>
                         </div>
                     </div>
                 </div>
@@ -144,31 +136,28 @@
             <div class="row mb-3">
                 <div class="col">
                     <label for="transcription" class="form-label">Transcription:</label>
-                    <input type="text" class="form-control" placeholder="Enter transcription" name="transcription"
-                           id="transcription">
+                    <input type="text" class="form-control" placeholder="Enter transcription" name="transcription" id="transcription" v-model.lazy="formData.transcription">
                 </div>
             </div>
             <div class="row mb-3">
                 <div class="col">
                     <label for="meaning" class="form-label">Meaning:</label>
-                    <input type="text" class="form-control" placeholder="Enter meaning" name="meaning" id="meaning">
+                    <input type="text" class="form-control" placeholder="Enter meaning" name="meaning" id="meaning" v-model.lazy="formData.meaning">
                 </div>
             </div>
             <div class="row mb-3">
                 <div class="col">
-                    <label for="context" class="form-label">Input your example(s) line by line:</label>
-                    <textarea class="form-control" rows="3" id="context" name="context"
-                              placeholder="Enter examples"></textarea>
+                    <label for="contexts" class="form-label">Input your example(s) line by line:</label>
+                    <textarea class="form-control" rows="3" id="contexts" name="contexts" placeholder="Enter examples" v-model.lazy="formData.contexts"></textarea>
                 </div>
             </div>
             <div class="row mb-3">
                 <div class="col">
                     <label for="collocations" class="form-label">Input your collocation(s) line by line:</label>
-                    <textarea class="form-control" rows="3" id="collocations" name="collocations"
-                              placeholder="Enter collocations"></textarea>
+                    <textarea class="form-control" rows="3" id="collocations" name="collocations" placeholder="Enter collocations" v-model.lazy="formData.collocations"></textarea>
                 </div>
             </div>
-            <button type="submit" class="btn btn-primary mb-5" onclick="">Submit</button>
+            <button type="submit" class="btn btn-primary mb-5">Submit</button>
         </form>
     </div>
     <div class="container p-4" id="custom-alert-panel" style="display:none">

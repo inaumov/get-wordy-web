@@ -22,7 +22,7 @@ const generateCardsApp = Vue.createApp({
     data() {
         return {
             formData: {
-                words: [],
+                words: null,
             },
         }
     },
@@ -30,10 +30,29 @@ const generateCardsApp = Vue.createApp({
         post_words_form : postGenerateCards
     }
 });
-
 generateCardsApp.mount('#generate-cards-panel');
 
-function loadCards() {
+const addCardApp = Vue.createApp({
+    data() {
+        return {
+            parts: ["noun", "pronoun", "verb", "adjective", "adverb", "phrasal verb"],
+            formData: {
+                word: null,
+                partOfSpeech: null,
+                transcription: null,
+                meaning: null,
+                contexts: null,
+                collocations: null
+            },
+        }
+    },
+    methods: {
+        post_card_form : postCardForm
+    }
+});
+addCardApp.mount('#add-card-panel');
+
+function renderCardsPanel() {
     showPanel('all-cards-panel'); // temporarily
 }
 
@@ -107,7 +126,7 @@ function showCard(cardElement) {
     console.log(cardElement);
 }
 
-function play() {
+function renderPlayPanel() {
     // hide other tabs
     hidePanel('all-cards-panel');
     hidePanel('generate-cards-panel');
@@ -119,7 +138,7 @@ function play() {
     showPanel('play-game-panel');
 }
 
-function generate() {
+function renderGeneratePanel() {
     // hide other tabs
     hidePanel('all-cards-panel');
     hidePanel('play-game-panel');
@@ -130,7 +149,7 @@ function generate() {
     showPanel('generate-cards-panel');
 }
 
-function addCard() {
+function renderAddCardPanel() {
     // clear the previous content
     hidePanel('all-cards-panel');
     hidePanel('play-game-panel');
@@ -140,31 +159,6 @@ function addCard() {
     hidePanel('custom-alert-panel');
     // show form
     showPanel("add-card-panel");
-
-    let radioGrp = document.getElementById('radioGrp');
-    radioGrp.innerHTML = "";
-
-    const partOfSpeechArr = ["noun", "pronoun", "verb", "adjective", "adverb", "phrasal verb"];
-    for (let i = 0; i < partOfSpeechArr.length; i++) {
-        let div = document.createElement("div");
-        div.className = "form-check";
-        let partOfSpeech = partOfSpeechArr[i];
-        let inputId = "radio" + i;
-        let input = document.createElement("input");
-        input.type = "radio";
-        input.className = "form-check-input";
-        input.id = inputId;
-        input.name = "pos_radios";
-        input.value = partOfSpeech;
-        let label = document.createElement("label");
-        label.innerHTML = partOfSpeech;
-        label.className = "form-check-label";
-        label.setAttribute("for", inputId)
-        div.appendChild(input);
-        div.appendChild(label);
-        radioGrp.appendChild(div);
-    }
-
 }
 
 function showPanel(panelId) {
@@ -187,7 +181,7 @@ function customAlert(flag) {
 
 function postGenerateCards() {
     let words = this.formData.words;
-    const valuesArr = words.split('\n');
+    const valuesArr = !words ? [] : words.split('\n');
 
     let reqHeader = new Headers();
     reqHeader.append('Content-Type', 'application/json');
@@ -212,27 +206,29 @@ function postGenerateCards() {
 
 function postCardForm() {
     let dictionaryId = getQueryVariable('dictionaryId');
-    let form = document.getElementById('add-card-form');
-    let formData = new FormData(form);
-    const word = formData.get('word');
-    const meaning = formData.get('meaning');
-    const transcription = formData.get('transcription');
-    const pos = formData.get('pos_radios');
-    const contextArr = formData.get('context').split('\n');
-    const collocationArr = formData.get('collocations').split('\n');
+
+    let word = this.formData.word;
+    let partOfSpeech = this.formData.partOfSpeech;
+    let transcription = this.formData.transcription;
+    let meaning = this.formData.meaning;
+    let contexts = this.formData.contexts;
+    let collocations = this.formData.collocations;
+
+    const contextArr = !contexts ? [] : contexts.split('\n');
+    const collocationArr = !collocations ? [] : collocations.split('\n');
 
     let reqHeader = new Headers();
     reqHeader.append('Content-Type', 'application/json');
 
-    let wordRequest = {
+    let wordObj = {
         value: word,
-        partOfSpeech: pos,
+        partOfSpeech: partOfSpeech,
         transcription: transcription,
         meaning: meaning
     };
 
     let cardRequest = {
-        word: wordRequest,
+        word: wordObj,
         contexts: contextArr,
         collocations: collocationArr
     };
