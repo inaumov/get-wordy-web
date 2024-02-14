@@ -35,7 +35,7 @@
 <main>
     <div class="container" id="action-buttons">
         <div class="row p-5 text-center">
-            <div class="col-sm-12">
+            <div class="col-12">
                 <a href="#" class="btn btn-default btn-lg" onclick="renderCardsPanel();return false;">
                     <i class="bi bi-card-list"></i> All cards
                 </a>
@@ -89,20 +89,23 @@
             </tbody>
         </table>
     </div>
-    <div class="container p-4" id="generate-cards-panel" style="display:none">
-        <p class="mb-3">This page is designed to auto generate cards per each inputted word</p>
-        <form action="" id="generate-cards-form" v-on:submit.prevent="post_words_form">
-            <div class="mb-3">
-                <label for="text" class="form-label">Input your words:</label>
-                <textarea class="form-control" rows="5" id="text" name="words" v-model.lazy="formData.words"></textarea>
+    <div class="container" id="generate-cards-panel" style="display:none">
+        <div class="row justify-content-center pb-5">
+            <div class="col-8 bg-light p-5 border rounded">
+                <form action="" id="generate-cards-form" v-on:submit.prevent="post_words_form">
+                    <div class="mb-3">
+                        <label for="text" class="form-label">Input new words to generate cards:</label>
+                        <textarea class="form-control" rows="5" id="text" name="words" v-model.lazy="formData.words"></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Submit</button>
+                </form>
             </div>
-            <button type="submit" class="btn btn-primary">Submit</button>
-        </form>
+        </div>
     </div>
-    <div class="container p-4 text-center" id="play-game-panel" style="display:none">
+    <div class="container text-center" id="play-game-panel" style="display:none">
         <p class="mb-3">You wanna play? let's play</p>
-        <div class="d-flex align-items-center">
-            <div class="col-sm-12">
+        <div class="d-flex align-items-center pb-5">
+            <div class="col">
                 <a href="#" class="btn btn-default btn-lg" onclick="printFiboNumbers();return false;">
                     <i class="bi bi-123"></i> Fibonacci Series
                 </a>
@@ -115,12 +118,13 @@
     <div class="container p-4 text-center" id="play-game-panel-inner" style="display:none">
         to be replaced
     </div>
-    <div class="container p-4" id="add-card-panel" style="display:none">
-        <p class="mb-3">This page is designed to add a card manually</p>
+    <div class="container" id="add-card-panel" style="display:none">
+        <div class="row justify-content-center pb-5">
+        <div class="col-8 bg-light p-5 border rounded">
         <form action="" id="add-card-form" v-on:submit.prevent="post_card_form">
             <div class="row mb-3">
                 <div class="col">
-                    <label for="word" class="form-label">Word:</label>
+                    <label for="word" class="form-label">New word:</label>
                     <input type="text" class="form-control" placeholder="Enter word" name="word" id="word" v-model.lazy="formData.word">
                 </div>
                 <div class="col">
@@ -148,17 +152,19 @@
             <div class="row mb-3">
                 <div class="col">
                     <label for="contexts" class="form-label">Input your example(s) line by line:</label>
-                    <textarea class="form-control" rows="3" id="contexts" name="contexts" placeholder="Enter examples" v-model.lazy="formData.contexts"></textarea>
+                    <textarea class="form-control" rows="5" id="contexts" name="contexts" placeholder="Enter examples" v-model.lazy="formData.contexts"></textarea>
                 </div>
             </div>
             <div class="row mb-3">
                 <div class="col">
                     <label for="collocations" class="form-label">Input your collocation(s) line by line:</label>
-                    <textarea class="form-control" rows="3" id="collocations" name="collocations" placeholder="Enter collocations" v-model.lazy="formData.collocations"></textarea>
+                    <textarea class="form-control" rows="5" id="collocations" name="collocations" placeholder="Enter collocations" v-model.lazy="formData.collocations"></textarea>
                 </div>
             </div>
-            <button type="submit" class="btn btn-primary mb-5">Submit</button>
+            <button type="submit" class="btn btn-primary">Submit</button>
         </form>
+        </div>
+        </div>
     </div>
     <div class="container p-4" id="custom-alert-panel" style="display:none">
         <div class="alert alert-success" role="alert">

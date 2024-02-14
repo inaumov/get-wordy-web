@@ -53,6 +53,12 @@ const addCardApp = Vue.createApp({
 addCardApp.mount('#add-card-panel');
 
 function renderCardsPanel() {
+    hidePanel('generate-cards-panel');
+    hidePanel('add-card-panel');
+    hidePanel('custom-alert-panel');
+    hidePanel('play-game-panel-inner');
+    hidePanel('play-game-panel');
+    // show form
     showPanel('all-cards-panel'); // temporarily
 }
 
