@@ -22,7 +22,7 @@ const generateCardsApp = Vue.createApp({
     data() {
         return {
             formData: {
-                words: null,
+                words: [],
             },
         }
     },
@@ -37,12 +37,12 @@ const addCardApp = Vue.createApp({
         return {
             parts: ["noun", "pronoun", "verb", "adjective", "adverb", "phrasal verb"],
             formData: {
-                word: null,
-                partOfSpeech: null,
-                transcription: null,
-                meaning: null,
-                contexts: null,
-                collocations: null
+                word: '',
+                partOfSpeech: '',
+                transcription: '',
+                meaning: '',
+                contexts: [],
+                collocations: []
             },
         }
     },
