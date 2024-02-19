@@ -21,6 +21,7 @@
 # Logs #
 ########
 *.log
+logs
 
 # Eclipse project #
 ###################
@@ -49,3 +50,19 @@ log
 # spring boot properties #
 *-local.properties
 *-dev.properties
+
+# Logs (static content package tool specific)
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+node_modules
+.DS_Store
+dist
+dist-ssr
+coverage
+*.local
+
+# VS code project #
+.vscode/*
+!.vscode/extensions.json

@@ -1,0 +1,8 @@
+{
+  "compilerOptions": {
+    "paths": {
+      "@/*": ["./static/*"]
+    }
+  },
+  "exclude": ["node_modules", "dist"]
+}
