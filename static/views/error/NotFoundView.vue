@@ -1,3 +1,14 @@
+<script>
+import {applyCaption} from '@/js/utils.js'
+
+export default {
+  mounted() {
+    applyCaption('Not found')
+    console.log('Unknown route')
+  }
+}
+</script>
+
 <template>
   <div class="pt-5 align-items-center justify-content-center">
     <div class="text-center">
