@@ -2,13 +2,14 @@
 import ActionButtons from "@/components/cards/ActionButtons.vue";
 import CardsTable from "@/components/cards/CardsTable.vue";
 
+import {applyCaption} from '@/js/utils.js'
 import {fetchCards} from '@/assets/cards.js';
 
 export default {
   components: {ActionButtons, CardsTable},
+  props: ['dictionaryId', 'dictionaryName'],
   data() {
     return {
-      dictionaryId: this.$route.params.dictionaryId,
       cards: [],
     }
   },
@@ -20,6 +21,8 @@ export default {
   },
   mounted() {
     this.getData()
+    applyCaption(this.dictionaryName)
+    console.log("Selected dictionary: id = ", this.dictionaryId, ", name = ", this.dictionaryName)
   }
 };
 

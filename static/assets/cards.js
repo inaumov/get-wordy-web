@@ -1,11 +1,11 @@
 const cardsAPI = "api/v1/dictionaries";
 
 export function fetchCards(dictionaryId) {
-    let reqHeader = new Headers();
-    reqHeader.append('Content-Type', 'application/json');
+    let headers = new Headers();
+    headers.append('Content-Type', 'application/json');
 
     let initObject = {
-        method: 'GET', headers: reqHeader,
+        method: 'GET', headers: headers,
     };
 
     let cardsRequest = new Request(cardsAPI + "/" + dictionaryId + "/cards", initObject);
@@ -15,11 +15,11 @@ export function fetchCards(dictionaryId) {
 }
 
 export function fetchCard(dictionaryId, cardId) {
-    let reqHeader = new Headers();
-    reqHeader.append('Content-Type', 'application/json');
+    let headers = new Headers();
+    headers.append('Content-Type', 'application/json');
 
     let initObject = {
-        method: 'GET', headers: reqHeader,
+        method: 'GET', headers: headers,
     };
 
     let cardRequest = new Request(cardsAPI + "/" + dictionaryId + "/cards/" + cardId, initObject);
@@ -49,12 +49,12 @@ export function generateCards(dictionaryId, textData) {
     let words = textData.words;
     const valuesArr = !words ? [] : words.split('\n');
 
-    let reqHeader = new Headers();
-    reqHeader.append('Content-Type', 'application/json');
+    let headers = new Headers();
+    headers.append('Content-Type', 'application/json');
 
     let initObject = {
         method: 'POST',
-        headers: reqHeader,
+        headers: headers,
         body: JSON.stringify(valuesArr),
     };
     let generateRequest = new Request(cardsAPI + "/" + dictionaryId + "/generate", initObject);
@@ -73,8 +73,8 @@ export function createCard(dictionaryId, cardData) {
     const contextArr = !contexts ? [] : contexts.split('\n');
     const collocationArr = !collocations ? [] : collocations.split('\n');
 
-    let reqHeader = new Headers();
-    reqHeader.append('Content-Type', 'application/json');
+    let headers = new Headers();
+    headers.append('Content-Type', 'application/json');
 
     let wordObj = {
         value: word,
@@ -91,7 +91,7 @@ export function createCard(dictionaryId, cardData) {
 
     let initObject = {
         method: 'POST',
-        headers: reqHeader,
+        headers: headers,
         body: JSON.stringify(cardRequest),
     };
 
@@ -163,11 +163,11 @@ export function rollDice(dictionaryId) {
 }
 
 export function fetchCardsForExercise(dictionaryId, limit) {
-    let reqHeader = new Headers();
-    reqHeader.append('Content-Type', 'application/json');
+    let headers = new Headers();
+    headers.append('Content-Type', 'application/json');
 
     let initObject = {
-        method: 'GET', headers: reqHeader,
+        method: 'GET', headers: headers,
     };
 
     let cardsRequest = new Request(cardsAPI + "/" + dictionaryId + "/exercise?limit=" + limit, initObject);

@@ -1,5 +1,6 @@
 <script>
 import {fetchDictionaries} from '@/assets/dictionaries.js';
+import {applyCaption} from '@/js/utils.js'
 
 export default {
   data() {
@@ -12,7 +13,6 @@ export default {
           cardsTotal: ''
         }
       ],
-      build_link: buildLink
     }
   },
   methods: {
@@ -23,15 +23,9 @@ export default {
   },
   mounted() {
     this.getData()
+    applyCaption('My dictionaries')
   }
 };
-
-function buildLink(dictionary) {
-  let id = dictionary.dictionaryId;
-  let name = encodeURIComponent(dictionary.name);
-  return '/cards?dictionaryId=' + id + '&dictionaryName=' + name;
-}
-
 </script>
 
 <template>
@@ -40,7 +34,10 @@ function buildLink(dictionary) {
       <img v-bind:src="dictionary.picture" class="card-img-top mx-auto d-block" v-bind:alt="dictionary.name">
       <div class="card-body">
         <h5 class="card-title">{{ dictionary.name }}</h5>
-        <a v-bind:href="build_link(dictionary)" target="_self" class="btn btn-primary">{{ dictionary.cardsTotal }}</a>
+        <router-link class="btn btn-primary"
+                     :to="{ name: 'all-cards', params: { dictionaryId : dictionary.dictionaryId}, query: { dictionaryName: dictionary.name }}">
+          {{ dictionary.cardsTotal }}
+        </router-link>
       </div>
     </div>
   </div>

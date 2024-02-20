@@ -43,10 +43,16 @@ export default {
       </tbody>
     </table>
   </div>
-  <div v-else class="d-flex justify-content-center p-5">
-    <a href="#" class="btn btn-default btn-lg float-end" target="_self">
-      <i class="bi bi-journal-plus"></i> Create dictionary
-    </a>
+  <div v-else class="d-flex justify-content-center pt-5">
+    <div class="text-center">
+      <p class="fs-4">Create your first dictionary</p>
+      <p class="lead">
+        Dictionaries are an isolated space for grouping cards and tracking your progress
+      </p>
+      <a href="#" class="btn btn-default btn-lg mt-4" target="_self">
+        <i class="bi bi-plus-square"></i> Add dictionary
+      </a>
+    </div>
   </div>
 </template>
 

@@ -17,7 +17,12 @@ const router = createRouter({
             // this generates a separate chunk (Settings.[hash].js) for this route
             // which is lazy-loaded when the route is visited.
             component: () => import('@/views/CardsView.vue'),
-            props: true
+            props: (route) => (
+                {
+                    dictionaryId: route.params.dictionaryId,
+                    dictionaryName: route.query.dictionaryName
+                }
+            ),
         },
         {
             path: '/Dictionaries/:dictionaryId/PlayGame',

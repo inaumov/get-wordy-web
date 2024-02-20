@@ -5,10 +5,10 @@ import {createCard} from '@/assets/cards.js';
 
 export default {
   components: {ActionButtons},
+  props: ['dictionaryId'],
   data() {
     return {
       parts: ["noun", "pronoun", "verb", "adjective", "adverb", "phrasal verb"],
-      dictionaryId: this.$route.params.dictionaryId,
       formData: {
         word: '',
         partOfSpeech: '',
