@@ -1,7 +1,7 @@
 <script>
 import ActionButtons from "@/components/cards/ActionButtons.vue";
 
-import {createCard} from '@/assets/cards.js';
+import {createCard} from '@/js/cards.js';
 
 export default {
   components: {ActionButtons},

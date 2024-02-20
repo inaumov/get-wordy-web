@@ -3,7 +3,7 @@ import ActionButtons from "@/components/cards/ActionButtons.vue";
 import CardsTable from "@/components/cards/CardsTable.vue";
 
 import {applyCaption} from '@/js/utils.js'
-import {fetchCards} from '@/assets/cards.js';
+import {fetchCards} from '@/js/cards.js';
 
 export default {
   components: {ActionButtons, CardsTable},

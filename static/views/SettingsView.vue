@@ -1,5 +1,5 @@
 <script>
-import {fetchDictionaries} from '@/assets/dictionaries.js';
+import {fetchDictionaries} from '@/js/dictionaries.js';
 
 export default {
   data() {

@@ -1,12 +1,12 @@
 <script>
 import ActionButtons from "@/components/cards/ActionButtons.vue";
-import {rollDice} from "@/assets/cards.js";
+import {rollDice} from "@/js/cards.js";
 
 export default {
   components: {ActionButtons},
+  props: ['dictionaryId'],
   data() {
     return {
-      dictionaryId: this.$route.params.dictionaryId,
       cards: []
     }
   },

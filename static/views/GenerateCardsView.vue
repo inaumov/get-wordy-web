@@ -1,13 +1,13 @@
 <script>
 import ActionButtons from "@/components/cards/ActionButtons.vue";
 
-import {generateCards} from '@/assets/cards.js';
+import {generateCards} from '@/js/cards.js';
 
 export default {
   components: {ActionButtons},
+  props: ['dictionaryId'],
   data() {
     return {
-      dictionaryId: this.$route.params.dictionaryId,
       formData: {
         words: [],
       },

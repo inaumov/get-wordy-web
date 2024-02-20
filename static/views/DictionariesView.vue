@@ -1,5 +1,5 @@
 <script>
-import {fetchDictionaries} from '@/assets/dictionaries.js';
+import {fetchDictionaries} from '@/js/dictionaries.js';
 import {applyCaption} from '@/js/utils.js'
 
 export default {
@@ -42,7 +42,7 @@ export default {
     </div>
   </div>
   <div v-else class="d-flex justify-content-center p-5">
-    <p>Loading dictionaries...</p>
+    <p class="lead">Loading dictionaries...</p>
   </div>
 </template>
 
