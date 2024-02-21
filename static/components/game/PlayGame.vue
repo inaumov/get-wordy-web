@@ -1,15 +1,6 @@
 <script>
 
 export default {
-  data() {
-    return {
-      cards: [
-        {
-          word: {}
-        }
-      ]
-    }
-  },
   methods: {
     roll_dice: function () {
       this.$emit("nextStep", 'RollDice');
