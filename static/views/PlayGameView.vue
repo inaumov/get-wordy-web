@@ -27,6 +27,6 @@ export default {
 <template>
 
   <action-buttons/>
-  <component :is="currentComponent" @nextStep="nextStep" :key="dictionaryId"></component>
+  <component :is="currentComponent" @nextStep="nextStep"></component>
 
 </template>
