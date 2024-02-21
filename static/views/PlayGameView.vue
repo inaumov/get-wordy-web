@@ -1,35 +1,32 @@
 <script>
 import ActionButtons from "@/components/cards/ActionButtons.vue";
-import {rollDice} from "@/js/cards.js";
+import PlayGame from "@/components/game/PlayGame.vue";
+import RollDice from "@/components/game/RollDice.vue";
+import CardsList from "@/components/game/CardsList.vue";
 
 export default {
-  components: {ActionButtons},
+  components: {ActionButtons, PlayGame, RollDice, CardsList},
   props: ['dictionaryId'],
   data() {
     return {
-      cards: []
+      currentComponent: ''
     }
   },
   methods: {
-    roll_dice: rollDice
+    nextStep(component) {
+      this.currentComponent = component
+    }
   },
+  mounted() {
+    this.nextStep('PlayGame')
+  }
 }
 
 </script>
 
 <template>
 
-  <ActionButtons/>
-
-  <div class="container text-center" id="play-game-panel">
-    <p class="mb-3">You wanna play? let's play</p>
-    <div class="d-flex align-items-center pb-5">
-      <div class="col">
-        <a href="#" class="btn btn-default btn-lg" @click="roll_dice(this.dictionaryId)">
-          <i class="bi bi-dice-5"></i> Roll Dice
-        </a>
-      </div>
-    </div>
-  </div>
+  <action-buttons/>
+  <component :is="currentComponent" @nextStep="nextStep" :key="dictionaryId"></component>
 
 </template>
