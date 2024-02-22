@@ -19,6 +19,7 @@ export default {
   },
   mounted() {
     this.nextStep('PlayGame')
+    console.log('PlayGame parent view mounted. dictionaryId = ', this.dictionaryId);
   }
 }
 
@@ -27,6 +28,6 @@ export default {
 <template>
 
   <action-buttons/>
-  <component :is="currentComponent" @nextStep="nextStep"></component>
+  <component :is="currentComponent" @nextStep="nextStep" v-bind="{dictionaryId: this.dictionaryId}"></component>
 
 </template>

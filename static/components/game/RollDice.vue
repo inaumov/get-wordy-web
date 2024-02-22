@@ -1,6 +1,7 @@
 <script>
 
 export default {
+  props: ['dictionaryId'],
   data() {
     return {
       die1: 0,
@@ -12,6 +13,7 @@ export default {
     this.die1 = this.roll();
     this.die2 = this.roll();
     this.total = this.die1 + this.die2;
+    console.log('PlayGame view: 2nd step mounted. dictionaryId = ', this.dictionaryId);
   },
   methods: {
     roll() {

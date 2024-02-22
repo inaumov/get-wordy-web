@@ -16,6 +16,7 @@ export default {
   },
   mounted() {
     this.cards = fetchCardsForExercise(this.dictionaryId, this.limit);
+    console.log('PlayGame view: 3rd step mounted. dictionaryId = ', this.dictionaryId);
   }
 }
 </script>

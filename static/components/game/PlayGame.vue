@@ -1,12 +1,14 @@
 <script>
 
 export default {
+  props: ['dictionaryId'],
   methods: {
     roll_dice: function () {
       this.$emit("nextStep", 'RollDice');
     }
   },
   mounted() {
+    console.log('PlayGame view: 1st step mounted. dictionaryId = ', this.dictionaryId);
   }
 }
 </script>
