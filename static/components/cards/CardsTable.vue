@@ -1,9 +1,10 @@
 <script>
 
 export default {
+  props: ['cards'],
   data() {
     return {
-      cards: []
+      // cards: []
     }
   },
 }
@@ -32,14 +33,14 @@ export default {
         <td>{{ card.status }}</td>
         <td>{{ card.score }}</td>
         <td>
-          <ul class="list-unstyled" v-if="card.contexts.length > 0">
+          <ul class="list-unstyled" v-if="card.contexts">
             <li v-for="context in card.contexts">
               {{ context }}
             </li>
           </ul>
         </td>
         <td>
-          <ul class="list-unstyled" v-if="card.collocations.length > 0">
+          <ul class="list-unstyled" v-if="card.collocations">
             <li v-for="collocation in card.collocations">
               {{ collocation }}
             </li>

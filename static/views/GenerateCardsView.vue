@@ -22,7 +22,7 @@ export default {
 
 <template>
 
-  <ActionButtons/>
+  <action-buttons/>
 
   <div class="container" id="generate-cards-panel">
     <div class="row justify-content-center pb-5">

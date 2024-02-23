@@ -28,7 +28,7 @@ export default {
 
 <template>
 
-  <ActionButtons/>
+  <action-buttons/>
 
   <div class="container" id="add-card-panel">
     <div class="row justify-content-center pb-5">

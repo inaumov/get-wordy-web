@@ -30,7 +30,7 @@ export default {
 
 <template>
 
-  <ActionButtons/>
-  <CardsTable cards="cards"/>
+  <action-buttons/>
+  <cards-table v-bind="{cards: this.cards}"/>
 
 </template>

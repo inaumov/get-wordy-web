@@ -12,7 +12,7 @@
           <i class="bi bi-bricks"></i> Generate
         </router-link>
         <router-link :to="{ name : 'add-card'}" class="btn btn-default btn-lg">
-          <i class="bi bi-plus-circle-dotted"></i> Add manually
+          <i class="bi bi-plus-circle"></i> Add manually
         </router-link>
       </div>
     </div>
