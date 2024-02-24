@@ -9,7 +9,16 @@ export default {
     }
   },
   methods: {
-    to_readable_status: toReadableStatus
+    toReadableStatus: toReadableStatus,
+    canBeReset: function (card) {
+      return card.status === 'POSTPONED' || card.status === 'LEARNT';
+    },
+    resetStatus(id) {
+      this.$emit('resetStatus', id)
+    },
+    deleteCard(id) {
+      this.$emit('deleteCard', id)
+    },
   }
 }
 
@@ -27,6 +36,7 @@ export default {
         <th>Score</th>
         <th>Context</th>
         <th>Collocations</th>
+        <th>Actions</th>
       </tr>
       </thead>
       <tbody>
@@ -34,7 +44,7 @@ export default {
         <td>{{ card.word.value }} ({{ card.word.partOfSpeech }})</td>
         <td>{{ card.word.transcription }}</td>
         <td>{{ card.word.meaning }}</td>
-        <td style="min-width: 80px">{{ to_readable_status(card.status) }}</td>
+        <td class="text-nowrap">{{ toReadableStatus(card.status) }}</td>
         <td>{{ card.score }}</td>
         <td>
           <ul class="list-unstyled" v-if="card.contexts">
@@ -50,8 +60,31 @@ export default {
             </li>
           </ul>
         </td>
+        <td>
+          <div id="actions" class="float-end">
+            <button class="btn btn-lg" @click="resetStatus(card.id)" v-if="canBeReset(card)">
+              <i class="bi bi-arrow-repeat"></i>
+            </button>
+            <button class="btn btn-lg" @click="deleteCard(card.id)">
+              <i class="bi bi-x-lg"></i>
+            </button>
+          </div>
+        </td>
       </tr>
       </tbody>
     </table>
   </div>
 </template>
+
+<style scoped>
+
+table #actions {
+  position: relative;
+  display: inline-flex;
+}
+
+table #actions .btn {
+  padding: 0 5px !important;
+}
+
+</style>
