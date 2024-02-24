@@ -28,7 +28,7 @@ export default {
 </script>
 
 <template>
-  <div v-if="dictionaries[0].dictionaryId" class="container pt-4 pb-4" id="content">
+  <div v-if="dictionaries[0].dictionaryId" class="container p-4" id="content">
     <h6>Edit dictionaries</h6>
     <table class="table table-hover table-bordered table-light">
       <tbody>
@@ -42,8 +42,23 @@ export default {
       </tr>
       </tbody>
     </table>
+    <h6 class="pt-3">Select cards limit for exercise</h6>
+    <div class="border bg-light p-2">
+      <div class="form-check pt-1 pb-1">
+        <input class="form-check-input" type="radio" name="exerciseLimit" id="rollDice" checked>
+        <label class="form-check-label" for="rollDice">
+          Roll dice before each game, from 2 to 12
+        </label>
+      </div>
+      <div class="form-check pt-1 pb-1">
+        <input class="form-check-input" type="radio" name="exerciseLimit" id="defaultLimit">
+        <label class="form-check-label" for="defaultLimit">
+          Predefined number, where 5 is the default
+        </label>
+      </div>
+    </div>
   </div>
-  <div v-else class="d-flex justify-content-center pt-5">
+  <div v-else class="d-flex justify-content-center p-4">
     <div class="text-center">
       <p class="fs-4">Create your first dictionary</p>
       <p class="lead">
