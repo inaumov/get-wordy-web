@@ -1,4 +1,5 @@
 <script>
+import {toReadableStatus} from "@/js/cards.js";
 
 export default {
   props: ['cards'],
@@ -7,6 +8,9 @@ export default {
       // cards: []
     }
   },
+  methods: {
+    to_readable_status: toReadableStatus
+  }
 }
 
 </script>
@@ -30,7 +34,7 @@ export default {
         <td>{{ card.word.value }} ({{ card.word.partOfSpeech }})</td>
         <td>{{ card.word.transcription }}</td>
         <td>{{ card.word.meaning }}</td>
-        <td>{{ card.status }}</td>
+        <td style="min-width: 80px">{{ to_readable_status(card.status) }}</td>
         <td>{{ card.score }}</td>
         <td>
           <ul class="list-unstyled" v-if="card.contexts">

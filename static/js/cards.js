@@ -96,3 +96,17 @@ export function fetchCardsForExercise(dictionaryId, limit) {
     return fetch(cardsRequest)
         .catch(err => console.log("HTTP error: ", err));
 }
+
+export function toReadableStatus(status) {
+    if (status === 'TO_LEARN') {
+        return 'To learn'
+    } else if (status === 'LEARNT') {
+        return 'Done'
+    } else if (status === 'POSTPONED') {
+        return 'Postponed'
+    } else if (status === 'EDIT') {
+        return 'Edit'
+    } else {
+        return status
+    }
+}
