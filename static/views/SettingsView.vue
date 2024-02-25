@@ -1,5 +1,8 @@
 <script>
-import {fetchDictionaries} from '@/js/dictionaries.js';
+import {fetchDictionaries, updateName, updatePicture} from '@/js/dictionaries.js';
+import {ref} from 'vue';
+
+const selectedDictionary = ref(0)
 
 export default {
   data() {
@@ -19,6 +22,24 @@ export default {
       const response = await fetchDictionaries();
       this.dictionaries = await response.json();
     },
+    onSelectElement(event) {
+      let val = event.target.innerText;
+      const result = this.dictionaries.find(obj => {
+        return obj.name === val || obj.picture === val;
+      })
+      selectedDictionary.value = result.dictionaryId;
+      console.log('Selected: ' + selectedDictionary.value);
+    },
+    onNameEdit(event) {
+      let txt = event.target.innerText.trim();
+      console.log('Name changed: ' + txt, 'for id = ', selectedDictionary.value);
+      updateName(selectedDictionary.value, txt);
+    },
+    onPictureEdit(event) {
+      let txt = event.target.innerText.trim();
+      console.log('Picture changed: ' + txt, 'for id = ', selectedDictionary.value);
+      updatePicture(selectedDictionary.value, txt);
+    }
   },
   mounted() {
     this.getData()
@@ -34,10 +55,18 @@ export default {
       <tbody>
       <tr v-for="dictionary in dictionaries">
         <td>
-          <span contenteditable="true" class="p-1">{{ dictionary.name }}</span>
+          <span contenteditable="true" class="p-1" v-text="dictionary.name"
+                v-on:blur="onNameEdit"
+                v-on:focusin="onSelectElement"
+          >
+          </span>
         </td>
         <td>
-          <span contenteditable="true" class="p-1">{{ dictionary.picture }}</span>
+          <span contenteditable="true" class="p-1" v-text="dictionary.picture"
+                v-on:blur="onPictureEdit"
+                v-on:focusin="onSelectElement"
+          >
+          </span>
         </td>
       </tr>
       </tbody>
