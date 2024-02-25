@@ -1,8 +1,7 @@
 <script>
 import {fetchDictionaries, updateName, updatePicture} from '@/js/dictionaries.js';
-import {ref} from 'vue';
 
-const selectedDictionary = ref(0)
+let selectedDictionaryId = 0;
 
 export default {
   data() {
@@ -27,19 +26,35 @@ export default {
       const result = this.dictionaries.find(obj => {
         return obj.name === val || obj.picture === val;
       })
-      selectedDictionary.value = result.dictionaryId;
-      console.log('Selected: ' + selectedDictionary.value);
+      selectedDictionaryId = result.dictionaryId;
+      console.log('Selected: ' + selectedDictionaryId);
     },
     onNameEdit(event) {
-      let txt = event.target.innerText.trim();
-      console.log('Name changed: ' + txt, 'for id = ', selectedDictionary.value);
-      updateName(selectedDictionary.value, txt);
+      let currName = event.target.innerText.trim();
+      const result = this.dictionaries.find(obj => {
+        return obj.dictionaryId === selectedDictionaryId
+      });
+      let actualName = result.name;
+      if (currName === actualName) {
+        console.log('No changes detected in name: ' + actualName, 'for id = ', selectedDictionaryId);
+      } else {
+        updateName(selectedDictionaryId, currName);
+        console.log('Name has been changed: ' + currName, 'for id = ', selectedDictionaryId);
+      }
     },
     onPictureEdit(event) {
-      let txt = event.target.innerText.trim();
-      console.log('Picture changed: ' + txt, 'for id = ', selectedDictionary.value);
-      updatePicture(selectedDictionary.value, txt);
-    }
+      let currUrl = event.target.innerText.trim();
+      const result = this.dictionaries.find(obj => {
+        return obj.dictionaryId === selectedDictionaryId
+      });
+      let actualUrl = result.picture;
+      if (currUrl === actualUrl) {
+        console.log('No changes detected in picture url: ' + actualUrl, 'for id = ', selectedDictionaryId);
+      } else {
+        console.log('Picture url has been changed: ' + currUrl, 'for id = ', selectedDictionaryId);
+        updatePicture(selectedDictionaryId, currUrl);
+      }
+    },
   },
   mounted() {
     this.getData()
