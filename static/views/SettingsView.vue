@@ -6,14 +6,7 @@ let selectedDictionaryId = 0;
 export default {
   data() {
     return {
-      dictionaries: [
-        {
-          dictionaryId: '',
-          picture: '',
-          name: '',
-          cardsTotal: ''
-        }
-      ],
+      dictionaries: [],
     }
   },
   methods: {
@@ -23,36 +16,29 @@ export default {
     },
     onSelectElement(event) {
       let val = event.target.innerText;
-      const result = this.dictionaries.find(obj => {
+      const dictionary = this.dictionaries.find(obj => {
         return obj.name === val || obj.picture === val;
       })
-      selectedDictionaryId = result.dictionaryId;
-      console.log('Selected: ' + selectedDictionaryId);
+      selectedDictionaryId = dictionary['dictionaryId'];
     },
     onNameEdit(event) {
-      let currName = event.target.innerText.trim();
-      const result = this.dictionaries.find(obj => {
-        return obj.dictionaryId === selectedDictionaryId
-      });
-      let actualName = result.name;
-      if (currName === actualName) {
-        console.log('No changes detected in name: ' + actualName, 'for id = ', selectedDictionaryId);
-      } else {
-        updateName(selectedDictionaryId, currName);
-        console.log('Name has been changed: ' + currName, 'for id = ', selectedDictionaryId);
-      }
+      this.handleEdit(event, 'name', updateName)
     },
     onPictureEdit(event) {
-      let currUrl = event.target.innerText.trim();
-      const result = this.dictionaries.find(obj => {
-        return obj.dictionaryId === selectedDictionaryId
+      this.handleEdit(event, 'picture', updatePicture)
+    },
+    handleEdit(event, property, serviceFunc) {
+      let currVal = event.target.innerText.trim();
+      const dictionary = this.dictionaries.find(obj => {
+        return obj['dictionaryId'] === selectedDictionaryId
       });
-      let actualUrl = result.picture;
-      if (currUrl === actualUrl) {
-        console.log('No changes detected in picture url: ' + actualUrl, 'for id = ', selectedDictionaryId);
+      let actualVal = dictionary[property];
+      if (currVal === actualVal) {
+        console.log('No changes detected for dictionary id =', selectedDictionaryId, 'and property [' + property + ']:', actualVal);
       } else {
-        console.log('Picture url has been changed: ' + currUrl, 'for id = ', selectedDictionaryId);
-        updatePicture(selectedDictionaryId, currUrl);
+        console.log('Property [' + property + '] has been changed:', currVal, ', dictionary id =', selectedDictionaryId);
+        serviceFunc(selectedDictionaryId, currVal);
+        dictionary[property] = currVal; // update model
       }
     },
   },
@@ -64,7 +50,7 @@ export default {
 </script>
 
 <template>
-  <div v-if="dictionaries[0].dictionaryId" class="container p-4" id="content">
+  <div v-if="dictionaries.length > 0" class="container p-4" id="content">
     <h6>Edit dictionaries</h6>
     <table class="table table-hover table-bordered table-light">
       <tbody>
