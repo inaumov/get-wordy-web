@@ -41,6 +41,9 @@ export default {
         dictionary[property] = currVal; // update model
       }
     },
+    deleteDictionary(id) {
+      this.$emit('deleteDictionary', id)
+    },
   },
   mounted() {
     this.getData()
@@ -63,11 +66,20 @@ export default {
           </span>
         </td>
         <td>
-          <span contenteditable="true" class="p-1" v-text="dictionary.picture"
-                v-on:blur="onPictureEdit"
-                v-on:focusin="onSelectElement"
-          >
-          </span>
+          <div style="display: flex">
+            <div style="width: 95.33%">
+              <span contenteditable="true" class="p-1" v-text="dictionary.picture"
+                    v-on:blur="onPictureEdit"
+                    v-on:focusin="onSelectElement"
+              >
+              </span>
+            </div>
+            <div id="actions" style="width: 4.67%">
+              <button class="btn btn-lg float-end" @click="deleteDictionary(dictionary.id)">
+                <i class="bi bi-x-lg"></i>
+              </button>
+            </div>
+          </div>
         </td>
       </tr>
       </tbody>
@@ -106,4 +118,17 @@ td span {
   width: 100%;
   display: inline-block;
 }
+
+tr .btn {
+  opacity: 0;
+}
+
+tr:hover .btn {
+  opacity: 1;
+}
+
+table #actions .btn {
+  padding: 0 5px !important;
+}
+
 </style>
