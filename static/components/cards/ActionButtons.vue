@@ -1,3 +1,9 @@
+<script>
+export default {
+  props: ['forceRerender']
+}
+</script>
+
 <template>
   <div class="container" id="action-buttons">
     <div class="row p-5 text-center">
@@ -5,7 +11,7 @@
         <router-link :to="{ name : 'all-cards'}" class="btn btn-default btn-lg">
           <i class="bi bi-card-list"></i> All cards
         </router-link>
-        <router-link :to="{ name : 'play-game'}" class="btn btn-default btn-lg">
+        <router-link :to="{ name : 'play-game'}" class="btn btn-default btn-lg" @click="forceRerender">
           <i class="bi bi-emoji-smile-upside-down"></i> Try game
         </router-link>
         <router-link :to="{ name : 'generate'}" class="btn btn-default btn-lg">

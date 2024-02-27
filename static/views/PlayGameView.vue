@@ -15,6 +15,10 @@ export default {
   methods: {
     nextStep(component) {
       this.currentComponent = component
+    },
+    forceRerender() {
+      this.nextStep('PlayGame')
+      console.log('Force rerender PlayGame parent view. dictionaryId = ', this.dictionaryId);
     }
   },
   mounted() {
@@ -27,7 +31,7 @@ export default {
 
 <template>
 
-  <action-buttons/>
+  <action-buttons v-bind="{forceRerender: this.forceRerender}"/>
   <component :is="currentComponent" @nextStep="nextStep" v-bind="{dictionaryId: this.dictionaryId}"></component>
 
 </template>
