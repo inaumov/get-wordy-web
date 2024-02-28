@@ -42,7 +42,9 @@ export default {
       <i v-bind:class="switchClass(this.die1)" style="margin-right: 3px"></i>
       <i v-bind:class="switchClass(this.die2)" style="margin-left: 3px"></i>
     </div>
-    <p class="mb-3">You Rolled {{ total }}</p>
+    <p class="mb-3">
+      You Rolled {{ total }}
+    </p>
     <div class="col pb-5">
       <button v-on:click="re_roll" class="btn btn-default btn-lg">
         <i class="bi bi-arrow-repeat"></i> Re roll
