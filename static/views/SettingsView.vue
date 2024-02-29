@@ -1,5 +1,5 @@
 <script>
-import {fetchDictionaries, updateName, updatePicture} from '@/js/dictionaries.js';
+import {fetchDictionaries, updateName, updatePicture, deleteDictionary} from '@/js/dictionaries.js';
 import {store} from '@/js/store.js';
 
 let selectedDictionaryId = 0;
@@ -48,7 +48,14 @@ export default {
       }
     },
     deleteDictionary(id) {
-      this.$emit('deleteDictionary', id)
+      deleteDictionary(id)
+          .then(response => {
+            if (response.ok) {
+              const index = this.dictionaries.findIndex(dictionary => dictionary['dictionaryId'] === id)
+              this.dictionaries.splice(index, 1)
+            }
+            console.log("DELETE dictionary has been requested. Response.status =", response.status);
+          })
     },
     onLimitSelectionToggle(selection) {
       this.limitSettings.selectLimit(selection);
@@ -85,7 +92,7 @@ export default {
               </span>
             </div>
             <div id="actions" style="width: 4.67%">
-              <button class="btn btn-lg float-end" @click="deleteDictionary(dictionary.id)">
+              <button class="btn btn-lg float-end" @click="deleteDictionary(dictionary.dictionaryId)">
                 <i class="bi bi-x-lg"></i>
               </button>
             </div>

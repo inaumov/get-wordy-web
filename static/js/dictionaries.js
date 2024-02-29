@@ -54,3 +54,17 @@ export function updatePicture(dictionaryId, picture) {
     return fetch(patchRequest)
         .catch(err => console.log("HTTP error: ", err));
 }
+
+export function deleteDictionary(dictionaryId) {
+    let headers = new Headers();
+
+    let initObject = {
+        method: 'DELETE',
+        headers: headers
+    };
+
+    let patchRequest = new Request(dictionariesAPI + "/" + dictionaryId, initObject);
+
+    return fetch(patchRequest)
+        .catch(err => console.log("HTTP error: ", err));
+}
