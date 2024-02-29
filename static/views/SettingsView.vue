@@ -97,21 +97,21 @@ export default {
     <h6 class="pt-3">Select cards limit for exercise</h6>
     <div class="border bg-light p-2">
       <div class="form-check pt-1 pb-1">
-        <input class="form-check-input" type="radio" name="exerciseLimit" id="rollDice" value="ROLL_DICE"
-               v-model="limitSettings.exerciseLimitSelection"
-               @change="onLimitSelectionToggle('ROLL_DICE')"
-        >
-        <label class="form-check-label" for="rollDice">
-          Roll dice before each game, from 2 to 12
-        </label>
-      </div>
-      <div class="form-check pt-1 pb-1">
         <input class="form-check-input" type="radio" name="exerciseLimit" id="defaultLimit" value="DEFAULT_LIMIT"
                v-model="limitSettings.exerciseLimitSelection"
                @change="onLimitSelectionToggle('DEFAULT_LIMIT')"
         >
         <label class="form-check-label" for="defaultLimit">
           Predefined number, where 5 is the default
+        </label>
+      </div>
+      <div class="form-check pt-1 pb-1">
+        <input class="form-check-input" type="radio" name="exerciseLimit" id="rollDice" value="ROLL_DICE"
+               v-model="limitSettings.exerciseLimitSelection"
+               @change="onLimitSelectionToggle('ROLL_DICE')"
+        >
+        <label class="form-check-label" for="rollDice">
+          Roll dice before each game, from 2 to 12
         </label>
       </div>
     </div>
