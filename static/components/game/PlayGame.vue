@@ -23,21 +23,16 @@ export default {
 </script>
 
 <template>
-  <div class="container text-center" id="play-game-panel" v-if="limitSettings.exerciseLimitSelection === 'ROLL_DICE'">
+  <div class="container text-center" id="play-game-panel">
     <p class="mb-3">
       You wanna play? let's play
     </p>
-    <div class="col pb-5">
-      <a href="#" class="btn btn-default btn-lg" @click="roll_dice()">
+    <div class="col pb-5" v-if="limitSettings['exerciseLimitSelection'] === 'ROLL_DICE'">
+      <button class="btn btn-default btn-lg" v-on:click="roll_dice()">
         <i class="bi bi-dice-5"></i> Roll Dice
-      </a>
+      </button>
     </div>
-  </div>
-  <div class="container text-center" id="play-game-panel" v-else-if="limitSettings.exerciseLimitSelection === 'DEFAULT_LIMIT'">
-    <p class="mb-3">
-      You wanna play? let's play
-    </p>
-    <div class="col pb-5">
+    <div class="col pb-5" v-else-if="limitSettings['exerciseLimitSelection'] === 'DEFAULT_LIMIT'">
       <button v-on:click="print_cards" class="btn btn-default btn-lg">
         <i class="bi bi-arrow-right-square"></i> Pick cards
       </button>

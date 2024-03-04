@@ -1,26 +1,27 @@
 <script>
 import {fetchCardsForExercise} from "@/js/cards.js";
+import {store} from "@/js/store.js";
 
 export default {
   props: ['dictionaryId'],
+  setup: function () {
+    return {
+      limitSettings: store
+    }
+  },
   data() {
     return {
-      cards: [{
-        word: {
-          value: '',
-          meaning: ''
-        }
-      }],
-      limit: 5, // default for now
+      cards: []
     }
   },
   methods: {
     async getData() {
-      const response = await fetchCardsForExercise(this.dictionaryId, this.limit);
+      const limit = this.limitSettings['exerciseLimit'];
+      const response = await fetchCardsForExercise(this.dictionaryId, limit);
       this.cards = await response.json();
     },
     exercise: function () {
-      this.$emit("nextStep", 'Exercise');
+      this.$emit("nextStep", 'MatchExercise', this.cards);
     }
   },
   mounted() {
@@ -35,7 +36,7 @@ export default {
     <p class="mb-4 text-center">
       Read carefully the following definitions and prepare yourself to exercise
     </p>
-    <div class="row row-cols-5 gx-5 gy-2">
+    <div class="row justify-content-md-center mb-4">
       <div class="col" v-for="card in cards">
         <div class="card">
           <div class="card-body">
@@ -46,21 +47,15 @@ export default {
       </div>
     </div>
     <div class="col pb-5 text-center">
-      <a href="#" class="btn btn-default btn-lg" @click="exercise()">
+      <button type="button" class="btn btn-default btn-lg" v-on:click="exercise()">
         <i class="bi bi-arrow-right-square"></i> Exercise
-      </a>
+      </button>
     </div>
   </div>
 </template>
 
 <style scoped>
 
-div#game-cards-list.card {
-  padding: 75px;
-  margin-top: -40px;
-  margin-bottom: -40px;
-  transition: 0.4s ease;
-  cursor: pointer;
-  height: auto;
+div#game-cards-list .card {
 }
 </style>
