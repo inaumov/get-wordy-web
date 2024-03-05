@@ -32,7 +32,7 @@ export default {
 </script>
 
 <template>
-  <div class="container" id="game-cards-list">
+  <div class="container" id="game-cards-list" v-if="cards.length > 0">
     <p class="mb-4 text-center">
       Read carefully the following definitions and prepare yourself to exercise
     </p>
@@ -51,6 +51,11 @@ export default {
         <i class="bi bi-arrow-right-square"></i> Start
       </button>
     </div>
+  </div>
+  <div v-else>
+    <p class="mb-4 text-center">
+      No cards available at this time
+    </p>
   </div>
 </template>
 
