@@ -135,4 +135,9 @@ export default {
 div#match-exercise .card {
   background: rgba(255, 115, 0, 0.10);
 }
+
+div#match-exercise i {
+  color: rgb(185, 87, 84)
+}
+
 </style>

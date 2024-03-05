@@ -32,7 +32,7 @@ export default {
 
   <div class="container" id="add-card-panel">
     <div class="row justify-content-center pb-5">
-      <div class="col-8 border p-5">
+      <div class="col-8 border p-5 rounded">
         <form action="" id="add-card-form" v-on:submit.prevent="create_card(this.dictionaryId, this.formData)">
           <div class="row mb-3">
             <div class="col">
@@ -75,10 +75,18 @@ export default {
               </textarea>
             </div>
           </div>
-          <button type="submit" class="btn btn-primary">Submit</button>
+          <button type="submit" class="btn btn-lg">
+            <i class="bi bi-save"></i> Submit
+          </button>
         </form>
       </div>
     </div>
   </div>
 
 </template>
+
+<style>
+div#add-card-panel i {
+  color: rgb(185, 87, 84)
+}
+</style>

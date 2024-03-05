@@ -92,7 +92,7 @@ export default {
               </span>
             </div>
             <div id="actions" style="width: 4.67%">
-              <button class="btn btn-lg float-end" @click="deleteDictionary(dictionary.dictionaryId)">
+              <button class="btn btn-lg float-end" @click="deleteDictionary(dictionary['dictionaryId'])">
                 <i class="bi bi-x-lg"></i>
               </button>
             </div>
@@ -105,7 +105,7 @@ export default {
     <div class="border bg-light p-2">
       <div class="form-check pt-1 pb-1">
         <input class="form-check-input" type="radio" name="exerciseLimit" id="defaultLimit" value="DEFAULT_LIMIT"
-               v-model="limitSettings.exerciseLimitSelection"
+               v-model="limitSettings['exerciseLimitSelection']"
                @change="onLimitSelectionToggle('DEFAULT_LIMIT')"
         >
         <label class="form-check-label" for="defaultLimit">
@@ -114,7 +114,7 @@ export default {
       </div>
       <div class="form-check pt-1 pb-1">
         <input class="form-check-input" type="radio" name="exerciseLimit" id="rollDice" value="ROLL_DICE"
-               v-model="limitSettings.exerciseLimitSelection"
+               v-model="limitSettings['exerciseLimitSelection']"
                @change="onLimitSelectionToggle('ROLL_DICE')"
         >
         <label class="form-check-label" for="rollDice">
@@ -123,20 +123,24 @@ export default {
       </div>
     </div>
   </div>
-  <div v-else class="d-flex justify-content-center p-4">
+  <div v-else class="d-flex justify-content-center p-4" id="content_new">
     <div class="text-center">
       <p class="fs-4">Create your first dictionary</p>
       <p class="lead">
         Dictionaries are an isolated space for grouping cards and tracking your progress
       </p>
-      <a href="#" class="btn btn-default btn-lg mt-4" target="_self">
+      <button class="btn btn-lg mt-4">
         <i class="bi bi-plus-square"></i> Add dictionary
-      </a>
+      </button>
     </div>
   </div>
 </template>
 
 <style scoped>
+div#content i, div#content_new i {
+  color: rgb(185, 87, 84)
+}
+
 td span {
   width: 100%;
   display: inline-block;

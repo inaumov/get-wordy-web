@@ -20,7 +20,7 @@ export default {
       const response = await fetchCardsForExercise(this.dictionaryId, limit);
       this.cards = await response.json();
     },
-    exercise: function () {
+    start: function () {
       this.$emit("nextStep", 'MatchExercise', this.cards);
     }
   },
@@ -47,15 +47,21 @@ export default {
       </div>
     </div>
     <div class="col pb-5 text-center">
-      <button type="button" class="btn btn-default btn-lg" v-on:click="exercise()">
-        <i class="bi bi-arrow-right-square"></i> Exercise
+      <button type="button" class="btn btn-lg" v-on:click="start()">
+        <i class="bi bi-arrow-right-square"></i> Start
       </button>
     </div>
   </div>
 </template>
 
-<style scoped>
+<style>
 
 div#game-cards-list .card {
+  background: rgba(255, 115, 0, 0.10);
 }
+
+div#game-cards-list i {
+  color: rgb(185, 87, 84)
+}
+
 </style>

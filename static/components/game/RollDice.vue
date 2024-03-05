@@ -46,12 +46,19 @@ export default {
       You Rolled {{ total }}
     </p>
     <div class="col pb-5">
-      <button v-on:click="re_roll" class="btn btn-default btn-lg">
+      <button v-on:click="re_roll" class="btn btn-lg">
         <i class="bi bi-arrow-repeat"></i> Re roll
       </button>
-      <button v-on:click="print_cards" class="btn btn-default btn-lg">
+      <button v-on:click="print_cards" class="btn btn-lg">
         <i class="bi bi-arrow-right-square"></i> Pick cards
       </button>
     </div>
   </div>
 </template>
+
+<style>
+div#roll-dice-panel i {
+  color: rgb(185, 87, 84)
+}
+
+</style>
