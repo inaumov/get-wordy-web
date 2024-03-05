@@ -70,7 +70,7 @@ export default {
 </script>
 
 <template>
-  <div v-if="dictionaries.length > 0" class="container p-4" id="content">
+  <div v-if="dictionaries.length > 0" class="container p-4" id="all-settings">
     <h6>Edit dictionaries</h6>
     <table class="table table-hover table-bordered table-light">
       <tbody>
@@ -123,7 +123,7 @@ export default {
       </div>
     </div>
   </div>
-  <div v-else class="d-flex justify-content-center p-4" id="content_new">
+  <div v-else class="d-flex justify-content-center p-4" id="first-dictionary">
     <div class="text-center">
       <p class="fs-4">Create your first dictionary</p>
       <p class="lead">
@@ -137,7 +137,7 @@ export default {
 </template>
 
 <style scoped>
-div#content i, div#content_new i {
+div#first-dictionary i {
   color: rgb(185, 87, 84)
 }
 

@@ -78,10 +78,6 @@ export default {
 
 <style scoped>
 
-div#cards-table-panel i {
-  color: rgb(185, 87, 84)
-}
-
 table #actions {
   position: relative;
   display: inline-flex;
