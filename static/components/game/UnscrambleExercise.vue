@@ -133,7 +133,7 @@ export default {
             {{ letter }}
           </button>
         </div>
-        <div class="row justify-content-md-center my-5">
+        <div class="row justify-content-md-center my-4">
           <div class="col">
             <p class="text-center fs-4" style="height: 36px" id="answer-output">
               < {{ answeredLetters.join('') }} >

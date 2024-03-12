@@ -1,4 +1,4 @@
-<script xmlns="http://www.w3.org/1999/html">
+<script>
 
 export default {
   props: ['cards'],
@@ -7,9 +7,7 @@ export default {
       totalCards: 0,
       displayed: {
         cardId: '',
-        word: {
-          meaning: ''
-        }
+        word: {}
       },
       nextIndex: 0,
       nextCardNumber: 1,
@@ -79,6 +77,9 @@ export default {
     finishExercise() {
       this.isExerciseDone = true;
       this.setAppraisalCaption();
+    },
+    nextExercise: function () {
+      this.$emit("nextStep", 'UnscrambleExercise', this.cards);
     }
   },
   mounted() {
@@ -100,7 +101,7 @@ export default {
           Card {{ nextCardNumber }}
         </p>
         <p class="card-text text-center" style="font-size: larger">
-          {{ displayed.word.meaning }}
+          {{ displayed.word['meaning'] }}
         </p>
       </div>
     </div>
@@ -109,7 +110,7 @@ export default {
         <div class="col" v-for="card in cards">
           <button class="btn btn-lg border-0" v-on:click="onAnswered(card)"
                   v-bind:id="`answerBtn_${card['cardId']}`">
-            {{ card.word.value }}
+            {{ card.word['value'] }}
           </button>
         </div>
       </div>
@@ -127,6 +128,11 @@ export default {
     <p class="text-center mb-4">
       Your answer is {{ correctAnswers.length }} out of {{ cards.length }}
     </p>
+    <div class="col pb-5 text-center">
+      <button type="button" class="btn btn-lg" v-on:click="nextExercise()">
+        <i class="bi bi-fast-forward-circle"></i> Roll on
+      </button>
+    </div>
   </div>
 </template>
 
@@ -136,7 +142,7 @@ div#match-exercise .card {
   background: rgba(255, 115, 0, 0.10);
 }
 
-div#match-exercise i {
+div#match-exercise button i {
   color: rgb(185, 87, 84)
 }
 
