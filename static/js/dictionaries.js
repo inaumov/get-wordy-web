@@ -1,4 +1,4 @@
-const dictionariesAPI = "api/v1/dictionaries";
+const dictionariesAPI = import.meta.env.VITE_BACKEND_API + "dictionaries";
 
 export function fetchDictionaries() {
     let headers = new Headers();

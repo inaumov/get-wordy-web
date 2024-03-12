@@ -39,7 +39,7 @@ class DictionariesApiTest {
                 }).build()
         ) {
             HttpRequest httpRequest = HttpRequest.newBuilder()
-                    .uri(new URI("http://localhost:8080/GetWordyApp/api/v1/dictionaries"))
+                    .uri(new URI("http://localhost:8080/api/v1/dictionaries"))
                     .build();
 
             HttpResponse<String> httpResponse = httpClient.send(httpRequest, HttpResponse.BodyHandlers.ofString());

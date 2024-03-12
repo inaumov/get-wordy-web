@@ -8,7 +8,7 @@ const router = createRouter({
         {
             path: '/',
             name: 'home',
-            component: DictionariesView, NotFoundView
+            component: DictionariesView
         },
         {
             path: '/Dictionaries/:dictionaryId/Cards',

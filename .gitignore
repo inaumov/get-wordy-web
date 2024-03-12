@@ -47,6 +47,9 @@ log
 # Docker env vars #
 .env
 
+# Vite env vars #
+.env*.local
+
 # spring boot properties #
 *-local.properties
 *-dev.properties

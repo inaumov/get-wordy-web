@@ -33,7 +33,7 @@ class CardsApiTest {
                 .build()
         ) {
             HttpRequest httpRequest = HttpRequest.newBuilder()
-                    .uri(new URI("http://localhost:8080/GetWordyApp/api/v1/dictionaries/1/cards"))
+                    .uri(new URI("http://localhost:8080/api/v1/dictionaries/1/cards"))
                     .build();
 
             HttpResponse<String> httpResponse = httpClient.send(httpRequest, HttpResponse.BodyHandlers.ofString());
@@ -60,7 +60,7 @@ class CardsApiTest {
                 .build()
         ) {
             HttpRequest httpRequest = HttpRequest.newBuilder()
-                    .uri(new URI("http://localhost:8080/GetWordyApp/api/v1/dictionaries/1/exercise?limit=1"))
+                    .uri(new URI("http://localhost:8080/api/v1/dictionaries/1/exercise?limit=1"))
                     .build();
 
             HttpResponse<String> httpResponse = httpClient.send(httpRequest, HttpResponse.BodyHandlers.ofString());
