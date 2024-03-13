@@ -31,6 +31,6 @@ export default {
 <template>
 
   <action-buttons/>
-  <cards-table v-bind="{cards: this.cards}"/>
+  <cards-table v-bind="{dictionaryId: this.dictionaryId, cards: this.cards}"/>
 
 </template>

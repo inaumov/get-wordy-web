@@ -1,6 +1,7 @@
 package get.wordy.rest;
 
 import get.wordy.core.api.IDictionaryService;
+import get.wordy.core.api.exception.DictionaryNotFoundException;
 import get.wordy.core.bean.Card;
 import get.wordy.core.bean.Collocation;
 import get.wordy.core.bean.Context;
@@ -25,6 +26,7 @@ import java.util.List;
 import java.util.Set;
 
 @RestController
+@RequestMapping(value = "/dictionaries")
 public class CardsController extends HttpServlet {
     private static final Logger log = LoggerFactory.getLogger(CardsController.class);
 
@@ -34,7 +36,7 @@ public class CardsController extends HttpServlet {
         this.dictionaryService = dictionaryService;
     }
 
-    @RequestMapping(value = "/dictionaries/{dictionaryId}/cards", method = RequestMethod.GET)
+    @GetMapping(value = "/{dictionaryId}/cards")
     public ResponseEntity<List<CardResponse>> getCards(Principal user, @PathVariable("dictionaryId") int dictionaryId) {
 
         log.info("Getting all cards for the user = {}, dictionary id = {}", user.getName(), dictionaryId);
@@ -51,7 +53,7 @@ public class CardsController extends HttpServlet {
         return new ResponseEntity<>(cards, HttpStatus.OK);
     }
 
-    @RequestMapping(value = "/dictionaries/{dictionaryId}/exercise", method = RequestMethod.GET)
+    @GetMapping(value = "/{dictionaryId}/exercise")
     public ResponseEntity<List<CardResponse>> getCardsForExercise(Principal user,
                                                                   @PathVariable("dictionaryId") int dictionaryId,
                                                                   @RequestParam(value = "limit", required = false, defaultValue = "5") int limit) {
@@ -70,7 +72,7 @@ public class CardsController extends HttpServlet {
         return new ResponseEntity<>(cards, HttpStatus.OK);
     }
 
-    @RequestMapping(value = "/dictionaries/{dictionaryId}/cards/{cardId}", method = RequestMethod.GET)
+    @GetMapping(value = "/{dictionaryId}/cards/{cardId}")
     public ResponseEntity<CardResponse> getCard(Principal user,
                                                 @PathVariable("dictionaryId") int dictionaryId,
                                                 @PathVariable("cardId") int cardId) {
@@ -81,7 +83,7 @@ public class CardsController extends HttpServlet {
         return new ResponseEntity<>(cardResponse, HttpStatus.OK);
     }
 
-    @RequestMapping(value = "/dictionaries/{dictionaryId}/cards", method = RequestMethod.POST)
+    @PostMapping(value = "/{dictionaryId}/cards")
     public ResponseEntity<CardResponse> addCard(Principal user,
                                                 @PathVariable("dictionaryId") int dictionaryId,
                                                 @RequestBody CardRequest cardRequest, UriComponentsBuilder ucBuilder) {
@@ -104,7 +106,22 @@ public class CardsController extends HttpServlet {
         return new ResponseEntity<>(cardResponse, headers, HttpStatus.CREATED);
     }
 
-    @RequestMapping(value = "/dictionaries/{dictionaryId}/generate", method = RequestMethod.POST)
+    @DeleteMapping(value = "/{dictionaryId}/cards/{cardId}")
+    public void deleteCard(Principal user,
+                           @PathVariable("dictionaryId") int dictionaryId,
+                           @PathVariable("cardId") int cardId) {
+        log.info("Deleting card = {} for the user = {}, dictionary id = {}", cardId, user.getName(), dictionaryId);
+
+        dictionaryService.getDictionaries()
+                .stream()
+                .filter(dictionary -> dictionary.getId() == dictionaryId)
+                .findAny()
+                .orElseThrow(DictionaryNotFoundException::new);
+
+        dictionaryService.removeCard(cardId);
+    }
+
+    @PostMapping(value = "/dictionaries/{dictionaryId}/generate")
     public ResponseEntity<List<CardResponse>> generate(Principal user,
                                                        @PathVariable("dictionaryId") int dictionaryId,
                                                        @RequestBody String[] wordsArray) {

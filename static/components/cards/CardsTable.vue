@@ -1,8 +1,8 @@
 <script>
-import {toReadableStatus} from "@/js/cards.js";
+import {toReadableStatus, deleteCard} from "@/js/cards.js";
 
 export default {
-  props: ['cards'],
+  props: ['dictionaryId', 'cards'],
   data() {
     return {
       // cards: []
@@ -13,11 +13,18 @@ export default {
     canBeReset: function (card) {
       return card.status === 'POSTPONED' || card.status === 'LEARNT';
     },
-    resetStatus(id) {
-      this.$emit('resetStatus', id)
+    resetStatus(dictionaryId, cardId) {
+      // todo: resetStatus(dictionaryId, cardId);
     },
-    deleteCard(id) {
-      this.$emit('deleteCard', id)
+    deleteCard(dictionaryId, cardId) {
+      deleteCard(dictionaryId, cardId)
+          .then(response => {
+            if (response.ok) {
+              const index = this.cards.findIndex(card => card['cardId'] === cardId)
+              this.cards.splice(index, 1)
+            }
+            console.log("DELETE card has been requested. Response.status =", response.status);
+          });
     },
   }
 }
@@ -62,10 +69,10 @@ export default {
         </td>
         <td>
           <div id="actions" class="float-end">
-            <button class="btn btn-lg" @click="resetStatus(card.id)" v-if="canBeReset(card)">
+            <button class="btn btn-lg" @click="resetStatus(this.dictionaryId, card['cardId'])" v-if="canBeReset(card)">
               <i class="bi bi-arrow-repeat"></i>
             </button>
-            <button class="btn btn-lg" @click="deleteCard(card.id)">
+            <button class="btn btn-lg" @click="deleteCard(this.dictionaryId, card['cardId'])">
               <i class="bi bi-x-lg"></i>
             </button>
           </div>

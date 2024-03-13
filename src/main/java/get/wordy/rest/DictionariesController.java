@@ -28,7 +28,7 @@ public class DictionariesController {
         this.dictionaryService = dictionaryService;
     }
 
-    @RequestMapping(value = "/dictionaries", method = RequestMethod.GET)
+    @GetMapping(value = "/dictionaries")
     public ResponseEntity<List<DictionaryResponse>> getUserDictionaries(Principal user) {
         LOG.info("Getting dictionary list for the user = {}", user.getName());
 

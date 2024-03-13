@@ -110,3 +110,17 @@ export function toReadableStatus(status) {
         return status
     }
 }
+
+export function deleteCard(dictionaryId, cardId) {
+    let headers = new Headers();
+
+    let initObject = {
+        method: 'DELETE',
+        headers: headers
+    };
+
+    let patchRequest = new Request(dictionariesAPI + "/" + dictionaryId + "/cards/" + cardId, initObject);
+
+    return fetch(patchRequest)
+        .catch(err => console.log("HTTP error: ", err));
+}
