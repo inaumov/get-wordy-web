@@ -1,4 +1,5 @@
 <script>
+import {shuffle} from "@/js/utils.js"
 
 export default {
   props: ['cards'],
@@ -9,6 +10,7 @@ export default {
         cardId: '',
         word: {}
       },
+      shuffledCards: [],
       nextIndex: 0,
       nextCardNumber: 1,
       isExerciseDone: false,
@@ -23,6 +25,7 @@ export default {
         return;
       }
       this.displayed = this.cards[this.nextIndex++];
+      this.shuffleCards();
       this.nextCardNumber++;
     },
     onAnswered: function (answered) {
@@ -62,6 +65,9 @@ export default {
       }
 
     },
+    shuffleCards() {
+      this.shuffledCards = shuffle(this.cards);
+    },
     isFinish() {
       return this.nextIndex >= this.totalCards;
     },
@@ -84,6 +90,7 @@ export default {
   },
   mounted() {
     this.displayed = this.cards[this.nextIndex];
+    this.shuffleCards();
     this.nextIndex++;
     this.totalCards = this.cards.length;
   }
@@ -107,7 +114,7 @@ export default {
     </div>
     <div class="container text-center mb-4" id="answer-buttons">
       <div class="row justify-content-md-center">
-        <div class="col" v-for="card in cards">
+        <div class="col" v-for="card in shuffledCards">
           <button class="btn btn-lg border-0" v-on:click="onAnswered(card)"
                   v-bind:id="`answerBtn_${card['cardId']}`">
             {{ card.word['value'] }}

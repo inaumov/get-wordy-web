@@ -1,4 +1,5 @@
 <script>
+import {shuffle} from "@/js/utils.js"
 
 export default {
   props: ['cards'],
@@ -97,7 +98,7 @@ export default {
     prepareLetters() {
       let str = this.displayed.word['value'];
       str = str.replace(/\s/g, '\xa0');
-      this.letters = [...str].sort(() => Math.random() - 0.5);
+      this.letters = shuffle(str);
     },
   },
   mounted() {
