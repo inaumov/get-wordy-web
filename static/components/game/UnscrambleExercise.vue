@@ -22,13 +22,13 @@ export default {
   watch: {
     answeredLetters: {
       handler(inputLetters) {
-        console.log(inputLetters);
         if (inputLetters.length === this.letters.length) {
+          console.log("All input letters:", inputLetters);
           disableAllLetters(this.letters);
-          let inputWord = inputLetters
+          let clearedInput = inputLetters
               .join('')
               .replace('\xa0', ' ');
-          let isAnswerCorrect = inputWord === this.displayed.word.value;
+          let isAnswerCorrect = clearedInput === this.displayed.word.value;
           // pre save card id
           if (isAnswerCorrect) {
             this.correctAnswers.push(this.displayed['cardId']);
@@ -76,7 +76,7 @@ export default {
       this.nextCardNumber++;
     },
     onClick: function (letter) {
-      console.log(letter);
+      console.log("A letter selected:", letter);
       this.answeredLetters.push(letter);
     },
     isFinish() {
@@ -97,8 +97,14 @@ export default {
     },
     prepareLetters() {
       let str = this.displayed.word['value'];
-      str = str.replace(/\s/g, '\xa0');
-      this.letters = shuffle(str);
+      const actualArr = [...str];
+      let shuffledArr = [];
+      do {
+        shuffledArr = shuffle(str);
+      } while (actualArr.every((val, index) => val === shuffledArr[index])); // double check if shuffled well
+      // fix for UI display
+      this.letters = shuffledArr
+          .map((val) => val.replace(/\s/g, '\xa0'));
     },
   },
   mounted() {
