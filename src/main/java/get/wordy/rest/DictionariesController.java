@@ -1,6 +1,7 @@
 package get.wordy.rest;
 
 import get.wordy.core.api.IDictionaryService;
+import get.wordy.core.api.exception.DictionaryNotFoundException;
 import get.wordy.core.bean.Dictionary;
 import get.wordy.model.DictionaryRequest;
 import get.wordy.model.DictionaryResponse;
@@ -72,6 +73,27 @@ public class DictionariesController {
         } else if (StringUtils.hasText(partialUpdate.picture())) {
             dictionaryService.changeDictionaryPicture(id, partialUpdate.picture());
         }
+        return ResponseEntity
+                .noContent()
+                .build();
+    }
+
+    @DeleteMapping(value = "/dictionaries/{dictionaryId}")
+    public ResponseEntity<DictionaryResponse> deleteDictionary(Principal user,
+                                                               @PathVariable("dictionaryId") int dictionaryId) {
+        LOG.info("Deleting a dictionary for the user = {}, dictionary id = {}", user.getName(), dictionaryId);
+
+        Dictionary found = dictionaryService.getDictionaries()
+                .stream()
+                .filter(dictionary -> dictionary.getId() == dictionaryId)
+                .findAny()
+                .orElseThrow(DictionaryNotFoundException::new);
+        if (found.getCardsTotal() > 0) {
+            throw new IllegalStateException("Cannot delete dictionary with cards");
+        }
+
+        dictionaryService.removeDictionary(dictionaryId);
+
         return ResponseEntity
                 .noContent()
                 .build();

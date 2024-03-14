@@ -28,7 +28,7 @@ import java.util.Set;
 @RestController
 @RequestMapping(value = "/dictionaries")
 public class CardsController extends HttpServlet {
-    private static final Logger log = LoggerFactory.getLogger(CardsController.class);
+    private static final Logger LOG = LoggerFactory.getLogger(CardsController.class);
 
     private final IDictionaryService dictionaryService;
 
@@ -39,7 +39,7 @@ public class CardsController extends HttpServlet {
     @GetMapping(value = "/{dictionaryId}/cards")
     public ResponseEntity<List<CardResponse>> getCards(Principal user, @PathVariable("dictionaryId") int dictionaryId) {
 
-        log.info("Getting all cards for the user = {}, dictionary id = {}", user.getName(), dictionaryId);
+        LOG.info("Getting all cards for the user = {}, dictionary id = {}", user.getName(), dictionaryId);
 
         List<CardResponse> cards = dictionaryService.getCards(dictionaryId)
                 .stream()
@@ -47,7 +47,7 @@ public class CardsController extends HttpServlet {
                 .toList();
 
         if (cards.isEmpty()) {
-            log.info("No cards found for the user = {}", user.getName());
+            LOG.info("No cards found for the user = {}", user.getName());
             return new ResponseEntity<>(Collections.emptyList(), HttpStatus.OK);
         }
         return new ResponseEntity<>(cards, HttpStatus.OK);
@@ -58,7 +58,7 @@ public class CardsController extends HttpServlet {
                                                                   @PathVariable("dictionaryId") int dictionaryId,
                                                                   @RequestParam(value = "limit", required = false, defaultValue = "5") int limit) {
 
-        log.info("Getting cards to exercise for the user = {}, dictionary id = {}", user.getName(), dictionaryId);
+        LOG.info("Getting cards to exercise for the user = {}, dictionary id = {}", user.getName(), dictionaryId);
 
         List<CardResponse> cards = dictionaryService.getCardsForExercise(dictionaryId, limit)
                 .stream()
@@ -66,7 +66,7 @@ public class CardsController extends HttpServlet {
                 .toList();
 
         if (cards.isEmpty()) {
-            log.info("No ready to exercise cards found for the user = {}", user.getName());
+            LOG.info("No ready to exercise cards found for the user = {}", user.getName());
             return new ResponseEntity<>(Collections.emptyList(), HttpStatus.OK);
         }
         return new ResponseEntity<>(cards, HttpStatus.OK);
@@ -77,7 +77,7 @@ public class CardsController extends HttpServlet {
                                                 @PathVariable("dictionaryId") int dictionaryId,
                                                 @PathVariable("cardId") int cardId) {
 
-        log.info("Getting card = {} for the user = {}, dictionary id = {}", cardId, user.getName(), dictionaryId);
+        LOG.info("Getting card = {} for the user = {}, dictionary id = {}", cardId, user.getName(), dictionaryId);
         Card card = dictionaryService.loadCard(cardId);
         CardResponse cardResponse = toCardResponse(card);
         return new ResponseEntity<>(cardResponse, HttpStatus.OK);
@@ -88,7 +88,7 @@ public class CardsController extends HttpServlet {
                                                 @PathVariable("dictionaryId") int dictionaryId,
                                                 @RequestBody CardRequest cardRequest, UriComponentsBuilder ucBuilder) {
 
-        log.info("Adding a new card for the user = {}, dictionary id = {}", user.getName(), dictionaryId);
+        LOG.info("Adding a new card for the user = {}, dictionary id = {}", user.getName(), dictionaryId);
 
         Card card = new Card();
         card.setWord(toWordEntity(cardRequest.word()));
@@ -107,10 +107,10 @@ public class CardsController extends HttpServlet {
     }
 
     @DeleteMapping(value = "/{dictionaryId}/cards/{cardId}")
-    public void deleteCard(Principal user,
-                           @PathVariable("dictionaryId") int dictionaryId,
-                           @PathVariable("cardId") int cardId) {
-        log.info("Deleting card = {} for the user = {}, dictionary id = {}", cardId, user.getName(), dictionaryId);
+    public ResponseEntity<CardResponse> deleteCard(Principal user,
+                                                   @PathVariable("dictionaryId") int dictionaryId,
+                                                   @PathVariable("cardId") int cardId) {
+        LOG.info("Deleting card = {} for the user = {}, dictionary id = {}", cardId, user.getName(), dictionaryId);
 
         dictionaryService.getDictionaries()
                 .stream()
@@ -119,6 +119,10 @@ public class CardsController extends HttpServlet {
                 .orElseThrow(DictionaryNotFoundException::new);
 
         dictionaryService.removeCard(cardId);
+
+        return ResponseEntity
+                .noContent()
+                .build();
     }
 
     @PostMapping(value = "/dictionaries/{dictionaryId}/generate")
@@ -126,7 +130,7 @@ public class CardsController extends HttpServlet {
                                                        @PathVariable("dictionaryId") int dictionaryId,
                                                        @RequestBody String[] wordsArray) {
 
-        log.info("Generating cards for the user = {} and new words: {}", user.getName(), Arrays.toString(wordsArray));
+        LOG.info("Generating cards for the user = {} and new words: {}", user.getName(), Arrays.toString(wordsArray));
 
         Set<String> setOfWords = Set.of(wordsArray);
         List<CardResponse> cards = dictionaryService.generateCards(dictionaryId, setOfWords)
