@@ -65,6 +65,7 @@ dist
 dist-ssr
 coverage
 *.local
+package-lock.json
 
 # VS code project #
 .vscode/*
