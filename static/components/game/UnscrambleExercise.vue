@@ -1,8 +1,9 @@
 <script>
+import {submitResultForExercise} from "@/js/cards.js"
 import {shuffle} from "@/js/utils.js"
 
 export default {
-  props: ['cards'],
+  props: ['dictionaryId', 'cards'],
   data() {
     return {
       totalCards: 0,
@@ -92,8 +93,15 @@ export default {
       }
     },
     finishExercise() {
-      this.isExerciseDone = true;
-      this.setAppraisalCaption();
+      submitResultForExercise(this.dictionaryId, this.correctAnswers)
+          .then(response => {
+            if (!response.ok) {
+              // todo notification
+            }
+            this.isExerciseDone = true;
+            this.setAppraisalCaption();
+            console.log("Submitting exercise results. Response.status =", response.status);
+          });
     },
     prepareLetters() {
       let str = this.displayed.word['value'];

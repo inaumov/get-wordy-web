@@ -97,6 +97,20 @@ export function fetchCardsForExercise(dictionaryId, limit) {
         .catch(err => console.log("HTTP error: ", err));
 }
 
+export function submitResultForExercise(dictionaryId, cardIds) {
+    let headers = new Headers();
+    headers.append('Content-Type', 'application/json');
+
+    let initObject = {
+        method: 'PUT',
+        headers: headers,
+        body: JSON.stringify(cardIds),
+    };
+    let generateRequest = new Request(dictionariesAPI + "/" + dictionaryId + "/exercise", initObject);
+    return fetch(generateRequest)
+        .catch(err => console.log("HTTP error: ", err));
+}
+
 export function toReadableStatus(status) {
     if (status === 'TO_LEARN') {
         return 'To learn'

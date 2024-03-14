@@ -1,8 +1,9 @@
 <script>
+import {submitResultForExercise} from "@/js/cards.js"
 import {shuffle} from "@/js/utils.js"
 
 export default {
-  props: ['cards'],
+  props: ['dictionaryId', 'cards'],
   data() {
     return {
       totalCards: 0,
@@ -81,8 +82,15 @@ export default {
       }
     },
     finishExercise() {
-      this.isExerciseDone = true;
-      this.setAppraisalCaption();
+      submitResultForExercise(this.dictionaryId, this.correctAnswers)
+          .then(response => {
+            if (!response.ok) {
+              // todo notification
+            }
+            this.isExerciseDone = true;
+            this.setAppraisalCaption();
+            console.log("Submitting exercise results. Response.status =", response.status);
+          });
     },
     nextExercise: function () {
       this.$emit("nextStep", 'UnscrambleExercise', this.cards);
@@ -137,7 +145,7 @@ export default {
     </p>
     <div class="col pb-5 text-center">
       <button type="button" class="btn btn-lg" v-on:click="nextExercise()">
-        <i class="bi bi-fast-forward-circle"></i> Roll on
+        <i class="bi bi-box-arrow-right"></i> Roll on
       </button>
     </div>
   </div>

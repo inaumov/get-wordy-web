@@ -72,6 +72,20 @@ public class CardsController extends HttpServlet {
         return new ResponseEntity<>(cards, HttpStatus.OK);
     }
 
+    @PutMapping(value = "/{dictionaryId}/exercise")
+    public ResponseEntity<Void> submitExerciseResult(Principal user,
+                                                     @PathVariable("dictionaryId") int dictionaryId,
+                                                     @RequestBody int[] cardIds) {
+
+        LOG.info("Submitting exercise result for the user = {} and cards: {}", user.getName(), Arrays.toString(cardIds));
+
+        dictionaryService.increaseScoreUp(dictionaryId, cardIds, 25);
+
+        return ResponseEntity
+                .accepted()
+                .build();
+    }
+
     @GetMapping(value = "/{dictionaryId}/cards/{cardId}")
     public ResponseEntity<CardResponse> getCard(Principal user,
                                                 @PathVariable("dictionaryId") int dictionaryId,
