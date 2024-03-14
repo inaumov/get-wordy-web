@@ -35,7 +35,7 @@ export function updateName(dictionaryId, name) {
         .catch(err => console.log("HTTP error: ", err));
 }
 
-export function updatePicture(dictionaryId, picture) {
+export function updatePicture(dictionaryId, picture, forceRemovePicture) {
     let headers = new Headers();
     headers.append('Content-Type', 'application/json');
 
@@ -49,7 +49,11 @@ export function updatePicture(dictionaryId, picture) {
         body: JSON.stringify(jsonRequest),
     };
 
-    let patchRequest = new Request(dictionariesAPI + "/" + dictionaryId, initObject);
+    let queryString = "?";
+    if (forceRemovePicture) {
+        queryString += "forceRemovePicture=true";
+    }
+    let patchRequest = new Request(dictionariesAPI + "/" + dictionaryId + queryString, initObject);
 
     return fetch(patchRequest)
         .catch(err => console.log("HTTP error: ", err));

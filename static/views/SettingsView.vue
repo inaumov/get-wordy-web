@@ -20,32 +20,58 @@ export default {
       const response = await fetchDictionaries();
       this.dictionaries = await response.json();
     },
-    onSelectElement(event) {
-      let val = event.target.innerText;
-      const dictionary = this.dictionaries.find(obj => {
-        return obj.name === val || obj.picture === val;
-      })
+    onSelectElement(dictionary) {
       selectedDictionaryId = dictionary['dictionaryId'];
     },
-    onNameEdit(event) {
-      this.handleEdit(event, 'name', updateName)
-    },
-    onPictureEdit(event) {
-      this.handleEdit(event, 'picture', updatePicture)
-    },
-    handleEdit(event, property, serviceFunc) {
-      let currVal = event.target.innerText.trim();
-      const dictionary = this.dictionaries.find(obj => {
+    getSelectedDictionary() {
+      return this.dictionaries.find(obj => {
         return obj['dictionaryId'] === selectedDictionaryId
       });
-      let actualVal = dictionary[property];
-      if (currVal === actualVal) {
-        console.log('No changes detected for dictionary id =', selectedDictionaryId, 'and property [' + property + ']:', actualVal);
-      } else {
-        console.log('Property [' + property + '] has been changed:', currVal, ', dictionary id =', selectedDictionaryId);
-        serviceFunc(selectedDictionaryId, currVal);
-        dictionary[property] = currVal; // update model
+    },
+    onNameEdit(event) {
+      let currVal = event.target.innerText.trim();
+      const dictionary = this.getSelectedDictionary();
+      let actualVal = dictionary['name'];
+      if (currVal !== actualVal) {
+        updateName(selectedDictionaryId, currVal)
+            .then(response => {
+              if (response.ok) {
+                dictionary['name'] = currVal; // update model
+                console.log('Property [name] has been changed to:', currVal, ', for dictionary id =', selectedDictionaryId);
+              }
+              console.log("PATCH dictionary has been requested. Response.status =", response.status);
+            });
+        return;
       }
+      console.log('No changes detected in property [name] for dictionary id =', selectedDictionaryId);
+    },
+    onPictureEdit(event) {
+      let currVal = event.target.innerText.trim();
+      const dictionary = this.getSelectedDictionary();
+      let actualVal = dictionary['picture'] || "";
+      if (currVal !== actualVal) {
+        if (currVal === "") {
+          updatePicture(selectedDictionaryId, currVal, true)
+              .then(response => {
+                if (response.ok) {
+                  dictionary['picture'] = ""; // update model
+                  console.log('Property [picture] has been changed to empty, for dictionary id =', selectedDictionaryId);
+                }
+                console.log("PATCH dictionary has been requested. Response.status =", response.status);
+              });
+          return;
+        }
+        updatePicture(selectedDictionaryId, currVal)
+            .then(response => {
+              if (response.ok) {
+                dictionary['picture'] = currVal; // update model
+                console.log('Property [picture] has been changed to:', currVal, ', for dictionary id =', selectedDictionaryId);
+              }
+              console.log("PATCH dictionary has been requested. Response.status =", response.status);
+            });
+        return;
+      }
+      console.log('No changes detected in property [picture] for dictionary id =', selectedDictionaryId);
     },
     deleteDictionary(id) {
       deleteDictionary(id)
@@ -78,7 +104,7 @@ export default {
         <td>
           <span contenteditable="true" class="p-1" v-text="dictionary.name"
                 v-on:blur="onNameEdit"
-                v-on:focusin="onSelectElement"
+                v-on:focusin="onSelectElement(dictionary)"
           >
           </span>
         </td>
@@ -87,7 +113,7 @@ export default {
             <div style="width: 95.33%">
               <span contenteditable="true" class="p-1" v-text="dictionary.picture"
                     v-on:blur="onPictureEdit"
-                    v-on:focusin="onSelectElement"
+                    v-on:focusin="onSelectElement(dictionary)"
               >
               </span>
             </div>

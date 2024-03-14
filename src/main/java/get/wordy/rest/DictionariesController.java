@@ -57,14 +57,19 @@ public class DictionariesController {
 
     @PatchMapping("/dictionaries/{id}")
     public ResponseEntity<DictionaryResponse> partialUpdate(Principal user,
+                                                            @PathVariable("id") int id,
                                                             @RequestBody DictionaryRequest partialUpdate,
-                                                            @PathVariable("id") int id) {
+                                                            @RequestParam(value = "forceRemovePicture", required = false) boolean forceRemovePicture) {
         LOG.info("Updating dictionary for the user = {}, id = {}", user.getName(), id);
 
+        // handle name change
         if (StringUtils.hasText(partialUpdate.name())) {
             dictionaryService.renameDictionary(id, partialUpdate.name());
         }
-        if (StringUtils.hasText(partialUpdate.picture())) {
+        // handle picture change
+        if (forceRemovePicture) {
+            dictionaryService.changeDictionaryPicture(id, null);
+        } else if (StringUtils.hasText(partialUpdate.picture())) {
             dictionaryService.changeDictionaryPicture(id, partialUpdate.picture());
         }
         return ResponseEntity
