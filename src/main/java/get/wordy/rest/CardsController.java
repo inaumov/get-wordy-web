@@ -120,11 +120,30 @@ public class CardsController extends HttpServlet {
         return new ResponseEntity<>(cardResponse, headers, HttpStatus.CREATED);
     }
 
+    @PutMapping(value = "/{dictionaryId}/cards/{cardId}/resetScore")
+    public ResponseEntity<CardResponse> resetCard(Principal user,
+                                                  @PathVariable("dictionaryId") int dictionaryId,
+                                                  @PathVariable("cardId") int cardId) {
+        LOG.info("Resetting a card = {} for the user = {}, dictionary id = {}", cardId, user.getName(), dictionaryId);
+
+        dictionaryService.getDictionaries()
+                .stream()
+                .filter(dictionary -> dictionary.getId() == dictionaryId)
+                .findAny()
+                .orElseThrow(DictionaryNotFoundException::new);
+
+        dictionaryService.resetScore(cardId);
+
+        return ResponseEntity
+                .accepted()
+                .build();
+    }
+
     @DeleteMapping(value = "/{dictionaryId}/cards/{cardId}")
     public ResponseEntity<CardResponse> deleteCard(Principal user,
                                                    @PathVariable("dictionaryId") int dictionaryId,
                                                    @PathVariable("cardId") int cardId) {
-        LOG.info("Deleting card = {} for the user = {}, dictionary id = {}", cardId, user.getName(), dictionaryId);
+        LOG.info("Deleting a card = {} for the user = {}, dictionary id = {}", cardId, user.getName(), dictionaryId);
 
         dictionaryService.getDictionaries()
                 .stream()

@@ -138,3 +138,17 @@ export function deleteCard(dictionaryId, cardId) {
     return fetch(patchRequest)
         .catch(err => console.log("HTTP error: ", err));
 }
+
+export function resetScore(dictionaryId, cardId) {
+    let headers = new Headers();
+
+    let initObject = {
+        method: 'PUT',
+        headers: headers
+    };
+
+    let patchRequest = new Request(dictionariesAPI + "/" + dictionaryId + "/cards/" + cardId + "/resetScore", initObject);
+
+    return fetch(patchRequest)
+        .catch(err => console.log("HTTP error: ", err));
+}

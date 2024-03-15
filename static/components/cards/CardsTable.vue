@@ -1,5 +1,5 @@
 <script>
-import {toReadableStatus, deleteCard} from "@/js/cards.js";
+import {toReadableStatus, deleteCard, resetScore} from "@/js/cards.js";
 
 export default {
   props: ['dictionaryId', 'cards'],
@@ -13,14 +13,23 @@ export default {
     canBeReset: function (card) {
       return card.status === 'POSTPONED' || card.status === 'LEARNT';
     },
-    resetStatus(dictionaryId, cardId) {
-      // todo: resetStatus(dictionaryId, cardId);
+    resetScore(dictionaryId, card) {
+      const cardId = card['cardId'];
+      resetScore(dictionaryId, cardId)
+          .then(response => {
+            if (response.ok) {
+              card.score = 0;
+              card.status = '';
+            }
+            console.log("PUT reset score has been requested. Response.status =", response.status);
+          });
     },
-    deleteCard(dictionaryId, cardId) {
+    deleteCard(dictionaryId, card) {
+      const cardId = card['cardId'];
       deleteCard(dictionaryId, cardId)
           .then(response => {
             if (response.ok) {
-              const index = this.cards.findIndex(card => card['cardId'] === cardId)
+              const index = this.cards.findIndex(obj => obj['cardId'] === cardId)
               this.cards.splice(index, 1)
             }
             console.log("DELETE card has been requested. Response.status =", response.status);
@@ -69,10 +78,10 @@ export default {
         </td>
         <td>
           <div id="actions" class="float-end">
-            <button class="btn btn-lg" @click="resetStatus(this.dictionaryId, card['cardId'])" v-if="canBeReset(card)">
+            <button class="btn btn-lg" @click="resetScore(this.dictionaryId, card)" v-if="canBeReset(card)">
               <i class="bi bi-arrow-repeat"></i>
             </button>
-            <button class="btn btn-lg" @click="deleteCard(this.dictionaryId, card['cardId'])">
+            <button class="btn btn-lg" @click="deleteCard(this.dictionaryId, card)">
               <i class="bi bi-x-lg"></i>
             </button>
           </div>
