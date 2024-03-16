@@ -2,19 +2,22 @@
 import ActionButtons from "@/components/cards/ActionButtons.vue";
 
 import {generateCards} from '@/js/cards.js';
+import {toSentenceArray} from '@/js/utils.js';
 
 export default {
   components: {ActionButtons},
   props: ['dictionaryId'],
   data() {
     return {
-      formData: {
-        words: [],
-      },
     }
   },
   methods: {
-    generateCards: generateCards
+    onSubmit: function () {
+      let form = document.getElementById('generate-cards-form');
+      let formData = new FormData(form);
+      const wordsArr = toSentenceArray(formData.get('words'));
+      generateCards(this.dictionaryId, wordsArr);
+    }
   },
 };
 
@@ -27,11 +30,10 @@ export default {
   <div class="container" id="generate-cards-panel">
     <div class="row justify-content-center pb-5">
       <div class="col-8 border p-5 rounded">
-        <form action="" id="generate-cards-form" v-on:submit.prevent="generateCards(this.dictionaryId, this.formData)">
+        <form action="" id="generate-cards-form" v-on:submit.prevent="onSubmit()">
           <div class="mb-3">
             <label for="text" class="form-label">Input new words to generate cards</label>
-            <textarea class="form-control" rows="5" id="text" name="words" v-model.lazy="formData.words" required>
-            </textarea>
+            <textarea class="form-control" rows="5" id="text" name="words" required/>
           </div>
           <button type="submit" class="btn btn-lg">
             <i class="bi bi-save"></i> Submit

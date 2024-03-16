@@ -28,17 +28,14 @@ export function fetchCard(dictionaryId, cardId) {
         .catch(err => console.log("HTTP error: ", err));
 }
 
-export function generateCards(dictionaryId, textData) {
-    let words = textData.words;
-    const valuesArr = !words ? [] : words.split('\n');
-
+export function generateCards(dictionaryId, wordsArr) {
     let headers = new Headers();
     headers.append('Content-Type', 'application/json');
 
     let initObject = {
         method: 'POST',
         headers: headers,
-        body: JSON.stringify(valuesArr),
+        body: JSON.stringify(wordsArr),
     };
     let generateRequest = new Request(dictionariesAPI + "/" + dictionaryId + "/generate", initObject);
     return fetch(generateRequest)
@@ -50,11 +47,8 @@ export function createCard(dictionaryId, cardData) {
     let partOfSpeech = cardData.partOfSpeech;
     let transcription = cardData.transcription;
     let meaning = cardData.meaning;
-    let contexts = cardData.contexts;
-    let collocations = cardData.collocations;
-
-    const contextArr = !contexts ? [] : contexts.split('\n');
-    const collocationArr = !collocations ? [] : collocations.split('\n');
+    let contextsArr = cardData.examples;
+    let collocationsArr = cardData.collocations;
 
     let headers = new Headers();
     headers.append('Content-Type', 'application/json');
@@ -68,8 +62,8 @@ export function createCard(dictionaryId, cardData) {
 
     let cardRequest = {
         word: wordObj,
-        contexts: contextArr,
-        collocations: collocationArr
+        contexts: contextsArr,
+        collocations: collocationsArr
     };
 
     let initObject = {
