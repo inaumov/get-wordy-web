@@ -25,7 +25,6 @@ export default {
       handler(inputLetters) {
         if (inputLetters.length === this.letters.length) {
           console.log("All input letters:", inputLetters);
-          disableAllLetters(this.letters);
           let clearedInput = inputLetters
               .join('')
               .replace('\xa0', ' ');
@@ -36,13 +35,6 @@ export default {
           }
           enableNextButton();
           highlightAnswer(isAnswerCorrect);
-
-          function disableAllLetters(letters) {
-            for (let i = 0; i < letters.length; i++) {
-              let button = document.getElementById("letterBtn_" + i);
-              button.setAttribute('disabled', 'true');
-            }
-          }
 
           function enableNextButton() {
             let nextCardButton = document.getElementById("nextCardBtn");
@@ -76,8 +68,9 @@ export default {
       this.prepareLetters();
       this.nextCardNumber++;
     },
-    onClick: function (letter) {
+    onClick: function (letter, index) {
       console.log("A letter selected:", letter);
+      this.disableLetterBtn(index);
       this.answeredLetters.push(letter);
     },
     isFinish() {
@@ -91,6 +84,10 @@ export default {
       } else if (this.correctAnswers.length === 0) {
         this.appraisal = 'Pity';
       }
+    },
+    disableLetterBtn(index) {
+      let button = document.getElementById("letterBtn_" + index);
+      button.setAttribute('disabled', 'true');
     },
     finishExercise() {
       submitResultForExercise(this.dictionaryId, this.correctAnswers)
@@ -127,7 +124,7 @@ export default {
 <template>
   <div class="container" id="unscramble-exercise" :key="displayed.cardId" v-if="!isExerciseDone">
     <p class="text-center mb-3">
-      Exercise 2: Unscramble the word by selecting characters in correct sequence
+      Exercise 2: Unscramble the word by selecting letters in correct sequence
     </p>
     <div class="card mb-4">
       <div class="card-body">
@@ -142,7 +139,7 @@ export default {
     <div class="container text-center" id="unscramble-panel">
       <div class="row justify-content-md-center">
         <div class="col">
-          <button class="btn btn-light btn-lg border border-warning mx-2" v-on:click="onClick(letter)"
+          <button class="btn btn-light btn-lg border border-warning mx-2" v-on:click="onClick(letter, index)"
                   v-for="(letter, index) in letters"
                   v-bind:id="`letterBtn_${index}`">
             {{ letter }}
@@ -151,7 +148,7 @@ export default {
         <div class="row justify-content-md-center my-4">
           <div class="col">
             <p class="text-center fs-4" style="height: 36px" id="answer-output">
-              < {{ answeredLetters.join('') }} >
+              {{ answeredLetters.join('') }}
             </p>
             <p class="text-center fs-4">
               <i id="answer-check-icon" class="bi bi-question-square"></i>
