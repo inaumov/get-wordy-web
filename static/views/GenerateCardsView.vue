@@ -33,7 +33,7 @@ export default {
         <form action="" id="generate-cards-form" v-on:submit.prevent="onSubmit()">
           <div class="mb-3">
             <label for="text" class="form-label">Input new words to generate cards</label>
-            <textarea class="form-control" rows="5" id="text" name="words" required/>
+            <textarea class="form-control" rows="5" id="text" name="words" autocomplete="off" required/>
           </div>
           <button type="submit" class="btn btn-lg">
             <i class="bi bi-save"></i> Submit

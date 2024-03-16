@@ -42,11 +42,11 @@ export default {
         <form action="" id="add-card-form" v-on:submit.prevent="onSubmit()">
           <div class="row mb-3">
             <div class="col">
-              <label for="word" class="form-label">A word *</label>
-              <input type="text" class="form-control" name="word" id="word" required/>
+              <label for="word" class="form-label">A word <i>*</i></label>
+              <input type="text" class="form-control" name="word" id="word" autocomplete="off" required/>
             </div>
             <div class="col">
-              <label for="radioGrp" class="form-label">Part of speech *</label>
+              <label for="radioGrp" class="form-label">Part of speech <i>*</i></label>
               <div id="radioGrp">
                 <div class="form-check" v-for="part in parts">
                   <label class="form-check-label" v-bind:for="part">{{ part }}</label>
@@ -58,25 +58,30 @@ export default {
           <div class="row mb-3">
             <div class="col">
               <label for="transcription" class="form-label">Transcription</label>
-              <input type="text" class="form-control" name="transcription" id="transcription"/>
+              <input type="text" class="form-control" name="transcription" id="transcription" autocomplete="off"/>
             </div>
           </div>
           <div class="row mb-3">
             <div class="col">
-              <label for="meaning" class="form-label">Meaning *</label>
-              <input type="text" class="form-control" name="meaning" id="meaning" required/>
+              <label for="meaning" class="form-label">Meaning <i>*</i></label>
+              <input type="text" class="form-control" name="meaning" id="meaning" autocomplete="off" required/>
             </div>
           </div>
           <div class="row mb-3">
             <div class="col">
-              <label for="examples" class="form-label">Your example(s) line by line</label>
-              <textarea class="form-control" rows="5" id="examples" name="examples"/>
+              <label for="collocations" class="form-label">Collocations <small>(put it line by line)</small>
+              </label>
+              <textarea class="form-control" rows="3" id="collocations" name="collocations" autocomplete="off"/>
             </div>
           </div>
           <div class="row mb-3">
             <div class="col">
-              <label for="collocations" class="form-label">Collocation(s) line by line</label>
-              <textarea class="form-control" rows="5" id="collocations" name="collocations"/>
+              <label for="examples" class="form-label">
+                Examples of usage in sentences <small>(put it line by line)</small>
+                <br/>
+                <i>Note: It may be used to check for correct spelling in certain exercises</i>
+              </label>
+              <textarea class="form-control" rows="7" id="examples" name="examples" autocomplete="off"/>
             </div>
           </div>
           <button type="submit" class="btn btn-lg">
@@ -90,7 +95,7 @@ export default {
 </template>
 
 <style>
-div#add-card-panel i {
+div#add-card-panel label i, div#add-card-panel button i {
   color: rgb(185, 87, 84)
 }
 </style>
