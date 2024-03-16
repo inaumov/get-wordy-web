@@ -5,9 +5,10 @@ import RollDice from "@/components/game/RollDice.vue";
 import CardsList from "@/components/game/CardsList.vue";
 import MatchExercise from "@/components/game/MatchExercise.vue";
 import UnscrambleExercise from "@/components/game/UnscrambleExercise.vue";
+import SpellingExercise from "@/components/game/SpellingExercise.vue";
 
 export default {
-  components: {ActionButtons, PlayGame, RollDice, CardsList, MatchExercise, UnscrambleExercise},
+  components: {ActionButtons, PlayGame, RollDice, CardsList, MatchExercise, UnscrambleExercise, SpellingExercise},
   props: ['dictionaryId'],
   data() {
     return {

@@ -11,13 +11,48 @@ export default {
         cardId: '',
         word: {}
       },
-      shuffledCards: [],
+      aSentence: '',
       nextIndex: 0,
       nextCardNumber: 1,
       isExerciseDone: false,
+      answer: '',
       correctAnswers: [],
       appraisal: 'Good'
     }
+  },
+  watch: {
+    answer: {
+      handler(input) {
+        if (input.length === this.displayed.word.value.length) { // todo: should check chunk length
+          console.log("All input letters:", input);
+          let isAnswerCorrect = input === this.displayed.word.value;
+          // pre save card id
+          if (isAnswerCorrect) {
+            this.correctAnswers.push(this.displayed['cardId']);
+          }
+          enableNextButton();
+          highlightAnswer(isAnswerCorrect);
+
+          function enableNextButton() {
+            let nextCardButton = document.getElementById("nextCardBtn");
+            nextCardButton.removeAttribute('disabled');
+          }
+
+          function highlightAnswer(isAnswerCorrect) {
+            let icon = document.getElementById("answer-check-icon");
+            if (isAnswerCorrect) {
+              icon.className = "bi bi-check-square-fill";
+              icon.style = "color:limegreen"; // green
+            } else {
+              icon.className = "bi bi-x-square-fill";
+              icon.style = "color:crimson"; // red
+            }
+          }
+
+        }
+      },
+      deep: true,
+    },
   },
   methods: {
     next: function () {
@@ -26,48 +61,9 @@ export default {
         return;
       }
       this.displayed = this.cards[this.nextIndex++];
-      this.shuffleCards();
+      this.aSentence = this.getRandomSentence(this.displayed);
+      this.answer = '';
       this.nextCardNumber++;
-    },
-    onAnswered: function (answered) {
-      const isAnswerCorrect = answered['cardId'] === this.displayed.cardId;
-      // pre save card id
-      if (isAnswerCorrect) {
-        this.correctAnswers.push(answered['cardId']);
-      }
-      highlightAnswer();
-      disableAllAnswers(this.cards.map((card) => card['cardId']));
-      enableNextButton();
-
-      function highlightAnswer() {
-        let elementId = "answerBtn_" + answered['cardId'];
-        let answerBtn = document.getElementById(elementId);
-        let icon = document.createElement("i");
-        if (isAnswerCorrect) {
-          icon.className = "bi bi-check-square-fill";
-          icon.style = "color:limegreen"; // green
-        } else {
-          icon.className = "bi bi-x-square-fill";
-          icon.style = "color:crimson"; // red
-        }
-        answerBtn.prepend(icon, document.createTextNode(" "));
-      }
-
-      function disableAllAnswers(cardIds) {
-        cardIds.forEach(function (cardId) {
-          let button = document.getElementById("answerBtn_" + cardId);
-          button.setAttribute('disabled', 'disabled');
-        });
-      }
-
-      function enableNextButton() {
-        let nextCardButton = document.getElementById("nextCardBtn");
-        nextCardButton.removeAttribute('disabled');
-      }
-
-    },
-    shuffleCards() {
-      this.shuffledCards = shuffle(this.cards);
     },
     isFinish() {
       return this.nextIndex >= this.totalCards;
@@ -92,13 +88,14 @@ export default {
             console.log("Submitting exercise results. Response.status =", response.status);
           });
     },
-    nextExercise: function () {
-      this.$emit("nextStep", 'UnscrambleExercise', this.cards);
+    getRandomSentence(card) {
+      let arr = card['contexts'];
+      return shuffle(arr)[0];
     }
-  },
+},
   mounted() {
     this.displayed = this.cards[this.nextIndex];
-    this.shuffleCards();
+    this.aSentence = this.getRandomSentence(this.displayed);
     this.nextIndex++;
     this.totalCards = this.cards.length;
   }
@@ -106,9 +103,9 @@ export default {
 </script>
 
 <template>
-  <div class="container" id="match-exercise" :key="displayed.cardId" v-if="!isExerciseDone">
+  <div class="container" id="spelling-exercise" :key="displayed.cardId" v-if="!isExerciseDone">
     <p class="text-center mb-3">
-      Exercise 1: Match each meaning with its corresponding word
+      Exercise 3: Write a missing word using proper grammar to complete the sentence
     </p>
     <div class="card mb-4">
       <div class="card-body">
@@ -116,17 +113,17 @@ export default {
           Card {{ nextCardNumber }}
         </p>
         <p class="card-text text-center" style="font-size: larger">
-          {{ displayed.word['meaning'] }}
+          {{ aSentence }}
         </p>
       </div>
     </div>
-    <div class="container text-center mb-4" id="answer-buttons">
-      <div class="row justify-content-md-center">
-        <div class="col" v-for="card in shuffledCards">
-          <button class="btn btn-lg border-0" v-on:click="onAnswered(card)"
-                  v-bind:id="`answerBtn_${card['cardId']}`">
-            {{ card.word['value'] }}
-          </button>
+    <div class="container text-center" id="spelling-panel">
+      <div class="row justify-content-md-center my-4">
+        <div class="col">
+          <input class="text-center fs-4 mb-4" id="answer-input" v-model="answer" autocomplete="off"/>
+          <p class="text-center fs-4">
+            <i id="answer-check-icon" class="bi bi-question-square"></i>
+          </p>
         </div>
       </div>
     </div>
@@ -143,21 +140,16 @@ export default {
     <p class="text-center mb-4">
       Your answer is {{ correctAnswers.length }} out of {{ cards.length }}
     </p>
-    <div class="col pb-5 text-center">
-      <button type="button" class="btn btn-lg" v-on:click="nextExercise()">
-        <i class="bi bi-box-arrow-right"></i> Roll on
-      </button>
-    </div>
   </div>
 </template>
 
 <style scoped>
 
-div#match-exercise .card {
+div#spelling-exercise .card {
   background: rgba(255, 115, 0, 0.10);
 }
 
-div#match-exercise button i {
+div#spelling-exercise button i {
   color: rgb(185, 87, 84)
 }
 

@@ -111,6 +111,9 @@ export default {
       this.letters = shuffledArr
           .map((val) => val.replace(/\s/g, '\xa0'));
     },
+    nextExercise: function () {
+      this.$emit("nextStep", 'SpellingExercise', this.cards);
+    }
   },
   mounted() {
     this.displayed = this.cards[this.nextIndex];
@@ -124,7 +127,7 @@ export default {
 <template>
   <div class="container" id="unscramble-exercise" :key="displayed.cardId" v-if="!isExerciseDone">
     <p class="text-center mb-3">
-      Exercise 2: Unscramble the word by selecting letters in correct sequence
+      Exercise 2: Unscramble the word by selecting the letters in the correct sequence
     </p>
     <div class="card mb-4">
       <div class="card-body">
@@ -145,15 +148,15 @@ export default {
             {{ letter }}
           </button>
         </div>
-        <div class="row justify-content-md-center my-4">
-          <div class="col">
-            <p class="text-center fs-4" style="height: 36px" id="answer-output">
-              {{ answeredLetters.join('') }}
-            </p>
-            <p class="text-center fs-4">
-              <i id="answer-check-icon" class="bi bi-question-square"></i>
-            </p>
-          </div>
+      </div>
+      <div class="row justify-content-md-center my-4">
+        <div class="col">
+          <p class="text-center fs-4" id="answer-output">
+            {{ answeredLetters.join('') }}
+          </p>
+          <p class="text-center fs-4">
+            <i id="answer-check-icon" class="bi bi-question-square"></i>
+          </p>
         </div>
       </div>
     </div>
@@ -170,6 +173,11 @@ export default {
     <p class="text-center mb-4">
       Your answer is {{ correctAnswers.length }} out of {{ cards.length }}
     </p>
+    <div class="col pb-5 text-center">
+      <button type="button" class="btn btn-lg" v-on:click="nextExercise()">
+        <i class="bi bi-box-arrow-right"></i> Roll on
+      </button>
+    </div>
   </div>
 </template>
 
