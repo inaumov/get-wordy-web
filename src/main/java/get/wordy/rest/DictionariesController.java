@@ -2,7 +2,7 @@ package get.wordy.rest;
 
 import get.wordy.core.api.IDictionaryService;
 import get.wordy.core.api.exception.DictionaryNotFoundException;
-import get.wordy.core.bean.Dictionary;
+import get.wordy.core.api.bean.Dictionary;
 import get.wordy.model.DictionaryRequest;
 import get.wordy.model.DictionaryResponse;
 import org.slf4j.Logger;
@@ -92,7 +92,7 @@ public class DictionariesController {
             throw new IllegalStateException("Cannot delete dictionary with cards");
         }
 
-        dictionaryService.removeDictionary(dictionaryId);
+        dictionaryService.deleteDictionary(dictionaryId);
 
         return ResponseEntity
                 .noContent()

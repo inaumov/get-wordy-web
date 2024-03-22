@@ -2,10 +2,10 @@ package get.wordy.rest;
 
 import get.wordy.core.api.IDictionaryService;
 import get.wordy.core.api.exception.DictionaryNotFoundException;
-import get.wordy.core.bean.Card;
-import get.wordy.core.bean.Collocation;
-import get.wordy.core.bean.Context;
-import get.wordy.core.bean.Word;
+import get.wordy.core.api.bean.Card;
+import get.wordy.core.api.bean.Collocation;
+import get.wordy.core.api.bean.Context;
+import get.wordy.core.api.bean.Word;
 import get.wordy.model.CardRequest;
 import get.wordy.model.CardResponse;
 import get.wordy.model.WordRequest;
@@ -22,6 +22,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 import java.security.Principal;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -106,8 +107,8 @@ public class CardsController extends HttpServlet {
 
         Card card = new Card();
         card.setWord(toWordEntity(cardRequest.word()));
-        card.addContexts(toContextEntityList(cardRequest.contexts()));
-        card.addCollocations(toCollocationEntityList(cardRequest.collocations()));
+        card.setContexts(toContextEntityList(cardRequest.examples()));
+        card.setCollocations(toCollocationEntityList(cardRequest.collocations()));
         Card addedCard = dictionaryService.addCard(dictionaryId, card);
 
         HttpHeaders headers = new HttpHeaders();
@@ -151,27 +152,29 @@ public class CardsController extends HttpServlet {
                 .findAny()
                 .orElseThrow(DictionaryNotFoundException::new);
 
-        dictionaryService.removeCard(cardId);
+        dictionaryService.deleteCard(cardId);
 
         return ResponseEntity
                 .noContent()
                 .build();
     }
 
-    @PostMapping(value = "/dictionaries/{dictionaryId}/generate")
+    @PostMapping(value = "/{dictionaryId}/generate")
     public ResponseEntity<List<CardResponse>> generate(Principal user,
                                                        @PathVariable("dictionaryId") int dictionaryId,
                                                        @RequestBody String[] wordsArray) {
 
-        LOG.info("Generating cards for the user = {} and new words: {}", user.getName(), Arrays.toString(wordsArray));
+        Set<String> uniqueWords = new LinkedHashSet<>(wordsArray.length);
+        Collections.addAll(uniqueWords, wordsArray);
 
-        Set<String> setOfWords = Set.of(wordsArray);
-        List<CardResponse> cards = dictionaryService.generateCards(dictionaryId, setOfWords)
+        LOG.info("Generating cards for the user = {} and new words: {}", user.getName(), uniqueWords);
+
+        List<CardResponse> cards = dictionaryService.generateCards(dictionaryId, uniqueWords)
                 .stream()
                 .map(this::toCardResponse)
                 .toList();
 
-        return new ResponseEntity<>(cards, HttpStatus.CREATED);
+        return new ResponseEntity<>(cards, HttpStatus.ACCEPTED);
     }
 
     private List<Context> toContextEntityList(List<String> contexts) {

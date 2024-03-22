@@ -47,7 +47,7 @@ export function createCard(dictionaryId, cardData) {
     let partOfSpeech = cardData.partOfSpeech;
     let transcription = cardData.transcription;
     let meaning = cardData.meaning;
-    let contextsArr = cardData.examples;
+    let examplesArr = cardData.examples;
     let collocationsArr = cardData.collocations;
 
     let headers = new Headers();
@@ -62,7 +62,7 @@ export function createCard(dictionaryId, cardData) {
 
     let cardRequest = {
         word: wordObj,
-        contexts: contextsArr,
+        examples: examplesArr,
         collocations: collocationsArr
     };
 
