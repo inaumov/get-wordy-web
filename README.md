@@ -1,5 +1,6 @@
-# get-wordy-app
-Web client and backend restful api for Get Wordy application
+# get-wordy-web
+
+Web client and backend REST-ful api for Get Wordy App
 
 ## Project Setup: Frontend
 
