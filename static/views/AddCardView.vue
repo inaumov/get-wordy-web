@@ -2,7 +2,7 @@
 import ActionButtons from "@/components/cards/ActionButtons.vue";
 
 import {createCard} from '@/js/cards.js';
-import {toSentenceArray} from '@/js/utils.js';
+import {textToArray} from '@/js/utils.js';
 
 export default {
   components: {ActionButtons},
@@ -22,8 +22,8 @@ export default {
         partOfSpeech: formData.get('parts'),
         transcription: formData.get('transcription'),
         meaning: formData.get('meaning'),
-        examples: toSentenceArray(formData.get('examples')),
-        collocations: toSentenceArray(formData.get('collocations'))
+        sentences: textToArray(formData.get('sentences')),
+        collocations: textToArray(formData.get('collocations'))
       };
       createCard(this.dictionaryId, newCard);
     }
@@ -76,12 +76,12 @@ export default {
           </div>
           <div class="row mb-3">
             <div class="col">
-              <label for="examples" class="form-label">
+              <label for="sentences" class="form-label">
                 Examples of usage in sentences <small>(put it line by line)</small>
                 <br/>
                 <i>Note: It may be used to check for correct spelling in certain exercises</i>
               </label>
-              <textarea class="form-control" rows="7" id="examples" name="examples" autocomplete="off"/>
+              <textarea class="form-control" rows="7" id="sentences" name="sentences" autocomplete="off"/>
             </div>
           </div>
           <button type="submit" class="btn btn-lg">

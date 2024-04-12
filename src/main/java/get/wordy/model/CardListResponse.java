@@ -5,10 +5,10 @@ import get.wordy.core.api.bean.CardStatus;
 import java.time.Instant;
 import java.util.List;
 
-public record CardResponse(
+public record CardListResponse(
         int cardId,
         WordResponse word,
-        List<SentenceResponse> sentences,
+        List<String> sentences,
         List<String> collocations,
         CardStatus status,
         int score,

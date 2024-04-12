@@ -1,15 +1,9 @@
 package get.wordy.rest;
 
 import get.wordy.core.api.IDictionaryService;
+import get.wordy.core.api.bean.*;
 import get.wordy.core.api.exception.DictionaryNotFoundException;
-import get.wordy.core.api.bean.Card;
-import get.wordy.core.api.bean.Collocation;
-import get.wordy.core.api.bean.Context;
-import get.wordy.core.api.bean.Word;
-import get.wordy.model.CardRequest;
-import get.wordy.model.CardResponse;
-import get.wordy.model.WordRequest;
-import get.wordy.model.WordResponse;
+import get.wordy.model.*;
 import jakarta.servlet.http.HttpServlet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -38,13 +32,13 @@ public class CardsController extends HttpServlet {
     }
 
     @GetMapping(value = "/{dictionaryId}/cards")
-    public ResponseEntity<List<CardResponse>> getCards(Principal user, @PathVariable("dictionaryId") int dictionaryId) {
+    public ResponseEntity<List<CardListResponse>> getCards(Principal user, @PathVariable("dictionaryId") int dictionaryId) {
 
         LOG.info("Getting all cards for the user = {}, dictionary id = {}", user.getName(), dictionaryId);
 
-        List<CardResponse> cards = dictionaryService.getCards(dictionaryId)
+        List<CardListResponse> cards = dictionaryService.getCards(dictionaryId)
                 .stream()
-                .map(this::toCardResponse)
+                .map(this::toCardListResponse)
                 .toList();
 
         if (cards.isEmpty()) {
@@ -55,15 +49,15 @@ public class CardsController extends HttpServlet {
     }
 
     @GetMapping(value = "/{dictionaryId}/exercise")
-    public ResponseEntity<List<CardResponse>> getCardsForExercise(Principal user,
+    public ResponseEntity<List<ExerciseResponse>> getCardsForExercise(Principal user,
                                                                   @PathVariable("dictionaryId") int dictionaryId,
                                                                   @RequestParam(value = "limit", required = false, defaultValue = "5") int limit) {
 
         LOG.info("Getting cards to exercise for the user = {}, dictionary id = {}", user.getName(), dictionaryId);
 
-        List<CardResponse> cards = dictionaryService.getCardsForExercise(dictionaryId, limit)
+        List<ExerciseResponse> cards = dictionaryService.getCardsForExercise(dictionaryId, limit)
                 .stream()
-                .map(this::toCardResponse)
+                .map(this::toExerciseResponse)
                 .toList();
 
         if (cards.isEmpty()) {
@@ -107,8 +101,8 @@ public class CardsController extends HttpServlet {
 
         Card card = new Card();
         card.setWord(toWordEntity(cardRequest.word()));
-        card.setContexts(toContextEntityList(cardRequest.examples()));
-        card.setCollocations(toCollocationEntityList(cardRequest.collocations()));
+        card.setStrSentences(cardRequest.sentences());
+        card.setCollocations(cardRequest.collocations());
         Card addedCard = dictionaryService.addCard(dictionaryId, card);
 
         HttpHeaders headers = new HttpHeaders();
@@ -177,22 +171,6 @@ public class CardsController extends HttpServlet {
         return new ResponseEntity<>(cards, HttpStatus.ACCEPTED);
     }
 
-    private List<Context> toContextEntityList(List<String> contexts) {
-        return contexts.stream().map(v -> {
-            Context context = new Context();
-            context.setExample(v);
-            return context;
-        }).toList();
-    }
-
-    private List<Collocation> toCollocationEntityList(List<String> contexts) {
-        return contexts.stream().map(v -> {
-            Collocation context = new Collocation();
-            context.setExample(v);
-            return context;
-        }).toList();
-    }
-
     private Word toWordEntity(WordRequest wordRequest) {
         return new Word(0,
                 wordRequest.value(),
@@ -202,12 +180,24 @@ public class CardsController extends HttpServlet {
         );
     }
 
+    private CardListResponse toCardListResponse(Card card) {
+        return new CardListResponse(
+                card.getId(),
+                toWordResponse(card.getWord()),
+                card.getStrSentences(),
+                card.getCollocations(),
+                card.getStatus(),
+                card.getScore(),
+                card.getInsertedAt()
+        );
+    }
+
     private CardResponse toCardResponse(Card card) {
         return new CardResponse(
                 card.getId(),
                 toWordResponse(card.getWord()),
-                card.getContexts().stream().map(Context::getExample).toList(),
-                card.getCollocations().stream().map(Collocation::getExample).toList(),
+                toSentencesResponse(card.getSentences()),
+                card.getCollocations(),
                 card.getStatus(),
                 card.getScore(),
                 card.getInsertedAt()
@@ -222,6 +212,22 @@ public class CardsController extends HttpServlet {
                 word.getTranscription(),
                 word.getMeaning()
         );
+    }
+
+    private ExerciseResponse toExerciseResponse(Exercise exercise) {
+        return new ExerciseResponse(
+                exercise.getCardId(),
+                exercise.getWordId(),
+                toWordResponse(exercise.getWord()),
+                toSentencesResponse(exercise.getSentences())
+        );
+    }
+
+    private List<SentenceResponse> toSentencesResponse(List<Sentence> sentences) {
+        return sentences
+                .stream()
+                .map(v -> new SentenceResponse(v.getExample(), "test"))
+                .toList();
     }
 
 }

@@ -63,9 +63,9 @@ export default {
         <td class="text-nowrap">{{ toReadableStatus(card.status) }}</td>
         <td>{{ card.score }}</td>
         <td>
-          <ul class="list-unstyled" v-if="card.contexts">
-            <li v-for="context in card.contexts">
-              {{ context }}
+          <ul class="list-unstyled" v-if="card.sentences">
+            <li v-for="sentence in card.sentences">
+              {{ sentence }}
             </li>
           </ul>
         </td>

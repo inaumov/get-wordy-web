@@ -4,7 +4,7 @@ import java.util.List;
 
 public record CardRequest(
         WordRequest word,
-        List<String> examples,
+        List<String> sentences,
         List<String> collocations
 ) {
 }

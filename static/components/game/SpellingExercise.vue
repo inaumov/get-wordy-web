@@ -11,7 +11,7 @@ export default {
         cardId: '',
         word: {}
       },
-      aSentence: '',
+      aSentenceChunks: '',
       nextIndex: 0,
       nextCardNumber: 1,
       isExerciseDone: false,
@@ -23,9 +23,9 @@ export default {
   watch: {
     answer: {
       handler(input) {
-        if (input.length === this.displayed.word.value.length) { // todo: should check chunk length
+        if (input.length === this.displayed.word.value.length || input.length === this.aSentenceChunks['matchedWord'].length) {
           console.log("All input letters:", input);
-          let isAnswerCorrect = input === this.displayed.word.value;
+          let isAnswerCorrect = (input === this.displayed.word.value || input === this.aSentenceChunks['matchedWord']);
           // pre save card id
           if (isAnswerCorrect) {
             this.correctAnswers.push(this.displayed['cardId']);
@@ -61,7 +61,8 @@ export default {
         return;
       }
       this.displayed = this.cards[this.nextIndex++];
-      this.aSentence = this.getRandomSentence(this.displayed);
+      const aSentence = this.getRandomSentence(this.displayed);
+      this.aSentenceChunks = this.splitByClosestMatch(aSentence)
       this.answer = '';
       this.nextCardNumber++;
     },
@@ -89,13 +90,32 @@ export default {
           });
     },
     getRandomSentence(card) {
-      let arr = card['contexts'];
+      let arr = card['sentences'];
       return shuffle(arr)[0];
+    },
+    splitByClosestMatch(sentence) {
+      const fullSentence = sentence['fullSentence'];
+      const matchedWord = sentence['matchedWord'];
+
+      const chunks = fullSentence.split(matchedWord);
+      const beforeMatch = chunks[0];
+      const afterMatch = chunks.slice(1).join(matchedWord);
+      // Replace the matched phrase with non-breaking spaces in the original sentence
+      const replacedSentence = fullSentence.replace(new RegExp(matchedWord, 'i'), "_".repeat(matchedWord.length));
+
+      return {
+        originalSentence: fullSentence,
+        beforeMatch: beforeMatch,
+        matchedWord: matchedWord,
+        afterMatch: afterMatch,
+        replacedSentence: replacedSentence
+      };
     }
-},
+  },
   mounted() {
     this.displayed = this.cards[this.nextIndex];
-    this.aSentence = this.getRandomSentence(this.displayed);
+    const aSentence = this.getRandomSentence(this.displayed);
+    this.aSentenceChunks = this.splitByClosestMatch(aSentence)
     this.nextIndex++;
     this.totalCards = this.cards.length;
   }
@@ -113,7 +133,7 @@ export default {
           Card {{ nextCardNumber }}
         </p>
         <p class="card-text text-center" style="font-size: larger">
-          {{ aSentence }}
+          {{ aSentenceChunks.replacedSentence }}
         </p>
       </div>
     </div>

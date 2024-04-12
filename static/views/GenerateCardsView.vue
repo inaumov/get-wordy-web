@@ -2,7 +2,7 @@
 import ActionButtons from "@/components/cards/ActionButtons.vue";
 
 import {generateCards} from '@/js/cards.js';
-import {toSentenceArray} from '@/js/utils.js';
+import {textToArray} from '@/js/utils.js';
 
 export default {
   components: {ActionButtons},
@@ -15,7 +15,7 @@ export default {
     onSubmit: function () {
       let form = document.getElementById('generate-cards-form');
       let formData = new FormData(form);
-      const wordsArr = toSentenceArray(formData.get('words'));
+      const wordsArr = textToArray(formData.get('words'));
       generateCards(this.dictionaryId, wordsArr);
     }
   },

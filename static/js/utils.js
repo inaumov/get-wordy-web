@@ -7,6 +7,6 @@ export function shuffle(arr) {
     return [...arr].sort(() => Math.random() - 0.5)
 }
 
-export function toSentenceArray(textarea) {
+export function textToArray(textarea) {
     return textarea.trim().split(/\r?\n/).filter(elm => elm);
 }
