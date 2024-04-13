@@ -1,44 +1,25 @@
 package get.wordy.rest;
 
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.json.JsonMapper;
-import org.junit.jupiter.api.BeforeEach;
+import com.fasterxml.jackson.databind.JsonNode;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
-import java.net.Authenticator;
-import java.net.PasswordAuthentication;
-import java.net.URI;
-import java.net.URISyntaxException;
+import java.net.*;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
-class DictionariesApiTest {
+class DictionariesApiTest extends BaseApiTest {
 
-    private final JsonMapper jsonMapper = new JsonMapper();
-
-    @BeforeEach
-    void setUp() {
-        jsonMapper.enable(DeserializationFeature.FAIL_ON_READING_DUP_TREE_KEY);
-    }
+    private static final String IMAGE_URL_PATTERN = "(http(s?):/)(/[^/]+)+\\.(?:jpg|jpeg|png)";
 
     @Test
-    public void getDictionariesRequestUsingHttpClient() throws URISyntaxException, IOException, InterruptedException {
-        try (HttpClient httpClient = HttpClient.newBuilder()
-                .authenticator(new Authenticator() {
-                    @Override
-                    protected PasswordAuthentication getPasswordAuthentication() {
-                        return new PasswordAuthentication(
-                                "admin",
-                                "admin".toCharArray());
-                    }
-                }).build()
-        ) {
+    public void getDictionaries() throws URISyntaxException, IOException, InterruptedException {
+        try (HttpClient httpClient = HttpClient.newBuilder().build()) {
             HttpRequest httpRequest = HttpRequest.newBuilder()
+                    .header("Cookie", jSessionIdHolder.get())
                     .uri(new URI("http://localhost:8080/api/v1/dictionaries"))
                     .build();
 
@@ -46,6 +27,7 @@ class DictionariesApiTest {
 
             int statusCode = httpResponse.statusCode();
             String responseBody = httpResponse.body();
+            prettyPrint(responseBody);
 
             // all minimal checks
 
@@ -53,10 +35,23 @@ class DictionariesApiTest {
 
             var jsonNode = jsonMapper.readTree(responseBody);
             assertTrue(jsonNode.isArray(), "is not an array");
+            assertFalse(jsonNode.isEmpty(), "no elements in array");
 
-            System.out.println("Dictionaries response status code: " + statusCode);
-            System.out.println("Dictionaries response headers: " + httpResponse.headers());
-            System.out.println("Dictionaries response body: \n" + responseBody);
+            boolean foundOneExpected = false;
+            for (JsonNode dictionary : jsonNode) {
+                assertTrue(dictionary.get("dictionaryId").asInt() > 0);
+                assertFalse(dictionary.get("name").asText().isBlank());
+                if ("Random words".equals(dictionary.get("name").asText())) {
+                    assertTrue(dictionary.get("cardsTotal").asInt() > 0);
+                    assertTrue(dictionary.get("picture").asText().matches(IMAGE_URL_PATTERN));
+                    foundOneExpected = true;
+                }
+                assertTrue(dictionary.has("picture"));
+                assertTrue(dictionary.has("cardsTotal"));
+            }
+            if (!foundOneExpected) {
+                fail("no expected dictionary");
+            }
         }
     }
 
