@@ -39,7 +39,8 @@ class CardsApiTest extends BaseApiTest {
             assertFalse(jsonNode.isEmpty(), "no elements in array");
 
             for (JsonNode card : jsonNode) {
-                assertTrue(card.get("cardId").asInt() > 0);
+                assertTrue(card.get("cardId").asInt() > 0, "cardId must be greater than 0");
+                assertTrue(card.get("wordId").asInt() > 0, "wordId must be greater than 0");
                 assertWordInCard(card);
                 assertTrue(card.get("sentences").isArray());
                 assertTrue(card.get("collocations").isArray());
@@ -68,6 +69,18 @@ class CardsApiTest extends BaseApiTest {
 
             var jsonNode = jsonMapper.readTree(responseBody);
             assertTrue(jsonNode.isArray(), "is not an array");
+            assertEquals(4, jsonNode.size(), "no elements in array");
+
+            for (JsonNode card : jsonNode) {
+                assertTrue(card.get("cardId").asInt() > 0, "cardId must be greater than 0");
+                assertTrue(card.get("wordId").asInt() > 0, "wordId must be greater than 0");
+                assertWordInCard(card);
+                JsonNode sentences = card.get("sentences");
+                assertTrue(sentences.isArray());
+                assertFalse(sentences.isEmpty());
+                assertFalse(sentences.get(0).get("fullSentence").asText().isBlank());
+                assertFalse(sentences.get(0).get("matchedWord").asText().isBlank());
+            }
         }
     }
 
@@ -92,6 +105,7 @@ class CardsApiTest extends BaseApiTest {
             var card = jsonMapper.readTree(responseBody);
             assertTrue(card.isObject(), "is not an object");
             assertTrue(card.get("cardId").asInt() > 0, "cardId must be greater than 0");
+            assertTrue(card.get("wordId").asInt() > 0, "wordId must be greater than 0");
             assertWordInCard(card);
             JsonNode sentences = card.get("sentences");
             assertTrue(sentences.isArray());
@@ -126,6 +140,7 @@ class CardsApiTest extends BaseApiTest {
             var card = jsonMapper.readTree(responseBody);
             assertTrue(card.isObject(), "is not an object");
             assertTrue(card.get("cardId").asInt() > 0, "cardId must be greater than 0");
+            assertTrue(card.get("wordId").asInt() > 0, "wordId must be greater than 0");
             assertWordInCard(card);
             assertTrue(card.get("sentences").isArray());
             assertEquals(2, card.get("sentences").size());

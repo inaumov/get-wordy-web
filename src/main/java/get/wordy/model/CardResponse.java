@@ -7,6 +7,7 @@ import java.util.List;
 
 public record CardResponse(
         int cardId,
+        int wordId,
         WordResponse word,
         List<SentenceResponse> sentences,
         List<String> collocations,

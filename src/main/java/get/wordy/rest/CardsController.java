@@ -183,6 +183,7 @@ public class CardsController extends HttpServlet {
     private CardListResponse toCardListResponse(Card card) {
         return new CardListResponse(
                 card.getId(),
+                card.getWordId(),
                 toWordResponse(card.getWord()),
                 card.getStrSentences(),
                 card.getCollocations(),
@@ -195,6 +196,7 @@ public class CardsController extends HttpServlet {
     private CardResponse toCardResponse(Card card) {
         return new CardResponse(
                 card.getId(),
+                card.getWordId(),
                 toWordResponse(card.getWord()),
                 toSentencesResponse(card.getSentences()),
                 card.getCollocations(),
