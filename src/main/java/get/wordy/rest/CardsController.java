@@ -5,6 +5,7 @@ import get.wordy.core.api.bean.*;
 import get.wordy.core.api.exception.DictionaryNotFoundException;
 import get.wordy.model.*;
 import jakarta.servlet.http.HttpServlet;
+import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpHeaders;
@@ -113,6 +114,33 @@ public class CardsController extends HttpServlet {
         );
         CardResponse cardResponse = toCardResponse(addedCard);
         return new ResponseEntity<>(cardResponse, headers, HttpStatus.CREATED);
+    }
+
+    @PutMapping(value = "/{dictionaryId}/cards")
+    public ResponseEntity<CardResponse> updateCard(Principal user,
+                                                   UriComponentsBuilder ucBuilder,
+                                                   @PathVariable("dictionaryId") int dictionaryId,
+                                                   @Valid @RequestBody UpdateCardRequest cardRequest) {
+
+        LOG.info("Update a card for the user = {}, dictionary id = {}", user.getName(), dictionaryId);
+
+        Card card = new Card();
+        card.setId(cardRequest.cardId());
+        card.setWordId(cardRequest.wordId());
+        Word wordEntity = toWordEntity(cardRequest.word());
+        card.setWord(wordEntity.withId(cardRequest.wordId()));
+        card.setStrSentences(cardRequest.sentences());
+        card.setCollocations(cardRequest.collocations());
+        Card addedCard = dictionaryService.updateCard(dictionaryId, card);
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setLocation(ucBuilder
+                .path("/dictionaries/{dictionaryId}/cards/{cardId}")
+                .buildAndExpand(dictionaryId, card.getId())
+                .toUri()
+        );
+        CardResponse cardResponse = toCardResponse(addedCard);
+        return new ResponseEntity<>(cardResponse, headers, HttpStatus.ACCEPTED);
     }
 
     @PutMapping(value = "/{dictionaryId}/cards/{cardId}/resetScore")

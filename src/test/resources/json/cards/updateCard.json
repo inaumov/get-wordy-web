@@ -1,0 +1,18 @@
+{
+  "cardId": 77,
+  "wordId": 80,
+  "word": {
+    "value": "test",
+    "partOfSpeech": "noun",
+    "transcription": null,
+    "meaning": "A procedure intended to establish the quality, performance, or reliability of something, especially before it is taken into widespread use."
+  },
+  "sentences": [
+    "This range has not been tested on animals.",
+    "Vocabulary size is generally measured by extrapolating a test score"
+  ],
+  "collocations": [
+    "benchmark test",
+    "test score"
+  ]
+}

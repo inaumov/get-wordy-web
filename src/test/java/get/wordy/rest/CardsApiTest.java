@@ -149,6 +149,38 @@ class CardsApiTest extends BaseApiTest {
         }
     }
 
+    @Test
+    void updateCard() throws URISyntaxException, IOException, InterruptedException {
+        try (HttpClient httpClient = HttpClient.newBuilder().build()) {
+            HttpRequest httpRequest = HttpRequest.newBuilder()
+                    .header("Cookie", jSessionIdHolder.get())
+                    .headers("Content-Type", MediaType.APPLICATION_JSON_VALUE)
+                    .uri(new URI("http://localhost:8080/api/v1/dictionaries/1/cards"))
+                    .PUT(HttpRequest.BodyPublishers.ofFile(Paths.get("src/test/resources/json/cards/updateCard.json")))
+                    .build();
+
+            HttpResponse<String> httpResponse = httpClient.send(httpRequest, HttpResponse.BodyHandlers.ofString());
+
+            int statusCode = httpResponse.statusCode();
+            String responseBody = httpResponse.body();
+            prettyPrint(responseBody);
+
+            // all minimal checks
+
+            assertEquals(202, statusCode);
+
+            var card = jsonMapper.readTree(responseBody);
+            assertTrue(card.isObject(), "is not an object");
+            assertEquals(77, card.get("cardId").asInt());
+            assertEquals(80, card.get("wordId").asInt());
+            assertWordInCard(card);
+            assertTrue(card.get("sentences").isArray());
+            assertEquals(2, card.get("sentences").size());
+            assertBasicCardInfo(card);
+            assertEquals("EDIT", card.get("status").asText());
+        }
+    }
+
     private static void assertWordInCard(JsonNode card) {
         assertTrue(card.has("word"));
         JsonNode word = card.get("word");
