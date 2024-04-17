@@ -78,8 +78,8 @@ class CardsApiTest extends BaseApiTest {
                 JsonNode sentences = card.get("sentences");
                 assertTrue(sentences.isArray());
                 assertFalse(sentences.isEmpty());
-                assertFalse(sentences.get(0).get("fullSentence").asText().isBlank());
-                assertFalse(sentences.get(0).get("matchedWord").asText().isBlank());
+                assertFalse(sentences.get(0).get("originalSentence").asText().isBlank());
+                assertFalse(sentences.get(0).get("matchedWords").asText().isBlank());
             }
         }
     }
@@ -110,8 +110,8 @@ class CardsApiTest extends BaseApiTest {
             JsonNode sentences = card.get("sentences");
             assertTrue(sentences.isArray());
             assertFalse(sentences.isEmpty());
-            assertFalse(sentences.get(0).get("fullSentence").asText().isBlank());
-            assertFalse(sentences.get(0).get("matchedWord").asText().isBlank());
+            assertFalse(sentences.get(0).get("originalSentence").asText().isBlank());
+            assertFalse(sentences.get(0).get("matchedWords").asText().isBlank());
             assertTrue(card.get("collocations").isArray());
             assertBasicCardInfo(card);
         }
@@ -144,6 +144,10 @@ class CardsApiTest extends BaseApiTest {
             assertWordInCard(card);
             assertTrue(card.get("sentences").isArray());
             assertEquals(2, card.get("sentences").size());
+            JsonNode first = card.get("sentences").get(0);
+            assertMatchedWords(first, "This range has not been tested on animals", "tested");
+            JsonNode second = card.get("sentences").get(1);
+            assertMatchedWords(second, "Vocabulary size is generally measured by extrapolating a test score", "test");
             assertBasicCardInfo(card);
             assertEquals("EDIT", card.get("status").asText());
         }
@@ -176,6 +180,10 @@ class CardsApiTest extends BaseApiTest {
             assertWordInCard(card);
             assertTrue(card.get("sentences").isArray());
             assertEquals(2, card.get("sentences").size());
+            JsonNode first = card.get("sentences").get(0);
+            assertMatchedWords(first, "This range has not been tested on animals.", "tested");
+            JsonNode second = card.get("sentences").get(1);
+            assertMatchedWords(second, "Vocabulary size is generally measured by extrapolating a test score.", "test");
             assertBasicCardInfo(card);
             assertEquals("EDIT", card.get("status").asText());
         }
@@ -197,6 +205,11 @@ class CardsApiTest extends BaseApiTest {
         int score = card.get("score").asInt();
         assertTrue(score >= 0 && score <= 100);
         assertTrue(card.has("createdAt"));
+    }
+
+    private static void assertMatchedWords(JsonNode jsonNode, String sentence, String matchedWords) {
+        assertEquals(sentence, jsonNode.get("originalSentence").asText());
+        assertEquals(matchedWords, jsonNode.get("matchedWords").asText());
     }
 
 }

@@ -7,4 +7,7 @@ public record CardRequest(
         List<String> sentences,
         List<String> collocations
 ) {
+    public String getKeyword() {
+        return this.word.value();
+    }
 }

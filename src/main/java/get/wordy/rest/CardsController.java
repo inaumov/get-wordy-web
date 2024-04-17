@@ -1,5 +1,6 @@
 package get.wordy.rest;
 
+import get.wordy.spelling.SentenceSplitter;
 import get.wordy.core.api.IDictionaryService;
 import get.wordy.core.api.bean.*;
 import get.wordy.core.api.exception.DictionaryNotFoundException;
@@ -15,11 +16,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.security.Principal;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 @RestController
 @RequestMapping(value = "/dictionaries")
@@ -101,8 +98,12 @@ public class CardsController extends HttpServlet {
         LOG.info("Adding a new card for the user = {}, dictionary id = {}", user.getName(), dictionaryId);
 
         Card card = new Card();
-        card.setWord(toWordEntity(cardRequest.word()));
-        card.setStrSentences(cardRequest.sentences());
+        WordRequest word = cardRequest.word();
+        card.setWord(toWordEntity(word));
+        card.setSentences(cardRequest.sentences()
+                .stream()
+                .map(strSentence -> withClosestMatch(strSentence, cardRequest.getKeyword()))
+                .toList());
         card.setCollocations(cardRequest.collocations());
         Card addedCard = dictionaryService.addCard(dictionaryId, card);
 
@@ -129,7 +130,10 @@ public class CardsController extends HttpServlet {
         card.setWordId(cardRequest.wordId());
         Word wordEntity = toWordEntity(cardRequest.word());
         card.setWord(wordEntity.withId(cardRequest.wordId()));
-        card.setStrSentences(cardRequest.sentences());
+        card.setSentences(cardRequest.sentences()
+                .stream()
+                .map(strSentence -> withClosestMatch(strSentence, cardRequest.getKeyword()))
+                .toList());
         card.setCollocations(cardRequest.collocations());
         Card addedCard = dictionaryService.updateCard(dictionaryId, card);
 
@@ -256,8 +260,19 @@ public class CardsController extends HttpServlet {
     private List<SentenceResponse> toSentencesResponse(List<Sentence> sentences) {
         return sentences
                 .stream()
-                .map(v -> new SentenceResponse(v.getExample(), "test"))
+                .map(sentence -> new SentenceResponse(sentence.getExample(), sentence.getMatchedWord()))
                 .toList();
+    }
+
+    private static Sentence withClosestMatch(String strSentence, String keyword) {
+        Sentence sentence = new Sentence(strSentence);
+        Optional<SentenceSplitter.Chunks> sentenceChunks = SentenceSplitter.splitByClosestMatch(strSentence, keyword);
+        return sentenceChunks
+                .map(chunks -> {
+                    sentence.setMatchedWord(chunks.matchedWords());
+                    return sentence;
+                })
+                .orElse(sentence);
     }
 
 }
