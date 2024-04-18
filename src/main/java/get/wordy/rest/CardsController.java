@@ -12,6 +12,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
 
@@ -48,8 +49,8 @@ public class CardsController extends HttpServlet {
 
     @GetMapping(value = "/{dictionaryId}/exercise")
     public ResponseEntity<List<ExerciseResponse>> getCardsForExercise(Principal user,
-                                                                  @PathVariable("dictionaryId") int dictionaryId,
-                                                                  @RequestParam(value = "limit", required = false, defaultValue = "5") int limit) {
+                                                                      @PathVariable("dictionaryId") int dictionaryId,
+                                                                      @RequestParam(value = "limit", required = false, defaultValue = "5") int limit) {
 
         LOG.info("Getting cards to exercise for the user = {}, dictionary id = {}", user.getName(), dictionaryId);
 
@@ -260,7 +261,17 @@ public class CardsController extends HttpServlet {
     private List<SentenceResponse> toSentencesResponse(List<Sentence> sentences) {
         return sentences
                 .stream()
-                .map(sentence -> new SentenceResponse(sentence.getExample(), sentence.getMatchedWord()))
+                .map(sentence -> {
+                    String originalSentenceStr = sentence.getExample();
+                    String matchedWords = sentence.getMatchedWords();
+                    if (StringUtils.hasText(matchedWords)) {
+                        String replacedSentence = originalSentenceStr
+                                .replaceAll(matchedWords, "_".repeat(matchedWords.length()));
+                        return new SentenceResponse(originalSentenceStr, sentence.getMatchedWords(), replacedSentence);
+                    } else {
+                        return new SentenceResponse(originalSentenceStr, null, null);
+                    }
+                })
                 .toList();
     }
 
@@ -268,10 +279,7 @@ public class CardsController extends HttpServlet {
         Sentence sentence = new Sentence(strSentence);
         Optional<SentenceSplitter.Chunks> sentenceChunks = SentenceSplitter.splitByClosestMatch(strSentence, keyword);
         return sentenceChunks
-                .map(chunks -> {
-                    sentence.setMatchedWord(chunks.matchedWords());
-                    return sentence;
-                })
+                .map(chunks -> sentence.withMatchedWords(chunks.matchedWords()))
                 .orElse(sentence);
     }
 

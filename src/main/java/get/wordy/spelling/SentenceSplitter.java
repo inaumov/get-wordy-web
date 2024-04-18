@@ -28,6 +28,7 @@ public class SentenceSplitter {
 
         // Iterate over words to find the sequence of words with the highest similarity to the keyword (or phrase)
         for (int i = 0; i <= words.length - keywordLength; i++) {
+            // Combine current word and next word (if exists) to form a phrase
             StringBuilder phraseBuilder = new StringBuilder();
             for (int j = 0; j < keywordLength; j++) {
                 if (j > 0) {
