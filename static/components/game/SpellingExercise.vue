@@ -11,7 +11,7 @@ export default {
         cardId: '',
         word: {}
       },
-      aSentenceChunks: '',
+      spellingExercise: {},
       nextIndex: 0,
       nextCardNumber: 1,
       isExerciseDone: false,
@@ -23,32 +23,15 @@ export default {
   watch: {
     answer: {
       handler(input) {
-        if (input.length === this.displayed.word.value.length || input.length === this.aSentenceChunks['matchedWord'].length) {
-          console.log("All input letters:", input);
-          let isAnswerCorrect = (input === this.displayed.word.value || input === this.aSentenceChunks['matchedWord']);
+        let currentCardId = this.displayed['cardId'];
+        let allAnswers = new Set([this.displayed.word.value, this.spellingExercise['matchedWords']]);
+        if (allAnswers.has(input)) {
+          this.highlightAnswer(true);
+          this.enableNextButton();
           // pre save card id
-          if (isAnswerCorrect) {
-            this.correctAnswers.push(this.displayed['cardId']);
-          }
-          enableNextButton();
-          highlightAnswer(isAnswerCorrect);
-
-          function enableNextButton() {
-            let nextCardButton = document.getElementById("nextCardBtn");
-            nextCardButton.removeAttribute('disabled');
-          }
-
-          function highlightAnswer(isAnswerCorrect) {
-            let icon = document.getElementById("answer-check-icon");
-            if (isAnswerCorrect) {
-              icon.className = "bi bi-check-square-fill";
-              icon.style = "color:limegreen"; // green
-            } else {
-              icon.className = "bi bi-x-square-fill";
-              icon.style = "color:crimson"; // red
-            }
-          }
-
+          this.correctAnswers.push(currentCardId);
+        } else {
+          this.highlightAnswer(false);
         }
       },
       deep: true,
@@ -61,8 +44,7 @@ export default {
         return;
       }
       this.displayed = this.cards[this.nextIndex++];
-      const aSentence = this.getRandomSentence(this.displayed);
-      this.aSentenceChunks = this.splitByClosestMatch(aSentence)
+      this.spellingExercise = this.getRandomSentence(this.displayed);
       this.answer = '';
       this.nextCardNumber++;
     },
@@ -93,29 +75,24 @@ export default {
       let arr = card['sentences'];
       return shuffle(arr)[0];
     },
-    splitByClosestMatch(sentence) {
-      const fullSentence = sentence['fullSentence'];
-      const matchedWord = sentence['matchedWord'];
-
-      const chunks = fullSentence.split(matchedWord);
-      const beforeMatch = chunks[0];
-      const afterMatch = chunks.slice(1).join(matchedWord);
-      // Replace the matched phrase with non-breaking spaces in the original sentence
-      const replacedSentence = fullSentence.replace(new RegExp(matchedWord, 'i'), "_".repeat(matchedWord.length));
-
-      return {
-        originalSentence: fullSentence,
-        beforeMatch: beforeMatch,
-        matchedWord: matchedWord,
-        afterMatch: afterMatch,
-        replacedSentence: replacedSentence
-      };
+    highlightAnswer(isAnswerCorrect) {
+      let icon = document.getElementById("answer-check-icon");
+      if (isAnswerCorrect) {
+        icon.className = "bi bi-check-square-fill";
+        icon.style = "color:limegreen"; // green
+      } else {
+        icon.className = "bi bi-x-square-fill";
+        icon.style = "color:crimson"; // red
+      }
+    },
+    enableNextButton() {
+      let nextCardButton = document.getElementById("nextCardBtn");
+      nextCardButton.removeAttribute('disabled');
     }
   },
   mounted() {
     this.displayed = this.cards[this.nextIndex];
-    const aSentence = this.getRandomSentence(this.displayed);
-    this.aSentenceChunks = this.splitByClosestMatch(aSentence)
+    this.spellingExercise = this.getRandomSentence(this.displayed);
     this.nextIndex++;
     this.totalCards = this.cards.length;
   }
@@ -133,7 +110,7 @@ export default {
           Card {{ nextCardNumber }}
         </p>
         <p class="card-text text-center" style="font-size: larger">
-          {{ aSentenceChunks.replacedSentence }}
+          {{ spellingExercise['replacedSentence'] }}
         </p>
       </div>
     </div>
