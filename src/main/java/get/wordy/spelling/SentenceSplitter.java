@@ -1,6 +1,5 @@
 package get.wordy.spelling;
 
-import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.text.similarity.JaroWinklerSimilarity;
 
 import java.util.Arrays;
@@ -19,8 +18,8 @@ public class SentenceSplitter {
         if (sentence == null || sentence.isBlank() || sentence.trim().length() < keyword.length()) {
             return Optional.empty();
         }
-        String[] words = sentence.split(StringUtils.SPACE);
-        int keywordLength = keyword.split(StringUtils.SPACE).length;
+        String[] words = sentence.split("\\s+");
+        int keywordLength = keyword.split("\\s+").length;
 
         double maxSimilarityFound = MIN_VALUABLE_SIMILARITY;
         int startIndex = -1;
@@ -32,7 +31,7 @@ public class SentenceSplitter {
             StringBuilder phraseBuilder = new StringBuilder();
             for (int j = 0; j < keywordLength; j++) {
                 if (j > 0) {
-                    phraseBuilder.append(StringUtils.SPACE);
+                    phraseBuilder.append(" ");
                 }
                 phraseBuilder.append(words[i + j].toLowerCase());
             }

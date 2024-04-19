@@ -265,9 +265,8 @@ public class CardsController extends HttpServlet {
                     String originalSentenceStr = sentence.getExample();
                     String matchedWords = sentence.getMatchedWords();
                     if (StringUtils.hasText(matchedWords)) {
-                        String replacedSentence = originalSentenceStr
-                                .replaceAll(matchedWords, "_".repeat(matchedWords.length()));
-                        return new SentenceResponse(originalSentenceStr, sentence.getMatchedWords(), replacedSentence);
+                        String replacedSentence = prepareReplacedSentence(originalSentenceStr, matchedWords);
+                        return new SentenceResponse(originalSentenceStr, matchedWords, replacedSentence);
                     } else {
                         return new SentenceResponse(originalSentenceStr, null, null);
                     }
@@ -279,8 +278,27 @@ public class CardsController extends HttpServlet {
         Sentence sentence = new Sentence(strSentence);
         Optional<SentenceSplitter.Chunks> sentenceChunks = SentenceSplitter.splitByClosestMatch(strSentence, keyword);
         return sentenceChunks
-                .map(chunks -> sentence.withMatchedWords(chunks.matchedWords()))
+                .map(chunks -> {
+                    LOG.debug("Sentence split for \"{}\", with keyword \"{}\" closest match: {}", strSentence, keyword, chunks);
+                    return sentence.withMatchedWords(chunks.matchedWords());
+                })
                 .orElse(sentence);
+    }
+
+    private String prepareReplacedSentence(String originalSentence, String matchedWords) {
+        String[] matchedWordsArr = matchedWords.split("\\s+");
+        StringBuilder replacement = new StringBuilder();
+
+        for (int i = 0; i < matchedWordsArr.length; i++) {
+            String word = matchedWordsArr[i];
+            String repeatedUnderscores = "_".repeat(word.length());
+            replacement.append(repeatedUnderscores);
+            if (i < matchedWordsArr.length - 1) {
+                replacement.append(" "); // Append whitespace if it's not the last word
+            }
+        }
+
+        return originalSentence.replaceAll("(?i)" + matchedWords, replacement.toString());
     }
 
 }

@@ -91,7 +91,7 @@ public class SentenceSplitterTest {
 
     private static void printResult(String keyword, String tense, String sentence, SentenceSplitter.Chunks chunks) {
         String chunksStr = chunks.beforeMatch() + " | " + chunks.matchedWords() + " | " + chunks.afterMatch();
-        System.out.printf("Keyword: \"%s\", Tense: %s, Sentence: \"%s\", Chunks: \"%s\"", keyword, tense, sentence, chunksStr);
+        System.out.printf("Keyword: \"%s\", Tense: %s, Sentence: \"%s\", Chunks: \"%s\"\n", keyword, tense, sentence, chunksStr);
     }
 
 }
