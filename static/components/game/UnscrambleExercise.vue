@@ -1,23 +1,13 @@
 <script>
-import {submitResultForExercise} from "@/js/cards.js"
+import Exercise from "./Exercise.vue";
 import {shuffle} from "@/js/utils.js"
 
 export default {
-  props: ['dictionaryId', 'cards'],
+  extends: Exercise,
   data() {
     return {
-      totalCards: 0,
-      displayed: {
-        cardId: '',
-        word: {}
-      },
       letters: [],
-      nextIndex: 0,
-      nextCardNumber: 1,
-      isExerciseDone: false,
       answeredLetters: [],
-      correctAnswers: [],
-      appraisal: 'Good'
     }
   },
   watch: {
@@ -31,27 +21,11 @@ export default {
           let isAnswerCorrect = clearedInput === this.displayed.word.value;
           // pre save card id
           if (isAnswerCorrect) {
-            this.correctAnswers.push(this.displayed['cardId']);
+            let currentCardId = this.displayed['cardId'];
+            this.preSaveAnswer(currentCardId);
           }
-          enableNextButton();
-          highlightAnswer(isAnswerCorrect);
-
-          function enableNextButton() {
-            let nextCardButton = document.getElementById("nextCardBtn");
-            nextCardButton.removeAttribute('disabled');
-          }
-
-          function highlightAnswer(isAnswerCorrect) {
-            let icon = document.getElementById("answer-check-icon");
-            if (isAnswerCorrect) {
-              icon.className = "bi bi-check-square-fill";
-              icon.style = "color:limegreen"; // green
-            } else {
-              icon.className = "bi bi-x-square-fill";
-              icon.style = "color:crimson"; // red
-            }
-          }
-
+          this.highlightAnswer(isAnswerCorrect);
+          this.enableNextButton();
         }
       },
       deep: true,
@@ -59,46 +33,18 @@ export default {
   },
   methods: {
     next: function () {
-      if (this.isFinish()) {
-        this.finishExercise();
-        return;
-      }
-      this.displayed = this.cards[this.nextIndex++];
-      this.answeredLetters = [];
+      this.nextCard();
       this.prepareLetters();
-      this.nextCardNumber++;
+      this.answeredLetters = [];
     },
     onClick: function (letter, index) {
       console.log("A letter selected:", letter);
       this.disableLetterBtn(index);
       this.answeredLetters.push(letter);
     },
-    isFinish() {
-      return this.nextIndex >= this.totalCards;
-    },
-    setAppraisalCaption() {
-      if (this.correctAnswers.length === this.totalCards) {
-        this.appraisal = 'Excellent';
-      } else if (this.correctAnswers.length === this.totalCards - 1) {
-        this.appraisal = 'Great';
-      } else if (this.correctAnswers.length === 0) {
-        this.appraisal = 'Pity';
-      }
-    },
     disableLetterBtn(index) {
       let button = document.getElementById("letterBtn_" + index);
       button.setAttribute('disabled', 'true');
-    },
-    finishExercise() {
-      submitResultForExercise(this.dictionaryId, this.correctAnswers)
-          .then(response => {
-            if (!response.ok) {
-              // todo notification
-            }
-            this.isExerciseDone = true;
-            this.setAppraisalCaption();
-            console.log("Submitting exercise results. Response.status =", response.status);
-          });
     },
     prepareLetters() {
       let str = this.displayed.word['value'];
@@ -116,10 +62,8 @@ export default {
     }
   },
   mounted() {
-    this.displayed = this.cards[this.nextIndex];
+    this.init();
     this.prepareLetters();
-    this.nextIndex++;
-    this.totalCards = this.cards.length;
   }
 }
 </script>
@@ -171,7 +115,7 @@ export default {
       {{ appraisal }}
     </p>
     <p class="text-center mb-4">
-      Your answer is {{ correctAnswers.length }} out of {{ cards.length }}
+      Your answer is {{ correctAnswers.length }} out of {{ totalCards }}
     </p>
     <div class="col pb-5 text-center">
       <button type="button" class="btn btn-lg" v-on:click="nextExercise()">

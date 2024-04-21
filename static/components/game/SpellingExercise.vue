@@ -1,23 +1,13 @@
 <script>
-import {submitResultForExercise} from "@/js/cards.js"
 import {shuffle} from "@/js/utils.js"
+import Exercise from "./Exercise.vue";
 
 export default {
-  props: ['dictionaryId', 'cards'],
+  extends: Exercise,
   data() {
     return {
-      totalCards: 0,
-      displayed: {
-        cardId: '',
-        word: {}
-      },
       spellingExercise: {},
-      nextIndex: 0,
-      nextCardNumber: 1,
-      isExerciseDone: false,
       answer: '',
-      correctAnswers: [],
-      appraisal: 'Good'
     }
   },
   watch: {
@@ -28,8 +18,7 @@ export default {
         if (allAnswers.has(input)) {
           this.highlightAnswer(true);
           this.enableNextButton();
-          // pre save card id
-          this.correctAnswers.push(currentCardId);
+          this.preSaveAnswer(currentCardId);
         } else {
           this.highlightAnswer(false);
         }
@@ -39,62 +28,18 @@ export default {
   },
   methods: {
     next: function () {
-      if (this.isFinish()) {
-        this.finishExercise();
-        return;
-      }
-      this.displayed = this.cards[this.nextIndex++];
+      this.nextCard();
       this.spellingExercise = this.getRandomSentence(this.displayed);
       this.answer = '';
-      this.nextCardNumber++;
-    },
-    isFinish() {
-      return this.nextIndex >= this.totalCards;
-    },
-    setAppraisalCaption() {
-      if (this.correctAnswers.length === this.totalCards) {
-        this.appraisal = 'Excellent';
-      } else if (this.correctAnswers.length === this.totalCards - 1) {
-        this.appraisal = 'Great';
-      } else if (this.correctAnswers.length === 0) {
-        this.appraisal = 'Pity';
-      }
-    },
-    finishExercise() {
-      submitResultForExercise(this.dictionaryId, this.correctAnswers)
-          .then(response => {
-            if (!response.ok) {
-              // todo notification
-            }
-            this.isExerciseDone = true;
-            this.setAppraisalCaption();
-            console.log("Submitting exercise results. Response.status =", response.status);
-          });
     },
     getRandomSentence(card) {
       let arr = card['sentences'];
       return shuffle(arr)[0];
     },
-    highlightAnswer(isAnswerCorrect) {
-      let icon = document.getElementById("answer-check-icon");
-      if (isAnswerCorrect) {
-        icon.className = "bi bi-check-square-fill";
-        icon.style = "color:limegreen"; // green
-      } else {
-        icon.className = "bi bi-x-square-fill";
-        icon.style = "color:crimson"; // red
-      }
-    },
-    enableNextButton() {
-      let nextCardButton = document.getElementById("nextCardBtn");
-      nextCardButton.removeAttribute('disabled');
-    }
   },
   mounted() {
-    this.displayed = this.cards[this.nextIndex];
+    this.init();
     this.spellingExercise = this.getRandomSentence(this.displayed);
-    this.nextIndex++;
-    this.totalCards = this.cards.length;
   }
 }
 </script>
@@ -135,7 +80,7 @@ export default {
       {{ appraisal }}
     </p>
     <p class="text-center mb-4">
-      Your answer is {{ correctAnswers.length }} out of {{ cards.length }}
+      Your answer is {{ correctAnswers.length }} out of {{ totalCards }}
     </p>
   </div>
 </template>

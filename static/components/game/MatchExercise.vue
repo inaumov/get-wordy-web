@@ -1,46 +1,32 @@
 <script>
-import {submitResultForExercise} from "@/js/cards.js"
-import {shuffle} from "@/js/utils.js"
+import Exercise from "./Exercise.vue";
+import {shuffle} from "@/js/utils.js";
 
 export default {
-  props: ['dictionaryId', 'cards'],
+  extends: Exercise,
   data() {
     return {
-      totalCards: 0,
-      displayed: {
-        cardId: '',
-        word: {}
-      },
-      shuffledCards: [],
-      nextIndex: 0,
-      nextCardNumber: 1,
-      isExerciseDone: false,
-      correctAnswers: [],
-      appraisal: 'Good'
+      preparedMatches: []
     }
   },
   methods: {
     next: function () {
-      if (this.isFinish()) {
-        this.finishExercise();
-        return;
-      }
-      this.displayed = this.cards[this.nextIndex++];
-      this.shuffleCards();
-      this.nextCardNumber++;
+      this.nextCard();
+      this.prepareMatches();
     },
-    onAnswered: function (answered) {
-      const isAnswerCorrect = answered['cardId'] === this.displayed.cardId;
+    onAnswered: function (answeredCardId) {
+      let currentCardId = this.displayed['cardId'];
+      const isAnswerCorrect = answeredCardId === currentCardId;
       // pre save card id
       if (isAnswerCorrect) {
-        this.correctAnswers.push(answered['cardId']);
+        this.preSaveAnswer(currentCardId);
       }
       highlightAnswer();
       disableAllAnswers(this.cards.map((card) => card['cardId']));
-      enableNextButton();
+      this.enableNextButton();
 
       function highlightAnswer() {
-        let elementId = "answerBtn_" + answered['cardId'];
+        let elementId = "answerBtn_" + answeredCardId;
         let answerBtn = document.getElementById(elementId);
         let icon = document.createElement("i");
         if (isAnswerCorrect) {
@@ -59,54 +45,25 @@ export default {
           button.setAttribute('disabled', 'disabled');
         });
       }
-
-      function enableNextButton() {
-        let nextCardButton = document.getElementById("nextCardBtn");
-        nextCardButton.removeAttribute('disabled');
-      }
-
     },
-    shuffleCards() {
-      this.shuffledCards = shuffle(this.cards);
-    },
-    isFinish() {
-      return this.nextIndex >= this.totalCards;
-    },
-    setAppraisalCaption() {
-      if (this.correctAnswers.length === this.totalCards) {
-        this.appraisal = 'Excellent';
-      } else if (this.correctAnswers.length === this.totalCards - 1) {
-        this.appraisal = 'Great';
-      } else if (this.correctAnswers.length === 0) {
-        this.appraisal = 'Pity';
-      }
-    },
-    finishExercise() {
-      submitResultForExercise(this.dictionaryId, this.correctAnswers)
-          .then(response => {
-            if (!response.ok) {
-              // todo notification
-            }
-            this.isExerciseDone = true;
-            this.setAppraisalCaption();
-            console.log("Submitting exercise results. Response.status =", response.status);
-          });
+    prepareMatches: function () {
+      const arr = shuffle(this.cards);
+      // simplify to key value
+      this.preparedMatches = arr.map(i => ({id: i.cardId, value: i.word.value}));
     },
     nextExercise: function () {
       this.$emit("nextStep", 'UnscrambleExercise', this.cards);
     }
   },
   mounted() {
-    this.displayed = this.cards[this.nextIndex];
-    this.shuffleCards();
-    this.nextIndex++;
-    this.totalCards = this.cards.length;
+    this.init();
+    this.prepareMatches()
   }
 }
 </script>
 
 <template>
-  <div class="container" id="match-exercise" :key="displayed.cardId" v-if="!isExerciseDone">
+  <div class="container" id="match-exercise" :key="displayed['cardId']" v-if="!isExerciseDone">
     <p class="text-center mb-3">
       Exercise 1: Match each meaning with its corresponding word
     </p>
@@ -122,10 +79,10 @@ export default {
     </div>
     <div class="container text-center mb-4" id="answer-buttons">
       <div class="row justify-content-md-center">
-        <div class="col" v-for="card in shuffledCards">
-          <button class="btn btn-lg border-0" v-on:click="onAnswered(card)"
-                  v-bind:id="`answerBtn_${card['cardId']}`">
-            {{ card.word['value'] }}
+        <div class="col" v-for="answer in preparedMatches">
+          <button class="btn btn-lg border-0" v-on:click="onAnswered(answer['id'])"
+                  v-bind:id="`answerBtn_${answer['id']}`">
+            {{ answer['value'] }}
           </button>
         </div>
       </div>
@@ -141,7 +98,7 @@ export default {
       {{ appraisal }}
     </p>
     <p class="text-center mb-4">
-      Your answer is {{ correctAnswers.length }} out of {{ cards.length }}
+      Your answer is {{ correctAnswers.length }} out of {{ totalCards }}
     </p>
     <div class="col pb-5 text-center">
       <button type="button" class="btn btn-lg" v-on:click="nextExercise()">
