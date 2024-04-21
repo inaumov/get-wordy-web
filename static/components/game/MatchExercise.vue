@@ -1,8 +1,10 @@
 <script>
+import ShowResults from "@/components/game/ShowResults.vue";
 import Exercise from "./Exercise.vue";
 import {shuffle} from "@/js/utils.js";
 
 export default {
+  components: {ShowResults},
   extends: Exercise,
   data() {
     return {
@@ -93,19 +95,9 @@ export default {
       </button>
     </div>
   </div>
-  <div class="col pb-5 text-center" v-else-if="isExerciseDone">
-    <p class="text-center mb-4">
-      {{ appraisal }}
-    </p>
-    <p class="text-center mb-4">
-      Your answer is {{ correctAnswers.length }} out of {{ totalCards }}
-    </p>
-    <div class="col pb-5 text-center">
-      <button type="button" class="btn btn-lg" v-on:click="nextExercise()">
-        <i class="bi bi-box-arrow-right"></i> Roll on
-      </button>
-    </div>
-  </div>
+  <show-results
+      v-bind="{nextAction: {caption: 'Next', onAction: nextExercise}, result: [appraisal, correctAnswers.length, totalCards]}"
+      v-else-if="isExerciseDone"/>
 </template>
 
 <style scoped>
