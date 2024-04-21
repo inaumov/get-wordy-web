@@ -1,5 +1,6 @@
 package get.wordy.rest;
 
+import get.wordy.spelling.SentenceSplitter;
 import get.wordy.core.api.IDictionaryService;
 import get.wordy.core.api.bean.*;
 import get.wordy.core.api.exception.DictionaryNotFoundException;
@@ -11,15 +12,12 @@ import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.security.Principal;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 @RestController
 @RequestMapping(value = "/dictionaries")
@@ -51,8 +49,8 @@ public class CardsController extends HttpServlet {
 
     @GetMapping(value = "/{dictionaryId}/exercise")
     public ResponseEntity<List<ExerciseResponse>> getCardsForExercise(Principal user,
-                                                                  @PathVariable("dictionaryId") int dictionaryId,
-                                                                  @RequestParam(value = "limit", required = false, defaultValue = "5") int limit) {
+                                                                      @PathVariable("dictionaryId") int dictionaryId,
+                                                                      @RequestParam(value = "limit", required = false, defaultValue = "5") int limit) {
 
         LOG.info("Getting cards to exercise for the user = {}, dictionary id = {}", user.getName(), dictionaryId);
 
@@ -101,8 +99,12 @@ public class CardsController extends HttpServlet {
         LOG.info("Adding a new card for the user = {}, dictionary id = {}", user.getName(), dictionaryId);
 
         Card card = new Card();
-        card.setWord(toWordEntity(cardRequest.word()));
-        card.setStrSentences(cardRequest.sentences());
+        WordRequest word = cardRequest.word();
+        card.setWord(toWordEntity(word));
+        card.setSentences(cardRequest.sentences()
+                .stream()
+                .map(strSentence -> withClosestMatch(strSentence, cardRequest.getKeyword()))
+                .toList());
         card.setCollocations(cardRequest.collocations());
         Card addedCard = dictionaryService.addCard(dictionaryId, card);
 
@@ -129,7 +131,10 @@ public class CardsController extends HttpServlet {
         card.setWordId(cardRequest.wordId());
         Word wordEntity = toWordEntity(cardRequest.word());
         card.setWord(wordEntity.withId(cardRequest.wordId()));
-        card.setStrSentences(cardRequest.sentences());
+        card.setSentences(cardRequest.sentences()
+                .stream()
+                .map(strSentence -> withClosestMatch(strSentence, cardRequest.getKeyword()))
+                .toList());
         card.setCollocations(cardRequest.collocations());
         Card addedCard = dictionaryService.updateCard(dictionaryId, card);
 
@@ -256,8 +261,44 @@ public class CardsController extends HttpServlet {
     private List<SentenceResponse> toSentencesResponse(List<Sentence> sentences) {
         return sentences
                 .stream()
-                .map(v -> new SentenceResponse(v.getExample(), "test"))
+                .map(sentence -> {
+                    String originalSentenceStr = sentence.getExample();
+                    String matchedWords = sentence.getMatchedWords();
+                    if (StringUtils.hasText(matchedWords)) {
+                        String replacedSentence = prepareReplacedSentence(originalSentenceStr, matchedWords);
+                        return new SentenceResponse(originalSentenceStr, matchedWords, replacedSentence);
+                    } else {
+                        return new SentenceResponse(originalSentenceStr, null, null);
+                    }
+                })
                 .toList();
+    }
+
+    private static Sentence withClosestMatch(String strSentence, String keyword) {
+        Sentence sentence = new Sentence(strSentence);
+        Optional<SentenceSplitter.Chunks> sentenceChunks = SentenceSplitter.splitByClosestMatch(strSentence, keyword);
+        return sentenceChunks
+                .map(chunks -> {
+                    LOG.debug("Sentence split for \"{}\", with keyword \"{}\" closest match: {}", strSentence, keyword, chunks);
+                    return sentence.withMatchedWords(chunks.matchedWords());
+                })
+                .orElse(sentence);
+    }
+
+    private String prepareReplacedSentence(String originalSentence, String matchedWords) {
+        String[] matchedWordsArr = matchedWords.split("\\s+");
+        StringBuilder replacement = new StringBuilder();
+
+        for (int i = 0; i < matchedWordsArr.length; i++) {
+            String word = matchedWordsArr[i];
+            String repeatedUnderscores = "_".repeat(word.length());
+            replacement.append(repeatedUnderscores);
+            if (i < matchedWordsArr.length - 1) {
+                replacement.append(" "); // Append whitespace if it's not the last word
+            }
+        }
+
+        return originalSentence.replaceAll("(?i)" + matchedWords, replacement.toString());
     }
 
 }
