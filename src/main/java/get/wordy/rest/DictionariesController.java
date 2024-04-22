@@ -48,7 +48,7 @@ public class DictionariesController {
     @PostMapping("/dictionaries")
     public ResponseEntity<DictionaryResponse> createDictionary(Principal user,
                                                                @RequestBody DictionaryRequest dictionaryRequest) {
-        LOG.info("Creating dictionary for the user = {}", user.getName());
+        LOG.info("Creating a new dictionary = {} for the user = {}", dictionaryRequest.name(), user.getName());
 
         Dictionary dictionary = dictionaryService.createDictionary(dictionaryRequest.name(), dictionaryRequest.picture());
         DictionaryResponse response = toResponse(dictionary);

@@ -189,6 +189,23 @@ class CardsApiTest extends BaseApiTest {
         }
     }
 
+    @Test
+    void resetCard() throws URISyntaxException, IOException, InterruptedException {
+        try (HttpClient httpClient = HttpClient.newBuilder().build()) {
+            HttpRequest httpRequest = HttpRequest.newBuilder()
+                    .header("Cookie", jSessionIdHolder.get())
+                    .headers("Content-Type", MediaType.APPLICATION_JSON_VALUE)
+                    .uri(new URI("http://localhost:8080/api/v1/dictionaries/1/cards/77/resetScore"))
+                    .PUT(HttpRequest.BodyPublishers.noBody())
+                    .build();
+
+            HttpResponse<String> httpResponse = httpClient.send(httpRequest, HttpResponse.BodyHandlers.ofString());
+
+            int statusCode = httpResponse.statusCode();
+            assertEquals(202, statusCode);
+        }
+    }
+
     private static void assertWordInCard(JsonNode card) {
         assertTrue(card.has("word"));
         JsonNode word = card.get("word");
