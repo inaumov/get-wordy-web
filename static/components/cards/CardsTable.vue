@@ -13,9 +13,9 @@ export default {
     canBeReset: function (card) {
       return card.status === 'POSTPONED' || card.status === 'LEARNT';
     },
-    resetScore(dictionaryId, card) {
+    resetScore(card) {
       const cardId = card['cardId'];
-      resetScore(dictionaryId, cardId)
+      resetScore(this.dictionaryId, cardId)
           .then(response => {
             if (response.ok) {
               card.score = 0;
@@ -24,9 +24,12 @@ export default {
             console.log("PUT reset score has been requested. Response.status =", response.status);
           });
     },
-    deleteCard(dictionaryId, card) {
+    edit(card) {
+      // todo
+    },
+    deleteCard(card) {
       const cardId = card['cardId'];
-      deleteCard(dictionaryId, cardId)
+      deleteCard(this.dictionaryId, cardId)
           .then(response => {
             if (response.ok) {
               const index = this.cards.findIndex(obj => obj['cardId'] === cardId)
@@ -52,7 +55,7 @@ export default {
         <th>Score</th>
         <th>Context</th>
         <th>Collocations</th>
-        <th>Actions</th>
+        <th style="text-align: right">Actions</th>
       </tr>
       </thead>
       <tbody>
@@ -76,12 +79,15 @@ export default {
             </li>
           </ul>
         </td>
-        <td>
-          <div id="actions" class="float-end">
-            <button class="btn btn-lg" @click="resetScore(this.dictionaryId, card)" v-if="canBeReset(card)">
+        <td style="text-align: right">
+          <div id="actions">
+            <button class="btn btn-lg" @click="resetScore(card)" v-if="canBeReset(card)" title="Reset score">
               <i class="bi bi-arrow-repeat"></i>
             </button>
-            <button class="btn btn-lg" @click="deleteCard(this.dictionaryId, card)">
+            <button class="btn btn-lg" @click="edit(card)" title="Edit card">
+              <i class="bi bi-pencil-square"></i>
+            </button>
+            <button class="btn btn-lg" @click="deleteCard(card)" title="Delete">
               <i class="bi bi-x-lg"></i>
             </button>
           </div>
