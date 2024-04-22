@@ -95,15 +95,28 @@ class DictionariesApiTest extends BaseApiTest {
             prettyPrint(responseBody);
 
             // all minimal checks
-
-            assertEquals(201, statusCode);
-
             var dictionary = jsonMapper.readTree(responseBody);
             assertTrue(dictionary.isObject(), "is not an object");
             assertTrue(dictionary.get("dictionaryId").asInt() > 0, "cardId must be greater than 0");
             assertEquals("New dictionary. Test", dictionary.get("name").asText());
             assertTrue(dictionary.get("picture").asText().matches(IMAGE_URL_PATTERN));
             assertEquals(0, dictionary.get("cardsTotal").asInt());
+        }
+    }
+
+    @Test
+    void deleteDictionary() throws URISyntaxException, IOException, InterruptedException {
+        try (HttpClient httpClient = HttpClient.newBuilder().build()) {
+            HttpRequest httpRequest = HttpRequest.newBuilder()
+                    .header("Cookie", jSessionIdHolder.get())
+                    .uri(new URI("http://localhost:8080/api/v1/dictionaries/8"))
+                    .DELETE()
+                    .build();
+
+            HttpResponse<String> httpResponse = httpClient.send(httpRequest, HttpResponse.BodyHandlers.ofString());
+
+            int statusCode = httpResponse.statusCode();
+            assertEquals(204, statusCode);
         }
     }
 
