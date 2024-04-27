@@ -10,3 +10,9 @@ export function shuffle(arr) {
 export function textToArray(textarea) {
     return textarea.trim().split(/\r?\n/).filter(elm => elm);
 }
+
+export function arrayToText(strings) {
+    if (strings && Array.isArray(strings)) {
+        return strings.join('\n');
+    }
+}

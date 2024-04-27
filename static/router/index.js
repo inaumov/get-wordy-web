@@ -52,6 +52,17 @@ const router = createRouter({
             props: true
         },
         {
+            path: '/Dictionaries/:dictionaryId/Cards/:cardId',
+            name: 'edit-card',
+            component: () => import('@/views/EditCardView.vue'),
+            props: (route) => (
+                {
+                    dictionaryId: route.params.dictionaryId,
+                    cardId: route.params.cardId
+                }
+            ),
+        },
+        {
             path: '/Settings',
             name: 'settings',
             // route level code-splitting

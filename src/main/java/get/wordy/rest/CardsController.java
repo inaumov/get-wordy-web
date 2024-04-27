@@ -145,7 +145,7 @@ public class CardsController extends HttpServlet {
                 .toUri()
         );
         CardResponse cardResponse = toCardResponse(addedCard);
-        return new ResponseEntity<>(cardResponse, headers, HttpStatus.ACCEPTED);
+        return new ResponseEntity<>(cardResponse, headers, HttpStatus.OK);
     }
 
     @PutMapping(value = "/{dictionaryId}/cards/{cardId}/resetScore")

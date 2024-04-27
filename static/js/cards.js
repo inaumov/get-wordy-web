@@ -43,15 +43,49 @@ export function generateCards(dictionaryId, wordsArr) {
 }
 
 export function createCard(dictionaryId, cardData) {
+
+    let headers = new Headers();
+    headers.append('Content-Type', 'application/json');
+
+    let request = prepareCardJson(cardData);
+
+    let initObject = {
+        method: 'POST',
+        headers: headers,
+        body: JSON.stringify(request),
+    };
+    let createRequest = new Request(dictionariesAPI + "/" + dictionaryId + "/cards", initObject);
+    return fetch(createRequest)
+        .catch(err => console.log("HTTP error: ", err));
+}
+
+export function updateCard(dictionaryId, cardId, wordId, cardData) {
+
+    let headers = new Headers();
+    headers.append('Content-Type', 'application/json');
+
+    let request = prepareCardJson(cardData);
+    request['cardId'] = cardId;
+    request['wordId'] = wordId;
+
+    let initObject = {
+        method: 'PUT',
+        headers: headers,
+        body: JSON.stringify(request),
+    };
+
+    let updateRequest = new Request(dictionariesAPI + "/" + dictionaryId + "/cards", initObject);
+    return fetch(updateRequest)
+        .catch(err => console.log("HTTP error: ", err));
+}
+
+function prepareCardJson(cardData) {
     let word = cardData.word;
     let partOfSpeech = cardData.partOfSpeech;
     let transcription = cardData.transcription;
     let meaning = cardData.meaning;
     let sentencesArr = cardData.sentences;
     let collocationsArr = cardData.collocations;
-
-    let headers = new Headers();
-    headers.append('Content-Type', 'application/json');
 
     let wordObj = {
         value: word,
@@ -60,21 +94,11 @@ export function createCard(dictionaryId, cardData) {
         meaning: meaning
     };
 
-    let cardRequest = {
+    return {
         word: wordObj,
         sentences: sentencesArr,
         collocations: collocationsArr
-    };
-
-    let initObject = {
-        method: 'POST',
-        headers: headers,
-        body: JSON.stringify(cardRequest),
-    };
-
-    let generateRequest = new Request(dictionariesAPI + "/" + dictionaryId + "/cards", initObject);
-    return fetch(generateRequest)
-        .catch(err => console.log("HTTP error: ", err));
+    }
 }
 
 export function fetchCardsForExercise(dictionaryId, limit) {

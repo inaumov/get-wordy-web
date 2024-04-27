@@ -24,9 +24,6 @@ export default {
             console.log("PUT reset score has been requested. Response.status =", response.status);
           });
     },
-    edit(card) {
-      // todo
-    },
     deleteCard(card) {
       const cardId = card['cardId'];
       deleteCard(this.dictionaryId, cardId)
@@ -84,9 +81,9 @@ export default {
             <button class="btn btn-lg" @click="resetScore(card)" v-if="canBeReset(card)" title="Reset score">
               <i class="bi bi-arrow-repeat"></i>
             </button>
-            <button class="btn btn-lg" @click="edit(card)" title="Edit card">
+            <router-link :to="{name: 'edit-card', params: {dictionaryId: this.dictionaryId, cardId: card['cardId']}}" class="btn btn-lg" title="Edit card">
               <i class="bi bi-pencil-square"></i>
-            </button>
+            </router-link>
             <button class="btn btn-lg" @click="deleteCard(card)" title="Delete">
               <i class="bi bi-x-lg"></i>
             </button>
