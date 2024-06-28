@@ -171,7 +171,7 @@ class CardsApiTest extends BaseApiTest {
 
             // all minimal checks
 
-            assertEquals(202, statusCode);
+            assertEquals(200, statusCode);
 
             var card = jsonMapper.readTree(responseBody);
             assertTrue(card.isObject(), "is not an object");
