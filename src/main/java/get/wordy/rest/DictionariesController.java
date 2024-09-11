@@ -5,6 +5,7 @@ import get.wordy.core.api.exception.DictionaryNotFoundException;
 import get.wordy.core.api.bean.Dictionary;
 import get.wordy.model.DictionaryRequest;
 import get.wordy.model.DictionaryResponse;
+import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -47,7 +48,7 @@ public class DictionariesController {
 
     @PostMapping("/dictionaries")
     public ResponseEntity<DictionaryResponse> createDictionary(Principal user,
-                                                               @RequestBody DictionaryRequest dictionaryRequest) {
+                                                               @Valid @RequestBody DictionaryRequest dictionaryRequest) {
         LOG.info("Creating a new dictionary = {} for the user = {}", dictionaryRequest.name(), user.getName());
 
         Dictionary dictionary = dictionaryService.createDictionary(dictionaryRequest.name(), dictionaryRequest.picture());

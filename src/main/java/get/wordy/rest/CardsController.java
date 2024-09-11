@@ -94,7 +94,7 @@ public class CardsController extends HttpServlet {
     @PostMapping(value = "/{dictionaryId}/cards")
     public ResponseEntity<CardResponse> addCard(Principal user,
                                                 @PathVariable("dictionaryId") int dictionaryId,
-                                                @RequestBody CardRequest cardRequest, UriComponentsBuilder ucBuilder) {
+                                                @Valid @RequestBody CardRequest cardRequest, UriComponentsBuilder ucBuilder) {
 
         LOG.info("Adding a new card for the user = {}, dictionary id = {}", user.getName(), dictionaryId);
 

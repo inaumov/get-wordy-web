@@ -1,9 +1,16 @@
 package get.wordy.model;
 
-public record WordRequest(String value,
-                          String partOfSpeech,
-                          String transcription,
-                          String meaning
+import jakarta.validation.constraints.NotBlank;
+
+public record WordRequest(
+        @NotBlank
+        String value,
+        @NotBlank
+        String partOfSpeech,
+
+        String transcription,
+        @NotBlank
+        String meaning
 ) {
 
 }
