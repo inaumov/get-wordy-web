@@ -36,6 +36,7 @@ public class WebSecurityConfig {
         http
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/login").permitAll()
+                        .requestMatchers("/signup").permitAll()
                         .requestMatchers("/api/users/**").hasAnyRole("USER", "ADMIN")
                         .requestMatchers("/api/**").authenticated()
                         .anyRequest().authenticated()

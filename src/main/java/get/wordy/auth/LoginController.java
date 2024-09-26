@@ -17,6 +17,11 @@ public class LoginController {
         return "login";
     }
 
+    @GetMapping("/signup")
+    public String signup() {
+        return "signup";
+    }
+
     @GetMapping("/account")
     public String account(@AuthenticationPrincipal UserDetails userDetails) {
         LOG.debug("Logged in user: {}", userDetails.getUsername());
