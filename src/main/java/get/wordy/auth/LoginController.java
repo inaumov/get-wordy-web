@@ -22,6 +22,11 @@ public class LoginController {
         return "signup";
     }
 
+    @GetMapping("/reset_password")
+    public String resetPassword() {
+        return "reset_password";
+    }
+
     @GetMapping("/account")
     public String account(@AuthenticationPrincipal UserDetails userDetails) {
         LOG.debug("Logged in user: {}", userDetails.getUsername());
