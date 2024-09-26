@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Account</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
+    <style>
+        body {
+            background-color: #f8f9fa; /* Light background color */
+        }
+
+        @import url('https://fonts.googleapis.com/css2?family=Lato:wght@400;700;900&display=swap');
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="row mt-5">
+        <div class="col-md-6 offset-md-3">
+            <h4 class="text-center mb-4" th:text="'Welcome, ' + ${#authentication.getPrincipal().getUsername()}"></h4>
+            <hr/>
+            <p class="text-center mb-4">You have successfully logged in to our application.</p>
+            <div class="text-center mb-4" th:if="${#authorization.expression('hasRole(''ADMIN'')')}">
+                <span>You have administrative privileges.</span>
+                <a href="/"><span>Let's get started</span></a>
+            </div>
+            <div class="text-center mb-4" th:if="${#authorization.expression('hasRole(''USER'')')}">
+                <span>You have user privileges.</span>
+                <a href="/"><span>Let's get started</span></a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
