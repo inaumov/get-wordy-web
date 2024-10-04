@@ -10,13 +10,17 @@
             background-color: #f8f9fa; /* Light background color */
         }
 
+        .container {
+            max-width: 400px; /* Set a max width for the form */
+            margin-top: 100px; /* Center vertically */
+        }
+
         @import url('https://fonts.googleapis.com/css2?family=Lato:wght@400;700;900&display=swap');
     </style>
 </head>
 <body>
 <div class="container">
-    <div class="row mt-5">
-        <div class="col-md-6 offset-md-3">
+    <div class="row">
             <h4 class="text-center mb-4" th:text="'Welcome, ' + ${#authentication.getPrincipal().getUsername()}"></h4>
             <hr/>
             <p class="text-center mb-4">You have successfully logged in to our application.</p>
@@ -28,7 +32,6 @@
                 <span>You have user privileges.</span>
                 <a href="/"><span>Let's get started</span></a>
             </div>
-        </div>
     </div>
 </div>
 

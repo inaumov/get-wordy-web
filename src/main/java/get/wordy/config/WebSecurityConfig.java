@@ -11,6 +11,8 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.provisioning.JdbcUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.AuthenticationFailureHandler;
+import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 
 import javax.sql.DataSource;
 
@@ -38,10 +40,11 @@ public class WebSecurityConfig {
                         .requestMatchers(
                                 "/login",
                                 "/signup",
+                                "/users/registration",
                                 "/reset_password"
                         )
                         .permitAll()
-                        .requestMatchers("/api/users/**").hasAnyRole("USER", "ADMIN")
+                        .requestMatchers("/users/**").hasAnyRole("USER", "ADMIN")
                         .requestMatchers("/api/**").authenticated()
                         .anyRequest().authenticated()
                 )
@@ -49,8 +52,11 @@ public class WebSecurityConfig {
                 .formLogin((form) -> form
                         .loginPage("/login")
                         .usernameParameter("email")
+                        .loginProcessingUrl("/login")
                         .defaultSuccessUrl("/account", true)
                         .failureUrl("/login?error=true")
+//                        .successHandler(successHandler())  // Custom success handler
+//                        .failureHandler(failureHandler())   // Custom failure handler
                         .permitAll()
                 )
                 .logout((exit) -> exit
@@ -60,6 +66,24 @@ public class WebSecurityConfig {
                         .permitAll()
                 );
         return http.build();
+    }
+
+    // Custom success handler
+    private AuthenticationSuccessHandler successHandler() {
+        return (request, response, authentication) -> {
+            // Return a success response, such as user details or a simple message
+            response.setStatus(200);
+            response.getWriter().write("Login Successful");
+            response.getWriter().flush();
+        };
+    }
+
+    // Custom failure handler
+    private AuthenticationFailureHandler failureHandler() {
+        return (request, response, exception) -> {
+            // Return a 403 Forbidden status
+            response.sendError(403, "Authentication Failed");
+        };
     }
 
 }

@@ -1,11 +1,14 @@
 package get.wordy.auth;
 
+import get.wordy.users.UserDto;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.context.request.WebRequest;
 
 @Controller
 public class LoginController {
@@ -18,7 +21,9 @@ public class LoginController {
     }
 
     @GetMapping("/signup")
-    public String signup() {
+    public String signup(WebRequest request, Model model) {
+        UserDto userDto = new UserDto();
+        model.addAttribute("user", userDto);
         return "signup";
     }
 
@@ -28,7 +33,7 @@ public class LoginController {
     }
 
     @GetMapping("/account")
-    public String account(@AuthenticationPrincipal UserDetails userDetails) {
+    public String account(Model model, @AuthenticationPrincipal UserDetails userDetails) {
         LOG.debug("Logged in user: {}", userDetails.getUsername());
         return "account";
     }
