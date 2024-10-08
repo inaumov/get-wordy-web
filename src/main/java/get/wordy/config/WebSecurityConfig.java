@@ -1,5 +1,6 @@
 package get.wordy.config;
 
+import get.wordy.users.CustomUserDetailsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -9,7 +10,6 @@ import org.springframework.security.config.annotation.web.configurers.AbstractHt
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.provisioning.JdbcUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
@@ -22,10 +22,7 @@ public class WebSecurityConfig {
 
     @Bean
     public UserDetailsService userDetailsService(@Autowired DataSource dataSource) {
-        JdbcUserDetailsManager jdbcUserDetailsManager = new JdbcUserDetailsManager(dataSource);
-        jdbcUserDetailsManager.setUsersByUsernameQuery("select email,password,enabled from gw_users where email = ?");
-        jdbcUserDetailsManager.setAuthoritiesByUsernameQuery("select email,authority from usr_authorities where email = ?");
-        return jdbcUserDetailsManager;
+        return new CustomUserDetailsService(dataSource);
     }
 
     @Bean
@@ -53,7 +50,7 @@ public class WebSecurityConfig {
                         .loginPage("/login")
                         .usernameParameter("email")
                         .loginProcessingUrl("/login")
-                        .defaultSuccessUrl("/account", true)
+                        .defaultSuccessUrl("/welcome", true)
                         .failureUrl("/login?error=true")
 //                        .successHandler(successHandler())  // Custom success handler
 //                        .failureHandler(failureHandler())   // Custom failure handler

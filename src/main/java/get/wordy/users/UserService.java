@@ -1,9 +1,9 @@
 package get.wordy.users;
 
-import get.wordy.users.entity.GwUser;
-import get.wordy.users.repository.UserRepository;
 import get.wordy.users.exception.UserAlreadyExistException;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -15,12 +15,12 @@ import java.util.List;
 @Transactional
 public class UserService implements IUserService {
 
-    private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final CustomUserDetailsService userDetailsService;
 
-    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder) {
-        this.userRepository = userRepository;
+    public UserService(PasswordEncoder passwordEncoder, CustomUserDetailsService userDetailsService) {
         this.passwordEncoder = passwordEncoder;
+        this.userDetailsService = userDetailsService;
     }
 
     @Override
@@ -31,19 +31,25 @@ public class UserService implements IUserService {
         }
 
         // the rest of the registration operation
-        GwUser user = new GwUser();
-        user.setFirstName(userDto.getFirstName());
-        user.setLastName(userDto.getLastName());
-        user.setEmail(userDto.getEmail());
+        UserDetails user = User.builder()
+                .username(userDto.getFirstName() + userDto.getLastName() + "-temp")
+                .password(userDto.getPassword())
+                // encrypt the password using spring security
+                .passwordEncoder(passwordEncoder::encode)
+                .roles("USER")
+                .build();
 
-        // encrypt the password using spring security
-        user.setPassword(passwordEncoder.encode(userDto.getPassword()));
+        userDetailsService.createUser(user);
 
-        user.setRole("ROLE_USER");
+        UserProfile userProfile = UserProfile.builder()
+                .username(user.getUsername())
+                .firstName(userDto.getFirstName())
+                .lastName(userDto.getLastName())
+                .email(userDto.getEmail())
+                .build();
+        userDetailsService.createUserProfile(userProfile);
 
-        GwUser saved = userRepository.save(user);
-
-        log.info("A new account successfully created for the {}", saved.getEmail());
+        log.info("A new account successfully created for the email: {}", userDto.getEmail());
         return userDto;
     }
 
@@ -54,22 +60,22 @@ public class UserService implements IUserService {
 
     @Override
     public UserDto findUserByEmail(String email) {
-        return mapToUserDto(userRepository.findByEmail(email));
+        return mapToUserDto(userDetailsService.loadUserByUsername(email));
     }
 
     @Override
     public List<UserDto> findAllUsers() {
-        List<GwUser> users = userRepository.findAll();
+        List<CustomUserDetails> users = List.of();
         return users.stream()
                 .map(this::mapToUserDto)
                 .toList();
     }
 
     private boolean emailExists(String email) {
-        return userRepository.findByEmail(email) != null;
+        return userDetailsService.checkEmailExists(email);
     }
 
-    private UserDto mapToUserDto(GwUser user) {
+    private UserDto mapToUserDto(CustomUserDetails user) {
         UserDto userDto = new UserDto();
         userDto.setFirstName(userDto.getFirstName());
         userDto.setLastName(user.getLastName());

@@ -1,10 +1,10 @@
 package get.wordy.auth;
 
+import get.wordy.users.CustomUserDetails;
 import get.wordy.users.UserDto;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -32,9 +32,15 @@ public class LoginController {
         return "reset_password";
     }
 
+    @GetMapping("/welcome")
+    public String loggedIn(Model model, @AuthenticationPrincipal CustomUserDetails userDetails) {
+        LOG.debug("A user {} just have logged in", userDetails.getUsername());
+        return "welcome";
+    }
+
     @GetMapping("/account")
-    public String account(Model model, @AuthenticationPrincipal UserDetails userDetails) {
-        LOG.debug("Logged in user: {}", userDetails.getUsername());
+    public String account(Model model, @AuthenticationPrincipal CustomUserDetails userDetails) {
+        model.addAttribute("user", userDetails);
         return "account";
     }
 
