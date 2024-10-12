@@ -1,10 +1,23 @@
 <script>
 import {applyCaption} from '@/js/utils.js'
+import {inject} from 'vue';
 
 export default {
+  setup() {
+    const isLoggedIn = inject('isLoggedIn');
+    const setLoginStatus = inject('setLoginStatus');
+    return {isLoggedIn, setLoginStatus}
+  },
   methods: {
     handleClick() {
       applyCaption('Settings')
+    },
+    redirectToLogin() {
+      window.location.href = '/login';
+    },
+    logout() {
+      this.setLoginStatus(false); // update the global state to indicate the user is logged out
+      window.location.href = '/login?logout=true'; // redirect to spring boot's logout URL
     }
   }
 }
@@ -18,9 +31,13 @@ export default {
           <h4 id="caption">My dictionaries</h4>
         </div>
         <div class="col" id="settings">
-          <router-link to="/Settings" class="btn btn-lg float-end" @click="handleClick">
-            <i class="bi bi-gear"></i>
-          </router-link>
+          <div class="button-group d-flex flex-column align-items-end">
+            <button v-if="!isLoggedIn" class="btn btn-link" @click="redirectToLogin">Login</button>
+            <router-link v-if="isLoggedIn" to="/Settings" class="btn btn-md" @click="handleClick">
+              <i class="bi bi-gear"></i>
+            </router-link>
+            <button v-if="isLoggedIn" class="btn btn-link" @click="logout">Logout</button>
+          </div>
         </div>
       </div>
     </div>

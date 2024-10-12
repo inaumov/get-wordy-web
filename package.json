@@ -4,7 +4,7 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "vite --mode development & npm run sv",
+    "dev": "vite --mode development",
     "build:staging": "vite build  --base=./ --mode staging",
     "build:prod": "vite build  --base=./ --mode production"
   },

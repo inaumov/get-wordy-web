@@ -21,7 +21,7 @@ import javax.sql.DataSource;
 public class WebSecurityConfig {
 
     @Bean
-    public UserDetailsService userDetailsService(@Autowired DataSource dataSource) {
+    public CustomUserDetailsService userDetailsService(@Autowired DataSource dataSource) {
         return new CustomUserDetailsService(dataSource);
     }
 
