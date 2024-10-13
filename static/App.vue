@@ -1,20 +1,18 @@
 <script>
 import AppHeader from '@/components/AppHeader.vue'
 import AppFooter from '@/components/AppFooter.vue'
-import {ref, provide} from 'vue';
+import {provideAuth, checkLoginStatus} from '@/js/auth-check.js';
+import {onMounted} from "vue";
 
 export default {
   components: {AppHeader, AppFooter},
   setup() {
-    const isLoggedIn = ref(true);
-
     // provide globally to all child components
-    provide('isLoggedIn', isLoggedIn);
-    provide('setLoginStatus', (status) => {
-      isLoggedIn.value = status;
+    provideAuth();
+    onMounted(() => {
+      checkLoginStatus();
     });
-
-    return {isLoggedIn};
+    return {};
   }
 };
 

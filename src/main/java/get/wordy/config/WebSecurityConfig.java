@@ -7,7 +7,6 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
@@ -38,6 +37,7 @@ public class WebSecurityConfig {
                                 "/login",
                                 "/signup",
                                 "/users/registration",
+                                "/users/status",
                                 "/reset_password"
                         )
                         .permitAll()
@@ -57,6 +57,7 @@ public class WebSecurityConfig {
                         .permitAll()
                 )
                 .logout((exit) -> exit
+                        .logoutUrl("/logout")
                         .logoutSuccessUrl("/login?logout=true")
                         .invalidateHttpSession(true)
                         .deleteCookies("JSESSIONID")
