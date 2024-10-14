@@ -7,12 +7,14 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collection;
 
-@Getter
 public class CustomUserDetails implements UserDetails {
 
     private final UserDetails userDetails;
+    @Getter
     private final String email;
+    @Getter
     private final String firstName;
+    @Getter
     private final String lastName;
 
     public CustomUserDetails(UserDetails userDetails, String email, String firstName, String lastName) {
@@ -59,6 +61,11 @@ public class CustomUserDetails implements UserDetails {
 
     public String getDisplayName() {
         return firstName + StringUtils.SPACE + lastName;
+    }
+
+    public boolean hasPermission(String permission) {
+        return getAuthorities().stream()
+                .anyMatch(grantedAuthority -> grantedAuthority.getAuthority().equals(permission));
     }
 
 }

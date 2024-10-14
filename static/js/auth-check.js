@@ -1,6 +1,7 @@
 import {ref, provide, inject} from 'vue';
 
 const isLoggedIn = ref(false);
+const permissions = ref([]);
 
 export async function checkLoginStatus() {
     try {
@@ -15,6 +16,9 @@ export async function checkLoginStatus() {
         if (response.ok) {
             const data = await response.json();
             isLoggedIn.value = data['loggedIn'];
+            if (data['loggedIn']) {
+                await loadPermissions();
+            }
         } else {
             isLoggedIn.value = false;
         }
@@ -39,6 +43,25 @@ export async function logout() {
         }
     } catch (error) {
         console.error('Error while logout:', error);
+    }
+}
+
+async function loadPermissions() {
+    try {
+        const response = await fetch('/users/permissions', {
+            method: 'GET',
+            credentials: 'include', // include cookies in the request,
+            headers: {
+                'Cache-Control': 'no-cache', // prevent browser caching
+            },
+        });
+
+        if (response.ok) {
+            const data = await response.json();
+            permissions.value = [...data];
+        }
+    } catch (error) {
+        console.error('Error while getting user permissions:', error);
     }
 }
 

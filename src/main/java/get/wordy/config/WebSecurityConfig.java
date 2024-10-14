@@ -37,11 +37,10 @@ public class WebSecurityConfig {
                                 "/login",
                                 "/signup",
                                 "/users/registration",
-                                "/users/status",
                                 "/reset_password"
                         )
                         .permitAll()
-                        .requestMatchers("/users/**").hasAnyRole("USER", "ADMIN")
+                        .requestMatchers("/users/**").authenticated()
                         .requestMatchers("/api/**").authenticated()
                         .anyRequest().authenticated()
                 )
