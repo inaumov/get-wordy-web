@@ -16,17 +16,15 @@ public class CustomUserDetails implements UserDetails {
     private final String firstName;
     @Getter
     private final String lastName;
+    @Getter
+    private final Collection<? extends GrantedAuthority> authorities;
 
-    public CustomUserDetails(UserDetails userDetails, String email, String firstName, String lastName) {
+    public CustomUserDetails(UserDetails userDetails, String email, String firstName, String lastName, Collection<? extends GrantedAuthority> authorities) {
         this.userDetails = userDetails;
         this.email = email;
         this.firstName = firstName;
         this.lastName = lastName;
-    }
-
-    @Override
-    public Collection<? extends GrantedAuthority> getAuthorities() {
-        return userDetails.getAuthorities();
+        this.authorities = authorities;
     }
 
     @Override
@@ -63,9 +61,9 @@ public class CustomUserDetails implements UserDetails {
         return firstName + StringUtils.SPACE + lastName;
     }
 
-    public boolean hasPermission(String permission) {
+    public boolean hasPermissionOrRole(String authority) {
         return getAuthorities().stream()
-                .anyMatch(grantedAuthority -> grantedAuthority.getAuthority().equals(permission));
+                .anyMatch(grantedAuthority -> grantedAuthority.getAuthority().equals(authority));
     }
 
 }

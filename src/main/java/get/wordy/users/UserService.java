@@ -48,6 +48,7 @@ public class UserService implements IUserService {
                 .email(userDto.getEmail())
                 .build();
         userDetailsService.createUserProfile(userProfile);
+        userDetailsService.addUserToGroup(user.getUsername(), "individual_users");
 
         log.info("A new account successfully created for the email: {}", userDto.getEmail());
         return userDto;

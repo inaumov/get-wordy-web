@@ -2,15 +2,20 @@ package get.wordy.users;
 
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.provisioning.JdbcUserDetailsManager;
 import org.springframework.util.Assert;
 
 import javax.sql.DataSource;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class CustomUserDetailsService extends JdbcUserDetailsManager {
 
@@ -35,7 +40,15 @@ public class CustomUserDetailsService extends JdbcUserDetailsManager {
         UserDetails userDetails = super.loadUserByUsername(email);
         // Load user profile from user_profiles table
         UserProfile profile = loadUserProfile(userDetails.getUsername());
-        return new CustomUserDetails(userDetails, profile.getEmail(), profile.getFirstName(), profile.getLastName());
+        // Load group-based authorities (permissions) for the user
+        Stream<SimpleGrantedAuthority> groupAuthorities = loadGroupAuthorities(userDetails.getUsername())
+                .stream()
+                .map(x -> (SimpleGrantedAuthority) x);
+        // Combine user's existing authorities (roles) with group-based authorities
+        Collection<? extends GrantedAuthority> combinedAuthorities = Stream.concat(userDetails.getAuthorities().stream(), groupAuthorities)
+                .collect(Collectors.toSet());
+        // Return a new User object with both the user-specific and group-based authorities
+        return new CustomUserDetails(userDetails, profile.getEmail(), profile.getFirstName(), profile.getLastName(), combinedAuthorities);
     }
 
     public UserProfile loadUserProfile(String username) {
