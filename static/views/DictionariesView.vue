@@ -3,6 +3,7 @@ import {fetchDictionaries} from '@/js/dictionaries.js';
 import {applyCaption} from '@/js/utils.js'
 
 export default {
+  name: 'DictionariesView',
   data() {
     return {
       dictionaries: [

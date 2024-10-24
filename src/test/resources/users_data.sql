@@ -9,4 +9,4 @@ INSERT INTO authorities (username, authority)
 VALUES ('IvanDrago-temp', 'ROLE_USER');
 
 INSERT INTO group_members (group_id, username)
-VALUES (1, 'IvanDrago-temp');
+VALUES (3, 'IvanDrago-temp');

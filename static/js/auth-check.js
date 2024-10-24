@@ -72,6 +72,7 @@ export function provideAuth() {
         isLoggedIn.value = status;
     });
     provide('logout', logout);
+    provide('permissions', permissions);
 }
 
 export function useAuth() {
@@ -79,6 +80,7 @@ export function useAuth() {
         isLoggedIn: inject('isLoggedIn'),
         checkLoginStatus: inject('checkLoginStatus'),
         setLoginStatus: inject('setLoginStatus'),
-        logout: inject('logout')
+        logout: inject('logout'),
+        permissions: inject('permissions')
     };
 }

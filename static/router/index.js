@@ -1,4 +1,5 @@
 import {createRouter, createWebHistory} from 'vue-router'
+import MainView from "@/views/MainView.vue";
 import DictionariesView from "@/views/DictionariesView.vue";
 import NotFoundView from "@/views/error/NotFoundView.vue";
 
@@ -8,6 +9,11 @@ const router = createRouter({
         {
             path: '/',
             name: 'home',
+            component: MainView
+        },
+        {
+            path: '/Dictionaries',
+            name: 'dictionaries',
             component: DictionariesView
         },
         {

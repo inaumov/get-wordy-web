@@ -58,3 +58,5 @@ INSERT INTO group_authorities (group_id, authority)
 VALUES (1, 'P_MANAGE_OWN_CARDS');
 INSERT INTO group_authorities (group_id, authority)
 VALUES (1, 'P_MANAGE_OWN_DICTIONARIES');
+INSERT INTO group_authorities (group_id, authority)
+VALUES (3, 'P_MANAGE_CLASSES');
