@@ -1,5 +1,6 @@
 import {createRouter, createWebHistory} from 'vue-router'
 import MainView from "@/views/MainView.vue";
+import WordsheetListView from "@/views/classes/WordsheetListView.vue";
 import DictionariesView from "@/views/DictionariesView.vue";
 import NotFoundView from "@/views/error/NotFoundView.vue";
 
@@ -65,6 +66,45 @@ const router = createRouter({
                 {
                     dictionaryId: route.params.dictionaryId,
                     cardId: route.params.cardId
+                }
+            ),
+        },
+        {
+            path: '/Class/:classId',
+            name: 'class-wordsheet-list',
+            component: WordsheetListView,
+            props: (route) => (
+                {
+                    classId: route.params.classId
+                }
+            ),
+        },
+        {
+            path: '/Class/:classId/Wordsheet/:wordsheetId',
+            name: 'wordsheet',
+            // route level code-splitting
+            // this generates a separate chunk (Settings.[hash].js) for this route
+            // which is lazy-loaded when the route is visited.
+            component: () => import('@/views/classes/WordSheetView.vue'),
+            props: (route) => (
+                {
+                    classId: route.params.classId,
+                    wordsheetId: route.params.wordsheetId
+                }
+            ),
+        },
+        {
+            path: '/Class/:classId/Wordsheet/:wordsheetId/:word',
+            name: 'edit-word',
+            // route level code-splitting
+            // this generates a separate chunk (Settings.[hash].js) for this route
+            // which is lazy-loaded when the route is visited.
+            component: () => import('@/views/error/NotFoundView.vue'),
+            props: (route) => (
+                {
+                    classId: route.params.classId,
+                    wordsheetId: route.params.wordsheetId,
+                    word: route.params.word
                 }
             ),
         },
