@@ -25,18 +25,23 @@ export default {
   mounted() {
     this.getData()
     applyCaption('My dictionaries')
+  },
+  computed: {
+    hasDictionaries() {
+      return this.dictionaries && this.dictionaries.length > 0;
+    }
   }
 };
 </script>
 
 <template>
-  <div v-if="dictionaries[0].dictionaryId" class="container p-4" id="content">
+  <div v-if="hasDictionaries" class="container p-4" id="content">
     <div id="dictionary" class="card text-center" v-for="dictionary in dictionaries">
-      <img v-bind:src="dictionary.picture" class="card-img-top mx-auto d-block" v-bind:alt="dictionary.name">
+      <img v-bind:src="dictionary['picture']" class="card-img-top mx-auto d-block" v-bind:alt="dictionary['name']">
       <div class="card-body">
-        <h5 class="card-title">{{ dictionary.name }}</h5>
+        <h5 class="card-title">{{ dictionary['name'] }}</h5>
         <router-link class="btn btn-primary"
-                     :to="{ name: 'all-cards', params: { dictionaryId : dictionary.dictionaryId}, query: { dictionaryName: dictionary.name }}">
+                     :to="{ name: 'all-cards', params: { dictionaryId : dictionary['dictionaryId']}, query: { dictionaryName: dictionary['name'] }}">
           {{ dictionary.cardsTotal }}
         </router-link>
       </div>

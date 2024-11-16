@@ -11,19 +11,34 @@ export default {
   },
   data() {
     return {
+      dayOfWeek: '',
       classList: [],
     }
   },
   methods: {
     async getData() {
       const response = await fetchClasses();
-      this.classList = await response.json();
+      const jsonData = await response.json();
+      this.dayOfWeek = jsonData['dayOfWeek'];
+      this.classList = jsonData['classes'];
     },
-    navigateToDictionaries() {
-      this.router.push({name: 'dictionaries'});
+    navigateToWordsheetList(classItem) {
+      this.router.push(
+          {
+            name: 'class-wordsheet-list',
+            params: {
+              classId: classItem['classId']
+            }
+          }
+      );
+      console.log("Selected class: id = ", classItem['classId'], ", name = ", classItem['name'])
     },
   },
-
+  computed: {
+    hasClasses() {
+      return this.classList && this.classList.length > 0;
+    }
+  },
   mounted() {
     this.getData()
     applyCaption('Desna Academy')
@@ -32,30 +47,39 @@ export default {
 </script>
 
 <template>
-  <div class="container mt-5">
-    <div v-for="el in classList" :key="el.group" class="age-group">
-      <h3>{{ el.group }}</h3>
-      <ul class="list-group mb-4">
-        <li
-            v-for="classItem in el.classes"
-            :key="classItem['classId']"
-            class="list-group-item position-relative"
-            @click="navigateToDictionaries"
-            style="cursor: pointer;"
-        >
-          <span class="class-id">Class ID: {{ classItem['classId'] }}</span>
-          <div>
-            <span><strong>Class:</strong> {{ classItem['name'] }}</span><br>
-            <span><strong>Format:</strong> {{ classItem['classFormat'] }}</span><br>
-            <span><strong>Level:</strong> {{ classItem['classLevel'] }}</span>
+  <div v-if="hasClasses" class="container mt-5">
+    <div class="day-groups">
+      <h3 class="my-3">{{ dayOfWeek }}</h3>
+      <div class="row">
+        <div class="col-md-4 card" style="cursor: pointer" v-for="classItem in classList"
+             :key="classItem['classId']"
+             @click="navigateToWordsheetList(classItem)">
+          <div class="card-body">
+            <span class="class-id">Class ID: {{ classItem['classId'] }}</span>
+            <div>
+              <div class="class-details">
+                <span>{{ classItem['name'] }}</span>
+              </div>
+              <div v-if="classItem['format']" class="class-details">
+                <span><strong>Format</strong> : {{ classItem['format'] }}</span>
+              </div>
+              <div v-if="classItem['attendees']" class="class-details">
+                <span><strong>Attendees</strong> : {{ classItem['attendees'] }}</span>
+              </div>
+              <div v-if="classItem['level']" class="class-details">
+                <span><strong>Level</strong> : {{ classItem['level'] }}</span>
+              </div>
+              <div v-if="classItem['notes']" class="class-details">
+                <span><strong>Notes</strong> / <strong>Materials</strong> : {{ classItem['notes'] }}</span>
+              </div>
+            </div>
           </div>
-          <div class="class-info">
-            <span><strong>Description:</strong> {{ classItem['courseDescription'] }}</span><br>
-            <span><strong>Dictionaries in Total:</strong> {{ classItem['dictionariesTotal'] }}</span>
-          </div>
-        </li>
-      </ul>
+        </div>
+      </div>
     </div>
+  </div>
+  <div v-else class="d-flex justify-content-center p-5">
+    <p class="lead">No classes registered yet, please create.</p>
   </div>
 </template>
 
@@ -67,12 +91,7 @@ export default {
   top: 10px;
 }
 
-.class-info {
-  display: flex;
-  justify-content: space-between;
-}
-
-.age-group h3 {
+.day-groups h3 {
   font-size: 1.5rem;
 }
 </style>

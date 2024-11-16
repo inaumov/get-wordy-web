@@ -50,7 +50,7 @@ export default {
         <th>Meaning</th>
         <th>Status</th>
         <th>Score</th>
-        <th>Context</th>
+        <th>In Context</th>
         <th>Collocations</th>
         <th style="text-align: right">Actions</th>
       </tr>
