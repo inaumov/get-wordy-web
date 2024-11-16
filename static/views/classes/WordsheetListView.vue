@@ -26,7 +26,7 @@ export default {
   },
   mounted() {
     this.getData()
-    applyCaption(this.name || 'Wordsheet(s)')
+    applyCaption(this.name || 'Wordsheet list')
   },
   computed: {
     hasWordsheet() {

@@ -1,9 +1,9 @@
 package get.wordy.rest;
 
+import get.wordy.core.api.id.OwnerId;
 import get.wordy.spelling.SentenceSplitter;
 import get.wordy.core.api.IDictionaryService;
 import get.wordy.core.api.bean.*;
-import get.wordy.core.api.exception.DictionaryNotFoundException;
 import get.wordy.model.*;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.validation.Valid;
@@ -35,7 +35,7 @@ public class CardsController extends HttpServlet {
 
         LOG.info("Getting all cards for the user = {}, dictionary id = {}", user.getName(), dictionaryId);
 
-        List<CardListResponse> cards = dictionaryService.getCards(dictionaryId)
+        List<CardListResponse> cards = dictionaryService.getCards(createOwnerId(user), dictionaryId)
                 .stream()
                 .map(this::toCardListResponse)
                 .toList();
@@ -54,7 +54,7 @@ public class CardsController extends HttpServlet {
 
         LOG.info("Getting cards to exercise for the user = {}, dictionary id = {}", user.getName(), dictionaryId);
 
-        List<ExerciseResponse> cards = dictionaryService.getCardsForExercise(dictionaryId, limit)
+        List<ExerciseResponse> cards = dictionaryService.getCardsForExercise(createOwnerId(user), dictionaryId, limit)
                 .stream()
                 .map(this::toExerciseResponse)
                 .toList();
@@ -154,12 +154,6 @@ public class CardsController extends HttpServlet {
                                                   @PathVariable("cardId") int cardId) {
         LOG.info("Resetting a card = {} for the user = {}, dictionary id = {}", cardId, user.getName(), dictionaryId);
 
-        dictionaryService.getDictionaries()
-                .stream()
-                .filter(dictionary -> dictionary.getId() == dictionaryId)
-                .findAny()
-                .orElseThrow(DictionaryNotFoundException::new);
-
         dictionaryService.resetScore(cardId);
 
         return ResponseEntity
@@ -173,13 +167,7 @@ public class CardsController extends HttpServlet {
                                                    @PathVariable("cardId") int cardId) {
         LOG.info("Deleting a card = {} for the user = {}, dictionary id = {}", cardId, user.getName(), dictionaryId);
 
-        dictionaryService.getDictionaries()
-                .stream()
-                .filter(dictionary -> dictionary.getId() == dictionaryId)
-                .findAny()
-                .orElseThrow(DictionaryNotFoundException::new);
-
-        dictionaryService.deleteCard(cardId);
+        dictionaryService.deleteCard(createOwnerId(user), dictionaryId, cardId);
 
         return ResponseEntity
                 .noContent()
@@ -196,7 +184,7 @@ public class CardsController extends HttpServlet {
 
         LOG.info("Generating cards for the user = {} and new words: {}", user.getName(), uniqueWords);
 
-        List<CardResponse> cards = dictionaryService.generateCards(dictionaryId, uniqueWords)
+        List<CardResponse> cards = dictionaryService.generateCards(createOwnerId(user), dictionaryId, uniqueWords)
                 .stream()
                 .map(this::toCardResponse)
                 .toList();
@@ -299,6 +287,10 @@ public class CardsController extends HttpServlet {
         }
 
         return originalSentence.replaceAll("(?i)" + matchedWords, replacement.toString());
+    }
+
+    private static OwnerId createOwnerId(Principal user) {
+        return new OwnerId(user.getName(), "1");
     }
 
 }

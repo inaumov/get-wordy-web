@@ -10,8 +10,7 @@ export default {
   props: ['classId', 'wordsheetId'],
   data() {
     return {
-      name: 'rr',
-      wordsheetId: 0,
+      name: '',
       wordsList: []
     }
   },
@@ -34,7 +33,7 @@ export default {
   },
   mounted() {
     this.getData()
-    applyCaption(this.name)
+    applyCaption(this.name || 'Wordsheet')
     console.log("Selected wordsheet: id = ", this.wordsheetId, ", name = ", this.name)
   }
 };

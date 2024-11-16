@@ -1,8 +1,8 @@
 package get.wordy.rest;
 
 import get.wordy.core.api.IDictionaryService;
-import get.wordy.core.api.exception.DictionaryNotFoundException;
 import get.wordy.core.api.bean.Dictionary;
+import get.wordy.core.api.id.OwnerId;
 import get.wordy.model.DictionaryRequest;
 import get.wordy.model.DictionaryResponse;
 import jakarta.validation.Valid;
@@ -36,7 +36,7 @@ public class DictionariesController {
     public ResponseEntity<List<DictionaryResponse>> getUserDictionaries(Principal user) {
         LOG.info("Getting dictionary list for the user = {}", user.getName());
 
-        List<DictionaryResponse> dictionaries = dictionaryService.getDictionaries()
+        List<DictionaryResponse> dictionaries = dictionaryService.getDictionaries(createOwnerId(user))
                 .stream()
                 .map(this::toResponse)
                 .toList();
@@ -53,7 +53,7 @@ public class DictionariesController {
                                                                @Valid @RequestBody DictionaryRequest dictionaryRequest) {
         LOG.info("Creating a new dictionary = {} for the user = {}", dictionaryRequest.name(), user.getName());
 
-        Dictionary dictionary = dictionaryService.createDictionary(dictionaryRequest.name(), dictionaryRequest.picture());
+        Dictionary dictionary = dictionaryService.createDictionary(createOwnerId(user), dictionaryRequest.name(), dictionaryRequest.picture());
         DictionaryResponse response = toResponse(dictionary);
         return ResponseEntity.created(URI.create("/dictionaries/" + response.dictionaryId()))
                 .body(response);
@@ -68,13 +68,13 @@ public class DictionariesController {
 
         // handle name change
         if (StringUtils.hasText(partialUpdate.name())) {
-            dictionaryService.renameDictionary(id, partialUpdate.name());
+            dictionaryService.renameDictionary(createOwnerId(user), id, partialUpdate.name());
         }
         // handle picture change
         if (forceRemovePicture) {
-            dictionaryService.changeDictionaryPicture(id, null);
+            dictionaryService.changeDictionaryPicture(createOwnerId(user), id, null);
         } else if (StringUtils.hasText(partialUpdate.picture())) {
-            dictionaryService.changeDictionaryPicture(id, partialUpdate.picture());
+            dictionaryService.changeDictionaryPicture(createOwnerId(user), id, partialUpdate.picture());
         }
         return ResponseEntity
                 .noContent()
@@ -86,20 +86,15 @@ public class DictionariesController {
                                                                @PathVariable("dictionaryId") int dictionaryId) {
         LOG.info("Deleting a dictionary for the user = {}, dictionary id = {}", user.getName(), dictionaryId);
 
-        Dictionary found = dictionaryService.getDictionaries()
-                .stream()
-                .filter(dictionary -> dictionary.getId() == dictionaryId)
-                .findAny()
-                .orElseThrow(DictionaryNotFoundException::new);
-        if (found.getCardsTotal() > 0) {
-            throw new IllegalStateException("Cannot delete dictionary with cards");
-        }
-
-        dictionaryService.deleteDictionary(dictionaryId);
+        dictionaryService.deleteDictionary(createOwnerId(user), dictionaryId);
 
         return ResponseEntity
                 .noContent()
                 .build();
+    }
+
+    private static OwnerId createOwnerId(Principal user) {
+        return new OwnerId(user.getName(), "1");
     }
 
     private DictionaryResponse toResponse(Dictionary dictionary) {
