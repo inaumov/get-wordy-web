@@ -8,14 +8,7 @@ export default {
   data() {
     return {
       name: '',
-      wordsheetList: [
-        {
-          wordsheetId: 0,
-          name: '',
-          wordsTotal: 0,
-          isShared: false
-        }
-      ],
+      wordsheetList: [],
     }
   },
   methods: {

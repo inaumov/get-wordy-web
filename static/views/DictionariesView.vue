@@ -6,14 +6,7 @@ export default {
   name: 'DictionariesView',
   data() {
     return {
-      dictionaries: [
-        {
-          dictionaryId: '',
-          picture: '',
-          name: '',
-          cardsTotal: ''
-        }
-      ],
+      dictionaries: [],
     }
   },
   methods: {
@@ -42,7 +35,7 @@ export default {
         <h5 class="card-title">{{ dictionary['name'] }}</h5>
         <router-link class="btn btn-primary"
                      :to="{ name: 'all-cards', params: { dictionaryId : dictionary['dictionaryId']}, query: { dictionaryName: dictionary['name'] }}">
-          {{ dictionary.cardsTotal }}
+          {{ dictionary['cardsTotal'] }}
         </router-link>
       </div>
     </div>

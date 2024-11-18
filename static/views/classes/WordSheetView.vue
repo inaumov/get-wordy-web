@@ -24,8 +24,8 @@ export default {
       let form = document.getElementById('search-words-form');
       let formData = new FormData(form);
       let wordSearchRequest = formData.get('words');
-      const newItem = searchWordData(this.wordsheetId, wordSearchRequest);
-      this.wordsList = [...this.wordsList, newItem];
+      const itemsFound = searchWordData(this.wordsheetId, wordSearchRequest);
+      this.wordsList = [...this.wordsList, ...itemsFound];
     },
     onReady() {
 
