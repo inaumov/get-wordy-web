@@ -1,2 +1,5 @@
 #app {
+    form label i, form button i {
+        color: rgb(185, 87, 84)
+    }
 }

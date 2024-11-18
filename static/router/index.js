@@ -3,6 +3,8 @@ import MainView from "@/views/MainView.vue";
 import WordsheetListView from "@/views/classes/WordsheetListView.vue";
 import DictionariesView from "@/views/DictionariesView.vue";
 import NotFoundView from "@/views/error/NotFoundView.vue";
+import ClassListView from "@/views/ClassListView.vue";
+import ManageClassView from "@/views/classes/ManageClassView.vue";
 
 const router = createRouter({
     history: createWebHistory(import.meta.env.BASE_URL),
@@ -16,6 +18,11 @@ const router = createRouter({
             path: '/Dictionaries',
             name: 'dictionaries',
             component: DictionariesView
+        },
+        {
+            path: '/ClassList',
+            name: 'class-list',
+            component: ClassListView
         },
         {
             path: '/Dictionaries/:dictionaryId/Cards',
@@ -68,6 +75,11 @@ const router = createRouter({
                     cardId: route.params.cardId
                 }
             ),
+        },
+        {
+            path: '/Class',
+            name: 'add-new-class',
+            component: ManageClassView
         },
         {
             path: '/Class/:classId',
