@@ -18,22 +18,21 @@ export default {
   methods: {
     async getData() {
       const response = await fetchClasses(this.dayOfWeek);
-      const jsonData = await response.json();
-      this.classList = [...this.classList, ...jsonData];
+      this.classList = await response.json();
     },
     navigateToWordsheetList(classItem) {
-      this.router.push(
-          {
+      this.router.push({
             name: 'class-wordsheet-list',
             params: {
               classId: classItem['classId']
             }
-          }
-      );
+          });
       console.log("Selected class: id = ", classItem['classId'], ", name = ", classItem['name'])
     },
     addNewClass() {
-      this.router.push({name: 'add-new-class'});
+      this.router.push({
+        name: 'add-new-class'
+      });
     }
   },
   computed: {

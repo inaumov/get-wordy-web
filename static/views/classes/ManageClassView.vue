@@ -1,8 +1,12 @@
 <script>
-
+import {useRouter} from "vue-router";
 import {createClass} from '@/js/classes-api.js';
 
 export default {
+  setup() {
+    let router = useRouter();
+    return {router}
+  },
   data() {
     return {
       days: ["sun", "mon", "tue", "wen", "thu", "fri", "sat"],
@@ -20,7 +24,15 @@ export default {
         material: formData.get('material'),
         notes: formData.get('notes')
       };
-      createClass(newItem);
+      createClass(newItem)
+          .then(response => {
+            if (response.ok) {
+              this.router.push({
+                name: 'class-list'
+              });
+            }
+            console.log("POST new class has been requested. Response.status =", response.status);
+          });
     }
   },
 };
@@ -75,7 +87,7 @@ export default {
             <router-link :to="{name: 'home'}" class="btn btn-secondary" title="Back">Back</router-link>
           </div>
           <div class="col-6 text-end">
-            <button type="submit" class="btn btn-primary">Create</button>
+            <button type="submit" class="btn btn-primary">Save</button>
           </div>
         </div>
       </form>
