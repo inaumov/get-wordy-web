@@ -2,7 +2,7 @@
 import WordsheetTable from "@/components/classes/WordsheetTable.vue";
 
 import {applyCaption} from '@/js/utils.js'
-import {fetchWordSheet} from '@/js/classes-api.js';
+import {fetchWordsheet, updateReadiness, updateName} from '@/js/classes-api.js';
 import {searchWordData} from '@/js/wordsheet-api.js';
 
 export default {
@@ -10,15 +10,32 @@ export default {
   props: ['classId', 'wordsheetId'],
   data() {
     return {
-      name: '',
+      name: 'Wordsheet',
       wordsList: []
     }
   },
   methods: {
     async getData() {
-      const response = await fetchWordSheet(this.classId, this.wordsheetId);
+      const response = await fetchWordsheet(this.classId, this.wordsheetId);
       const wordsheet = await response.json();
+      this.name = wordsheet['name'];
       this.wordsList = wordsheet['items'];
+    },
+    onNameEdit(event) {
+      let currVal = event.target.innerText.trim();
+      const actualVal = this.name;
+      if (currVal !== actualVal) {
+        updateName(this.classId, this.wordsheetId, currVal)
+            .then(response => {
+              if (response.ok) {
+                this.name = currVal; // update model
+                console.log('Property [name] has been changed to:', currVal, ', for worksheet id =', this.wordsheetId);
+              }
+              console.log("PATCH wordsheet has been requested. Response.status =", response.status);
+            });
+        return;
+      }
+      console.log('No changes detected in property [name] for worksheet id =', this.wordsheetId);
     },
     onSearch: function () {
       let form = document.getElementById('search-words-form');
@@ -28,6 +45,12 @@ export default {
       this.wordsList = [...this.wordsList, ...itemsFound];
     },
     onReady() {
+      updateReadiness(this.classId, this.wordsheetId, true)
+          .then(response => {
+            if (response.ok) {
+            }
+            console.log("PATCH worksheet has been requested. Response.status =", response.status);
+          });
 
     }
   },
@@ -43,6 +66,11 @@ export default {
 <template>
 
   <div class="container">
+
+    <div class="d-flex justify-content-center pt-5">
+      <span contenteditable="true" class="h4 p-1" v-text="name" v-on:blur="onNameEdit">
+      </span>
+    </div>
 
     <div class="d-flex justify-content-center p-4">
       <div style="padding-top:7px;" class="col-md-4 form-group pull-right">

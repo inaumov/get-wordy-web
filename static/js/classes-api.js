@@ -1,4 +1,5 @@
 const classAPI = import.meta.env.VITE_BACKEND_API + "classes";
+const wordsheetAPI = import.meta.env.VITE_BACKEND_API + "wordsheets";
 
 export function fetchClasses(dayOfWeek) {
     let headers = new Headers();
@@ -43,13 +44,14 @@ export function fetchWordsheetList(classId) {
         headers: headers,
     };
 
-    let wordsheetRequest = new Request(classAPI + '/' + classId, initObject);
+    // let wordsheetRequest = new Request(classAPI + '/' + classId + '/wordsheets', initObject);
+    let wordsheetRequest = new Request(wordsheetAPI, initObject);
 
     return fetch(wordsheetRequest)
         .catch(err => console.log("HTTP error: ", err));
 }
 
-export function fetchWordSheet(classId, wordsheetId) {
+export function fetchWordsheet(classId, wordsheetId) {
     let headers = new Headers();
     headers.append('Content-Type', 'application/json');
 
@@ -57,8 +59,49 @@ export function fetchWordSheet(classId, wordsheetId) {
         method: 'GET', headers: headers,
     };
 
-    let cardsRequest = new Request(classAPI + '/' + classId + '/wordsheet/' + wordsheetId, initObject);
+    // let wordsheetRequest = new Request(classAPI + '/' + classId + '/wordsheets/' + wordsheetId, initObject);
+    let wordsheetRequest = new Request(wordsheetAPI + "/" + wordsheetId, initObject);
 
-    return fetch(cardsRequest)
+    return fetch(wordsheetRequest)
+        .catch(err => console.log("HTTP error: ", err));
+}
+
+export function updateName(classId, worksheetId, name) {
+    let headers = new Headers();
+    headers.append('Content-Type', 'application/json');
+
+    let jsonRequest = {
+        name: name
+    }
+
+    let initObject = {
+        method: 'PATCH',
+        headers: headers,
+        body: JSON.stringify(jsonRequest),
+    };
+
+    let patchRequest = new Request(classAPI + "/" + classId + "/wordsheet/" + worksheetId, initObject);
+
+    return fetch(patchRequest)
+        .catch(err => console.log("HTTP error: ", err));
+}
+
+export function updateReadiness(classId, worksheetId, isReady) {
+    let headers = new Headers();
+    headers.append('Content-Type', 'application/json');
+
+    let jsonRequest = {
+        isShared: isReady
+    }
+
+    let initObject = {
+        method: 'PATCH',
+        headers: headers,
+        body: JSON.stringify(jsonRequest),
+    };
+
+    let patchRequest = new Request(classAPI + "/" + classId + "/wordsheet/" + worksheetId, initObject);
+
+    return fetch(patchRequest)
         .catch(err => console.log("HTTP error: ", err));
 }
