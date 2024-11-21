@@ -1,17 +1,17 @@
 <script>
-import {deleteWord} from "@/js/wordsheet-api.js";
+import {deleteWord} from "@/js/classes-api.js";
 
 export default {
-  props: ['wordsheetId', 'items'],
+  props: ['classId', 'wordsheetId', 'items'],
   data() {
     return {
       // items: []
     }
   },
   methods: {
-    deleteWord(word) {
+    deleteItemFromWordsheet(word) {
       const wordId = word['wordId'];
-      deleteWord(this.wordsheetId, wordId)
+      deleteWord(this.classId, this.wordsheetId, wordId)
           .then(response => {
             if (response.ok) {
               const index = this.items.findIndex(obj => obj['wordId'] === wordId)
@@ -56,7 +56,7 @@ export default {
                          class="btn btn-lg" title="Edit word">
               <i class="bi bi-pencil-square"></i>
             </router-link>
-            <button class="btn btn-lg" @click="deleteWord(item)" title="Delete">
+            <button class="btn btn-lg" @click="deleteItemFromWordsheet(item)" title="Delete">
               <i class="bi bi-x-lg"></i>
             </button>
           </div>

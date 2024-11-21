@@ -3,7 +3,7 @@ import WordsheetTable from "@/components/classes/WordsheetTable.vue";
 
 import {applyCaption} from '@/js/utils.js'
 import {fetchWordsheet, updateReadiness, updateName} from '@/js/classes-api.js';
-import {searchWordData} from '@/js/wordsheet-api.js';
+import {searchWordData} from '@/js/words-search-api.js';
 
 export default {
   components: {WordsheetTable},
@@ -11,7 +11,8 @@ export default {
   data() {
     return {
       name: 'Wordsheet',
-      wordsList: []
+      wordsList: [],
+      itemsFound: []
     }
   },
   methods: {
@@ -29,27 +30,26 @@ export default {
             .then(response => {
               if (response.ok) {
                 this.name = currVal; // update model
-                console.log('Property [name] has been changed to:', currVal, ', for worksheet id =', this.wordsheetId);
+                console.log('Property [name] has been changed to:', currVal, ', for wordsheet id =', this.wordsheetId);
               }
               console.log("PATCH wordsheet has been requested. Response.status =", response.status);
             });
         return;
       }
-      console.log('No changes detected in property [name] for worksheet id =', this.wordsheetId);
+      console.log('No changes detected in property [name] for wordsheet id =', this.wordsheetId);
     },
     onSearch: function () {
       let form = document.getElementById('search-words-form');
       let formData = new FormData(form);
       let wordSearchRequest = formData.get('words');
-      const itemsFound = searchWordData(this.wordsheetId, wordSearchRequest);
-      this.wordsList = [...this.wordsList, ...itemsFound];
+      this.itemsFound = searchWordData(this.wordsheetId, wordSearchRequest);
     },
     onReady() {
       updateReadiness(this.classId, this.wordsheetId, true)
           .then(response => {
             if (response.ok) {
             }
-            console.log("PATCH worksheet has been requested. Response.status =", response.status);
+            console.log("PATCH wordsheet has been requested. Response.status =", response.status);
           });
 
     }
@@ -90,12 +90,18 @@ export default {
       </div>
     </div>
 
-    <wordsheet-table :key="this.wordsList.length" v-bind="{wordsheetId: this.wordsheetId, items: this.wordsList}"/>
+    <wordsheet-table :key="this.wordsList.length" v-bind="{classId: this.classId, wordsheetId: this.wordsheetId, items: this.wordsList}"/>
 
+    <!-- submit / back Buttons -->
     <div class="d-flex justify-content-end p-4">
-      <button type="button" class="btn btn-primary border btn-md" v-on:click="onReady">
-        Ready
-      </button>
+      <div class="col-6 text-start">
+        <router-link :to="{name: 'class-wordsheet-list'}" class="btn btn-secondary" title="Back">Back</router-link>
+      </div>
+      <div class="col-6 text-end">
+        <button type="button" class="btn btn-primary border btn-md" v-on:click="onReady">
+          Ready
+        </button>
+      </div>
     </div>
 
   </div>

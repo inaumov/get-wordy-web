@@ -74,7 +74,7 @@ export default {
         <!-- third row: notes (textarea) -->
         <div class="row mb-3">
           <div class="col-12">
-            <label for="notes" class="form-label">Enter any additional notes (Max 500 characters)</label>
+            <label for="notes" class="form-label">Any additional notes</label>
             <textarea class="form-control" id="notes" name="notes" rows="5" maxlength="500"
                       autocomplete="off"></textarea>
             <small class="form-text text-muted">Max 500 characters</small>

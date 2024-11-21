@@ -18,7 +18,14 @@ export default {
   methods: {
     async getData() {
       const response = await fetchClasses(this.dayOfWeek);
-      this.classList = await response.json();
+      let items = await response.json();
+      this.classList = items.map(item => {
+        // add the 'hasAttendees' property based on the condition
+        return {
+          ...item, // spread the existing properties
+          hasAttendees: item['attendees'] && item['attendees'] >= 1
+        };
+      });
     },
     navigateToWordsheetList(classItem) {
       this.router.push({
@@ -61,14 +68,14 @@ export default {
               <div class="class-details">
                 <span>{{ classItem['name'] }}</span>
               </div>
-              <div v-if="classItem['format']" class="class-details">
-                <span><strong>Format</strong> : {{ classItem['format'] }}</span>
+              <div class="class-details">
+                <span><strong>Attendees</strong> : {{ classItem.hasAttendees ? classItem['attendees'] : 'none' }}</span>
               </div>
-              <div v-if="classItem['attendees']" class="class-details">
-                <span><strong>Attendees</strong> : {{ classItem['attendees'] }}</span>
+              <div v-if="classItem['classFormat']" class="class-details">
+                <span><strong>Format</strong> : {{ classItem['classFormat'] }}</span>
               </div>
-              <div v-if="classItem['level']" class="class-details">
-                <span><strong>Level</strong> : {{ classItem['level'] }}</span>
+              <div v-if="classItem['classLevel']" class="class-details">
+                <span><strong>Level</strong> : {{ classItem['classLevel'] }}</span>
               </div>
               <div v-if="classItem['material']" class="class-details">
                 <span><strong>Materials</strong> : {{ classItem['material'] }}</span>

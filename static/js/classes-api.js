@@ -43,9 +43,9 @@ export function deleteClass(classId) {
         headers: headers
     };
 
-    let patchRequest = new Request(classAPI + "/" + classId, initObject);
+    let deleteRequest = new Request(classAPI + "/" + classId, initObject);
 
-    return fetch(patchRequest)
+    return fetch(deleteRequest)
         .catch(err => console.log("HTTP error: ", err));
 }
 
@@ -80,7 +80,7 @@ export function fetchWordsheet(classId, wordsheetId) {
         .catch(err => console.log("HTTP error: ", err));
 }
 
-export function updateName(classId, worksheetId, name) {
+export function updateName(classId, wordsheetId, name) {
     let headers = new Headers();
     headers.append('Content-Type', 'application/json');
 
@@ -94,13 +94,13 @@ export function updateName(classId, worksheetId, name) {
         body: JSON.stringify(jsonRequest),
     };
 
-    let patchRequest = new Request(classAPI + "/" + classId + "/wordsheets/" + worksheetId, initObject);
+    let patchRequest = new Request(classAPI + "/" + classId + "/wordsheets/" + wordsheetId, initObject);
 
     return fetch(patchRequest)
         .catch(err => console.log("HTTP error: ", err));
 }
 
-export function updateReadiness(classId, worksheetId, isReady) {
+export function updateReadiness(classId, wordsheetId, isReady) {
     let headers = new Headers();
     headers.append('Content-Type', 'application/json');
 
@@ -114,8 +114,22 @@ export function updateReadiness(classId, worksheetId, isReady) {
         body: JSON.stringify(jsonRequest),
     };
 
-    let patchRequest = new Request(classAPI + "/" + classId + "/wordsheets/" + worksheetId, initObject);
+    let patchRequest = new Request(classAPI + "/" + classId + "/wordsheets/" + wordsheetId, initObject);
 
     return fetch(patchRequest)
+        .catch(err => console.log("HTTP error: ", err));
+}
+
+export function deleteWord(classId, wordsheetId, wordId) {
+    let headers = new Headers();
+
+    let initObject = {
+        method: 'DELETE',
+        headers: headers
+    };
+
+    let deleteRequest = new Request(classAPI + "/" + classId + "/wordsheets/" + wordsheetId+ "/words/" + wordId, initObject);
+
+    return fetch(deleteRequest)
         .catch(err => console.log("HTTP error: ", err));
 }
