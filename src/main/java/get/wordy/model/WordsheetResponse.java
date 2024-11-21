@@ -1,6 +1,6 @@
 package get.wordy.model;
 
-public record WordsheetListItem(
+public record WordsheetResponse(
         int wordsheetId,
         String name,
         int wordsTotal,

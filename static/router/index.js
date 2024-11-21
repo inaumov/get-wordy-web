@@ -1,6 +1,6 @@
 import {createRouter, createWebHistory} from 'vue-router'
 import MainView from "@/views/MainView.vue";
-import WordsheetListView from "@/views/classes/WordsheetListView.vue";
+import WordSheetListView from "@/views/classes/WordSheetListView.vue";
 import DictionariesView from "@/views/DictionariesView.vue";
 import NotFoundView from "@/views/error/NotFoundView.vue";
 import ClassListView from "@/views/ClassListView.vue";
@@ -84,7 +84,7 @@ const router = createRouter({
         {
             path: '/Class/:classId',
             name: 'class-wordsheet-list',
-            component: WordsheetListView,
+            component: WordSheetListView,
             props: (route) => (
                 {
                     classId: route.params.classId

@@ -40,7 +40,7 @@ public class BaseApiTest {
     public String login() {
 
         Map<String, String> formData = new HashMap<>();
-        formData.put("username", "user");
+        formData.put("email", "user@test.com");
         formData.put("password", "qwerty");
 
         HttpRequest httpRequest = HttpRequest.newBuilder()

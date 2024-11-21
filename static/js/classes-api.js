@@ -35,6 +35,20 @@ export function createClass(classInfo) {
 
 }
 
+export function deleteClass(classId) {
+    let headers = new Headers();
+
+    let initObject = {
+        method: 'DELETE',
+        headers: headers
+    };
+
+    let patchRequest = new Request(classAPI + "/" + classId, initObject);
+
+    return fetch(patchRequest)
+        .catch(err => console.log("HTTP error: ", err));
+}
+
 export function fetchWordsheetList(classId) {
     let headers = new Headers();
     headers.append('Content-Type', 'application/json');
@@ -80,7 +94,7 @@ export function updateName(classId, worksheetId, name) {
         body: JSON.stringify(jsonRequest),
     };
 
-    let patchRequest = new Request(classAPI + "/" + classId + "/wordsheet/" + worksheetId, initObject);
+    let patchRequest = new Request(classAPI + "/" + classId + "/wordsheets/" + worksheetId, initObject);
 
     return fetch(patchRequest)
         .catch(err => console.log("HTTP error: ", err));
@@ -100,7 +114,7 @@ export function updateReadiness(classId, worksheetId, isReady) {
         body: JSON.stringify(jsonRequest),
     };
 
-    let patchRequest = new Request(classAPI + "/" + classId + "/wordsheet/" + worksheetId, initObject);
+    let patchRequest = new Request(classAPI + "/" + classId + "/wordsheets/" + worksheetId, initObject);
 
     return fetch(patchRequest)
         .catch(err => console.log("HTTP error: ", err));
