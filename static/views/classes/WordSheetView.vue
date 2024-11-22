@@ -1,18 +1,21 @@
 <script>
 import WordsheetTable from "@/components/classes/WordsheetTable.vue";
+import SearchResultsPreview from "@/components/search/SearchResultsPreview.vue";
 
 import {applyCaption} from '@/js/utils.js'
 import {fetchWordsheet, updateReadiness, updateName} from '@/js/classes-api.js';
 import {searchWordData} from '@/js/words-search-api.js';
 
 export default {
-  components: {WordsheetTable},
+  components: {SearchResultsPreview, WordsheetTable},
   props: ['classId', 'wordsheetId'],
   data() {
     return {
       name: 'Wordsheet',
       wordsList: [],
-      itemsFound: []
+      searchResult: {
+        parts: []
+      }
     }
   },
   methods: {
@@ -38,21 +41,34 @@ export default {
       }
       console.log('No changes detected in property [name] for wordsheet id =', this.wordsheetId);
     },
-    onSearch: function () {
+    async onSearch() {
       let form = document.getElementById('search-words-form');
+      let inputField = document.getElementById('ai-search-input');
+      // send request and clean input field on success
       let formData = new FormData(form);
-      let wordSearchRequest = formData.get('words');
-      this.itemsFound = searchWordData(this.wordsheetId, wordSearchRequest);
+      let searchRequest = formData.get('words');
+      const response = await searchWordData(searchRequest)
+      this.searchResult = await response.json();
+      if (response.ok && this.searchResult.hasOwnProperty('parts') && this.searchResult.parts.length > 0) {
+        inputField.value = '';
+      }
     },
     onReady() {
       updateReadiness(this.classId, this.wordsheetId, true)
           .then(response => {
             if (response.ok) {
+              console.log('Property [isShared] has been changed to:', true, ', for wordsheet id =', this.wordsheetId);
             }
             console.log("PATCH wordsheet has been requested. Response.status =", response.status);
           });
-
-    }
+    },
+    handleAddWord(word) {
+      if (!this.wordsList.some((item) => item === word)) { // todo maybe more narrow check
+        this.wordsList.push(word);
+      } else {
+        alert('This word is already added.');
+      }
+    },
   },
   mounted() {
     this.getData()
@@ -77,7 +93,8 @@ export default {
         <form id="search-words-form" action="" method="get" class="form-inline" v-on:submit.prevent="onSearch">
           <div class="form-group">
             <div class="input-group">
-              <input type="text" class="form-control" name="words" placeholder="Search for..." autocomplete="off"
+              <input id="ai-search-input" type="text" class="form-control" name="words" placeholder="Search for..."
+                     autocomplete="off"
                      required>
               <span class="input-group-btn">
                 <button type="submit" class="btn btn-md btn-default border">
@@ -89,6 +106,8 @@ export default {
         </form>
       </div>
     </div>
+
+    <search-results-preview @add-to-wordsheet="handleAddWord" v-bind="{previewData: this.searchResult}"/>
 
     <wordsheet-table :key="this.wordsList.length" v-bind="{classId: this.classId, wordsheetId: this.wordsheetId, items: this.wordsList}"/>
 
