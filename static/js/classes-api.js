@@ -1,5 +1,4 @@
 const classAPI = import.meta.env.VITE_BACKEND_API + "classes";
-const wordsheetAPI = import.meta.env.VITE_BACKEND_API + "wordsheets";
 
 export function fetchClasses(dayOfWeek) {
     let headers = new Headers();
@@ -58,8 +57,7 @@ export function fetchWordsheetList(classId) {
         headers: headers,
     };
 
-    // let wordsheetRequest = new Request(classAPI + '/' + classId + '/wordsheets', initObject);
-    let wordsheetRequest = new Request(wordsheetAPI, initObject);
+    let wordsheetRequest = new Request(classAPI + '/' + classId + '/wordsheets', initObject);
 
     return fetch(wordsheetRequest)
         .catch(err => console.log("HTTP error: ", err));
@@ -73,8 +71,7 @@ export function fetchWordsheet(classId, wordsheetId) {
         method: 'GET', headers: headers,
     };
 
-    // let wordsheetRequest = new Request(classAPI + '/' + classId + '/wordsheets/' + wordsheetId, initObject);
-    let wordsheetRequest = new Request(wordsheetAPI + "/" + wordsheetId, initObject);
+    let wordsheetRequest = new Request(classAPI + '/' + classId + '/wordsheets/' + wordsheetId, initObject);
 
     return fetch(wordsheetRequest)
         .catch(err => console.log("HTTP error: ", err));

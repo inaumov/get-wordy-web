@@ -2,26 +2,26 @@
 export default {
   props: ['previewData'],
   methods: {
-    add(part) {
+    add(explanation) {
       // transformation logic to go further
       let transformed = {
         word: {
           value: this.previewData.value,
-          partOfSpeech: part.partOfSpeech,
+          partOfSpeech: explanation.partOfSpeech,
           transcription: this.previewData.transcription,
-          meaning: part.meaning
+          meaning: explanation.meaning
         },
-        sentences: part.sentences,
-        collocations: part.collocations
+        sentences: explanation.inContext,
+        collocations: explanation.collocations
       };
       this.$emit('add-to-wordsheet', transformed);
       console.log('Add to wordsheet clicked for:', transformed);
-      this.remove(part)
+      this.remove(explanation)
     },
-    remove(part) {
-      const index = this.previewData.parts.indexOf(part);
+    remove(explanation) {
+      const index = this.previewData.explanations.indexOf(explanation);
       if (index !== -1) {
-        this.previewData.parts.splice(index, 1); // remove the item from the list
+        this.previewData.explanations.splice(index, 1); // remove the item from the list
       }
     },
   },
@@ -32,27 +32,27 @@ export default {
   <div class="p-4">
     <div v-if="previewData" class="word-row">
       <div class="word-preview"
-           v-for="part in previewData.parts.slice(0, 4)"
+           v-for="explanation in previewData.explanations"
            :key="previewData.value"
       >
         <div class="word-info">
-          <p><strong>{{ previewData.value }}</strong> ({{ part.partOfSpeech }})</p>
+          <p><strong>{{ previewData.value }}</strong> ({{ explanation.partOfSpeech }})</p>
           <p>{{ previewData.transcription }}</p>
-          <p class="meaning"><strong>Meaning:</strong> {{ part.meaning }}</p>
-          <div v-if="part.sentences && part.sentences.length > 0" class="sentences">
+          <p class="meaning"><strong>Meaning:</strong> {{ explanation.meaning }}</p>
+          <div v-if="explanation.sentences && explanation.sentences.length > 0" class="inContext">
             <strong>In Context:</strong>
             <ul>
-              <li v-for="(sentence, index) in part.sentences" :key="index">
+              <li v-for="(sentence, index) in explanation.inContext" :key="index">
                 {{ sentence }}
               </li>
             </ul>
           </div>
         </div>
         <div class="actions">
-          <button class="btn btn-lg remove-btn" @click="remove(part)" title="Close">
+          <button class="btn btn-lg remove-btn" @click="remove(explanation)" title="Close">
             <i class="bi bi-x-circle close-icon"></i>
           </button>
-          <button class="btn btn-lg add-btn" @click="add(part)" title="Add to word sheet">
+          <button class="btn btn-lg add-btn" @click="add(explanation)" title="Add to word sheet">
             <i class="bi bi-check-circle add-icon"></i>
           </button>
         </div>
@@ -92,11 +92,11 @@ export default {
 }
 
 .meaning,
-.sentences {
+.inContext {
   text-align: left;
 }
 
-.sentences ul {
+.inContext ul {
   list-style-type: disc;
   padding-left: 1.5rem;
   margin: 0.5rem 0;

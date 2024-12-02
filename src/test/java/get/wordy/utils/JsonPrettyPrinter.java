@@ -1,4 +1,4 @@
-package get.wordy.rest.utils;
+package get.wordy.utils;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;

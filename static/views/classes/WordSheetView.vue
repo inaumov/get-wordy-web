@@ -14,7 +14,7 @@ export default {
       name: 'Wordsheet',
       wordsList: [],
       searchResult: {
-        parts: []
+        explanations: []
       }
     }
   },
@@ -23,7 +23,7 @@ export default {
       const response = await fetchWordsheet(this.classId, this.wordsheetId);
       const wordsheet = await response.json();
       this.name = wordsheet['name'];
-      this.wordsList = wordsheet['items'];
+      this.wordsList = wordsheet['items'] || [];
     },
     onNameEdit(event) {
       let currVal = event.target.innerText.trim();
@@ -49,7 +49,7 @@ export default {
       let searchRequest = formData.get('words');
       const response = await searchWordData(searchRequest)
       this.searchResult = await response.json();
-      if (response.ok && this.searchResult.hasOwnProperty('parts') && this.searchResult.parts.length > 0) {
+      if (response.ok && this.searchResult.hasOwnProperty('explanations') && this.searchResult.explanations.length > 0) {
         inputField.value = '';
       }
     },
@@ -109,7 +109,7 @@ export default {
 
     <search-results-preview @add-to-wordsheet="handleAddWord" v-bind="{previewData: this.searchResult}"/>
 
-    <wordsheet-table :key="this.wordsList.length" v-bind="{classId: this.classId, wordsheetId: this.wordsheetId, items: this.wordsList}"/>
+    <wordsheet-table v-bind="{classId: this.classId, wordsheetId: this.wordsheetId, items: this.wordsList}"/>
 
     <!-- submit / back Buttons -->
     <div class="d-flex justify-content-end p-4">

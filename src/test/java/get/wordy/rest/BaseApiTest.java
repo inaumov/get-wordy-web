@@ -3,7 +3,7 @@ package get.wordy.rest;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.json.JsonMapper;
-import get.wordy.rest.utils.JsonPrettyPrinter;
+import get.wordy.utils.JsonPrettyPrinter;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.TestMethodOrder;
