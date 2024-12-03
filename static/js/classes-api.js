@@ -117,7 +117,23 @@ export function updateReadiness(classId, wordsheetId, isReady) {
         .catch(err => console.log("HTTP error: ", err));
 }
 
-export function deleteWord(classId, wordsheetId, wordId) {
+export function addToWordsheet(classId, wordsheetId, wordData) {
+
+    let headers = new Headers();
+    headers.append('Content-Type', 'application/json');
+
+    let initObject = {
+        method: 'POST',
+        headers: headers,
+        body: JSON.stringify(wordData),
+    };
+    let createRequest = new Request(classAPI + "/" + classId + "/wordsheets/" + wordsheetId + "/words", initObject);
+
+    return fetch(createRequest)
+        .catch(err => console.log("HTTP error: ", err));
+}
+
+export function deleteFromWordsheet(classId, wordsheetId, wordId) {
     let headers = new Headers();
 
     let initObject = {

@@ -11,11 +11,13 @@ import jakarta.validation.Valid;
 import org.apache.commons.lang3.BooleanUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.util.UriComponentsBuilder;
 
 import java.net.URI;
 import java.security.Principal;
@@ -150,6 +152,47 @@ public class ClassController {
                 .build();
     }
 
+    @PostMapping(value = "/{classId}/wordsheets/{wordsheetId}/words")
+    public ResponseEntity<WordsheetItemResponse> addToWordsheet(Principal user,
+                                                                @PathVariable("classId") String classId,
+                                                                @PathVariable("wordsheetId") int wordsheetId,
+                                                                @Valid @RequestBody WordsheetItemRequest request, UriComponentsBuilder ucBuilder) {
+
+        LOG.info("Receiving a new word to add request to wordsheet id = {}. User = {}, class id = {}", wordsheetId, user.getName(), classId);
+
+        WordsheetItem item = new WordsheetItem();
+        WordRequest word = request.word();
+        item.setWord(toWordEntity(word));
+        item.setSentences(request.sentences());
+        item.setCollocations(request.collocations());
+
+        WordsheetItem addedItem = classService.addToWordsheet(createClassOwnerId(classId), wordsheetId, item);
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setLocation(ucBuilder
+                .path("/{classId}/wordsheets/{wordsheetId}/words/{wordId}")
+                .buildAndExpand(classId, wordsheetId, addedItem.getId())
+                .toUri()
+        );
+        WordsheetItemResponse response = toWordSheetItem(addedItem);
+        return new ResponseEntity<>(response, headers, HttpStatus.CREATED);
+    }
+
+    @DeleteMapping(value = "/{classId}/wordsheets/{wordsheetId}/words/{wordId}")
+    public ResponseEntity<WordsheetItemResponse> deleteWordsheetItem(Principal user,
+                                                                     @PathVariable("classId") String classId,
+                                                                     @PathVariable("wordsheetId") int wordsheetId,
+                                                                     @PathVariable("wordId") int wordId) {
+
+        LOG.info("Deleting a word = {} from wordsheet id = {} for the user = {}, classId id = {}", wordId, wordsheetId, user.getName(), classId);
+
+        classService.deleteFromWordsheet(createClassOwnerId(classId), wordsheetId, wordId);
+
+        return ResponseEntity
+                .noContent()
+                .build();
+    }
+
     private OwnerId createUserOwnerId(String user) {
         return new OwnerId(user, "1");
     }
@@ -187,6 +230,15 @@ public class ClassController {
                 wordsheetListItem.name(),
                 wordsheetListItem.wordsTotal(),
                 wordsheetListItem.isShared()
+        );
+    }
+
+    private Word toWordEntity(WordRequest wordRequest) {
+        return new Word(0,
+                wordRequest.value(),
+                wordRequest.partOfSpeech(),
+                wordRequest.transcription(),
+                wordRequest.meaning()
         );
     }
 

@@ -3,7 +3,7 @@ import WordsheetTable from "@/components/classes/WordsheetTable.vue";
 import SearchResultsPreview from "@/components/search/SearchResultsPreview.vue";
 
 import {applyCaption} from '@/js/utils.js'
-import {fetchWordsheet, updateReadiness, updateName} from '@/js/classes-api.js';
+import {fetchWordsheet, updateReadiness, updateName, addToWordsheet} from '@/js/classes-api.js';
 import {searchWordData} from '@/js/words-search-api.js';
 
 export default {
@@ -64,7 +64,14 @@ export default {
     },
     handleAddWord(word) {
       if (!this.wordsList.some((item) => item === word)) { // todo maybe more narrow check
-        this.wordsList.push(word);
+        addToWordsheet(this.classId, this.wordsheetId, word)
+            .then(response => {
+              if (response.ok) {
+                let itemAdded = response.json();
+                this.wordsList.push(itemAdded);
+                console.log("POST new word has been requested. Response.id =", itemAdded['id']);
+              }
+            })
       } else {
         alert('This word is already added.');
       }

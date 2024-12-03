@@ -1,5 +1,5 @@
 <script>
-import {deleteWord} from "@/js/classes-api.js";
+import {deleteFromWordsheet} from "@/js/classes-api.js";
 
 export default {
   props: ['classId', 'wordsheetId', 'items'],
@@ -11,7 +11,7 @@ export default {
   methods: {
     deleteItemFromWordsheet(word) {
       const wordId = word['wordId'];
-      deleteWord(this.classId, this.wordsheetId, wordId)
+      deleteFromWordsheet(this.classId, this.wordsheetId, wordId)
           .then(response => {
             if (response.ok) {
               const index = this.items.findIndex(obj => obj['wordId'] === wordId)
