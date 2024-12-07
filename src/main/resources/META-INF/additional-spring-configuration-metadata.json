@@ -1,0 +1,10 @@
+{
+  "properties": [
+    {
+      "name": "openai.client.logging.http.enabled",
+      "type": "java.lang.Boolean",
+      "description": "Enable or disable HTTP request and response logging for the OpenAI client.",
+      "defaultValue": false
+    }
+  ]
+}
