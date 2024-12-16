@@ -1,14 +1,14 @@
 package get.wordy.rest;
 
-import get.wordy.core.ClassDetails;
-import get.wordy.core.IClassService;
-import get.wordy.core.WordsheetItem;
-import get.wordy.core.WordsheetListItem;
+import get.wordy.core.api.IClassService;
+import get.wordy.core.api.bean.ClassInfo;
 import get.wordy.core.api.bean.Word;
+import get.wordy.core.api.bean.WordsheetHeader;
 import get.wordy.core.api.id.OwnerId;
 import get.wordy.model.*;
 import jakarta.validation.Valid;
 import org.apache.commons.lang3.BooleanUtils;
+import org.apache.commons.lang3.RandomStringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpHeaders;
@@ -36,42 +36,38 @@ public class ClassController {
     }
 
     @GetMapping
-    public ResponseEntity<List<ClassDetails>> getClasses(Principal user,
-                                                         @RequestParam(value = "filter", required = false) String dayOfWeek) {
+    public ResponseEntity<List<ClassInfoResponse>> getClasses(Principal user,
+                                                              @RequestParam(value = "filter", required = false) String dayOfWeek) {
         LOG.info("Getting {} classes list for the user = {}", StringUtils.hasText(dayOfWeek) ? dayOfWeek : "all", user.getName());
 
-        List<ClassDetails> classes = classService.getClasses(user.getName(), dayOfWeek);
+        List<ClassInfoResponse> response = classService.getClasses(createUserOwnerId(user), dayOfWeek)
+                .stream()
+                .map(ClassInfoResponse::new)
+                .map(this::enrichWithAttendees)
+                .toList();
 
-        List<ClassDetails> response = new ArrayList<>();
-        // Add class data to the list
-        response.add(createClass("desna-4xRg5", "08:30 - 09:30", 1, "Online VIP", "", "LIS - 15"));
-        response.add(createClass("desna-4xRg6", "09:40 - 10:20", 1, "Online VIP", "", "Real Time 1"));
-        response.add(createClass("desna-4xRg7", "10:30 - 11:30", 0, "Online VIP", "Advanced", "TS-09"));
-        response.add(createClass("desna-4xRg8", "11:30 - 12:30", 1, "Offline VIP", "Intermediate", "IS-II"));
-        response.add(createClass("desna-4xRg9", "15:00 - 16:30", 7, "Offline group", "Beginner", "KB - 2"));
-        response.add(createClass("desna-Qsd33", "19:00 - 20:00", 3, "Offline group", "Elementary", "BIS - 5"));
-
-        response.addAll(classes);
         return ResponseEntity.ok(response);
     }
 
+    private ClassInfoResponse enrichWithAttendees(ClassInfoResponse response) {
+        return response.withAttendees(List.of("Test"));
+    }
+
     @PostMapping
-    public ResponseEntity<ClassDetails> addClass(Principal user,
-                                                 @Valid @RequestBody ClassDetails classDetails) {
+    public ResponseEntity<ClassInfoResponse> addClass(Principal user, @Valid @RequestBody ClassInfoRequest classInfoRequest) {
 
-        LOG.info("Add new class = {} request for the user = {}", classDetails.getName(), user.getName());
+        LOG.info("Add new class = {} request for the user = {}", classInfoRequest.getName(), user.getName());
 
-        ClassDetails savedClass = classService.saveClass(user.getName(), classDetails);
+        var savedClass = classService.saveClass(createUserOwnerId(user), copyClassInfo(classInfoRequest));
         return ResponseEntity.created(URI.create("/" + savedClass.getClassId()))
-                .body(savedClass);
+                .body(new ClassInfoResponse(savedClass));
     }
 
     @DeleteMapping(value = "/{classId}")
-    public ResponseEntity<ClassDetails> deleteClass(Principal user,
-                                                    @PathVariable("classId") String classId) {
+    public ResponseEntity<ClassInfo> deleteClass(Principal user, @PathVariable("classId") String classId) {
         LOG.info("Deleting a class for the user = {}, class id = {}", user.getName(), classId);
 
-        classService.deleteClass(createUserOwnerId(user.getName()), classId);
+        classService.deleteClass(createUserOwnerId(user), classId);
 
         return ResponseEntity
                 .noContent()
@@ -79,11 +75,11 @@ public class ClassController {
     }
 
     @GetMapping(value = "/{classId}/wordsheets")
-    public ResponseEntity<List<WordsheetResponse>> getClassWordsheetList(Principal user,
-                                                                         @PathVariable("classId") String classId) {
+    public ResponseEntity<List<WordsheetResponse>> getWordSheets(Principal user,
+                                                                 @PathVariable("classId") String classId) {
         LOG.info("Getting wordsheet list for the class id = {}", classId);
 
-        List<WordsheetResponse> wordsheetsList = classService.getWordsheetList(createUserOwnerId(user.getName()), classId)
+        List<WordsheetResponse> wordsheetsList = classService.getWordsheetList(createUserOwnerId(user), classId)
                 .stream()
                 .map(this::toResponse)
                 .toList();
@@ -96,12 +92,12 @@ public class ClassController {
     }
 
     @PostMapping("/{classId}/wordsheets")
-    public ResponseEntity<WordsheetResponse> createNewWordsheet(Principal user,
-                                                                @PathVariable("classId") String classId,
-                                                                @Valid @RequestBody WordsheetRequest wordsheetRequest) {
-        LOG.info("Creating a new wordsheet = {} for the class = {}", wordsheetRequest.name(), classId);
+    public ResponseEntity<WordsheetResponse> addWordSheet(Principal user,
+                                                          @PathVariable("classId") String classId,
+                                                          @Valid @RequestBody WordsheetRequest wordsheetRequest) {
+        LOG.info("Adding a new wordsheet = {} for the class = {}", wordsheetRequest.name(), classId);
 
-        WordsheetListItem wordsheet = classService.createWordsheet(createClassOwnerId(classId), wordsheetRequest.name());
+        var wordsheet = classService.createWordsheet(createUserOwnerId(user), classId, wordsheetRequest.name());
         WordsheetResponse response = toResponse(wordsheet);
         return ResponseEntity.created(URI.create("/{classId}/wordsheet/" + wordsheet.wordsheetId()))
                 .body(response);
@@ -114,10 +110,7 @@ public class ClassController {
 
         LOG.info("Getting a wordsheet for the class id = {}, and wordsheet id = {}", classId, wordsheetId);
 
-        List<WordsheetItemResponse> wordsheetItems = classService.getWordsheetItems(createClassOwnerId(classId), wordsheetId)
-                .stream()
-                .map(this::toWordSheetItem)
-                .toList();
+        List<Word> wordsheetItems = classService.getWords(createUserOwnerId(user), classId, wordsheetId);
 
         if (wordsheetItems.isEmpty()) {
             LOG.info("No wordsheet found for the wordsheet id = {}", wordsheetId);
@@ -127,6 +120,9 @@ public class ClassController {
                 "wordsheetId", wordsheetId,
                 "name", "Test",
                 "items", wordsheetItems
+                        .stream()
+                        .map(this::toWordSheetItem)
+                        .toList()
         );
 
         return new ResponseEntity<>(wordsheetResponse, HttpStatus.OK);
@@ -141,11 +137,11 @@ public class ClassController {
 
         // handle name change
         if (StringUtils.hasText(partialUpdate.name())) {
-            classService.renameWordsheet(createClassOwnerId(classId), wordsheetId, partialUpdate.name());
+            classService.renameWordsheet(createUserOwnerId(user), classId, wordsheetId, partialUpdate.name());
         }
         // handle availability change
         if (BooleanUtils.isTrue(partialUpdate.isShared())) {
-            classService.makeWorksheetIsShared(createClassOwnerId(classId), wordsheetId, true);
+            classService.makeWordsheetIsShared(createUserOwnerId(user), classId, wordsheetId, true);
         }
         return ResponseEntity
                 .noContent()
@@ -153,20 +149,14 @@ public class ClassController {
     }
 
     @PostMapping(value = "/{classId}/wordsheets/{wordsheetId}/words")
-    public ResponseEntity<WordsheetItemResponse> addToWordsheet(Principal user,
+    public ResponseEntity<WordsheetItemResponse> addToWordSheet(Principal user,
                                                                 @PathVariable("classId") String classId,
                                                                 @PathVariable("wordsheetId") int wordsheetId,
                                                                 @Valid @RequestBody WordsheetItemRequest request, UriComponentsBuilder ucBuilder) {
 
         LOG.info("Receiving a new word to add request to wordsheet id = {}. User = {}, class id = {}", wordsheetId, user.getName(), classId);
 
-        WordsheetItem item = new WordsheetItem();
-        WordRequest word = request.word();
-        item.setWord(toWordEntity(word));
-        item.setSentences(request.sentences());
-        item.setCollocations(request.collocations());
-
-        WordsheetItem addedItem = classService.addToWordsheet(createClassOwnerId(classId), wordsheetId, item);
+        Word addedItem = classService.addToWordsheet(createUserOwnerId(user), classId, wordsheetId, request.wordId());
 
         HttpHeaders headers = new HttpHeaders();
         headers.setLocation(ucBuilder
@@ -179,38 +169,40 @@ public class ClassController {
     }
 
     @DeleteMapping(value = "/{classId}/wordsheets/{wordsheetId}/words/{wordId}")
-    public ResponseEntity<WordsheetItemResponse> deleteWordsheetItem(Principal user,
+    public ResponseEntity<WordsheetItemResponse> removeFromWordsheet(Principal user,
                                                                      @PathVariable("classId") String classId,
                                                                      @PathVariable("wordsheetId") int wordsheetId,
                                                                      @PathVariable("wordId") int wordId) {
 
         LOG.info("Deleting a word = {} from wordsheet id = {} for the user = {}, classId id = {}", wordId, wordsheetId, user.getName(), classId);
 
-        classService.deleteFromWordsheet(createClassOwnerId(classId), wordsheetId, wordId);
+        classService.removeFromWordsheet(createUserOwnerId(user), classId, wordsheetId, wordId);
 
         return ResponseEntity
                 .noContent()
                 .build();
     }
 
-    private OwnerId createUserOwnerId(String user) {
-        return new OwnerId(user, "1");
+    private OwnerId createUserOwnerId(Principal user) {
+        return new OwnerId(user.getName(), "user");
     }
 
-    private OwnerId createClassOwnerId(String classId) {
-        return new OwnerId(classId, "2");
+    public ClassInfo copyClassInfo(ClassInfoRequest request) {
+        return new ClassInfo(
+                "desna-" + RandomStringUtils.secure().nextAlphanumeric(5),
+                request.getName(),
+                request.getFormat(),
+                request.getLevel(),
+                request.getMaterial(),
+                request.getNotes()
+        );
     }
 
-    public ClassDetails createClass(String classId, String name, int attendees, String classFormat,
-                                    String classLevel, String material) {
-        return new ClassDetails(classId, name, attendees, classFormat, classLevel, material, "notes");
-    }
-
-    private WordsheetItemResponse toWordSheetItem(WordsheetItem wordsheet) {
+    private WordsheetItemResponse toWordSheetItem(Word word) {
         return new WordsheetItemResponse(
-                wordsheet.getWord().getId(),
-                toWordResponse(wordsheet.getWord()),
-                wordsheet.getSentences()
+                word.getId(),
+                toWordResponse(word),
+                word.getSentences()
         );
     }
 
@@ -224,21 +216,12 @@ public class ClassController {
         );
     }
 
-    private WordsheetResponse toResponse(WordsheetListItem wordsheetListItem) {
+    private WordsheetResponse toResponse(WordsheetHeader wordsheetHeader) {
         return new WordsheetResponse(
-                wordsheetListItem.wordsheetId(),
-                wordsheetListItem.name(),
-                wordsheetListItem.wordsTotal(),
-                wordsheetListItem.isShared()
-        );
-    }
-
-    private Word toWordEntity(WordRequest wordRequest) {
-        return new Word(0,
-                wordRequest.value(),
-                wordRequest.partOfSpeech(),
-                wordRequest.transcription(),
-                wordRequest.meaning()
+                wordsheetHeader.wordsheetId(),
+                wordsheetHeader.name(),
+                wordsheetHeader.wordsTotal(),
+                wordsheetHeader.isShared()
         );
     }
 

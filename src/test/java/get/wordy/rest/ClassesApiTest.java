@@ -43,19 +43,21 @@ class ClassesApiTest extends BaseApiTest {
             JsonNode firstClass = null;
             for (JsonNode node : arrayNode) {
                 if (node.has("classId")
-                        && node.get("classId").asText().equals("desna-4xRg7")) {
+                        && node.get("classId").asText().equals("desna-4xRg7")) { // predefined
                     firstClass = node;
                     break;
                 }
             }
             assertNotNull(firstClass);
             assertEquals("10:30 - 11:30", firstClass.get("name").asText());
-            assertEquals(0, firstClass.get("attendees").asInt());
-            assertEquals("Online VIP", firstClass.get("classFormat").asText());
+            assertEquals("Online VIP", firstClass.get("format").asText());
             assertEquals("TS-09", firstClass.get("material").asText());
             // optional
-            assertTrue(firstClass.has("classLevel"));
-            assertTrue(firstClass.has("notes"));
+            assertTrue(firstClass.has("level"));
+            assertTrue(firstClass.get("notes").isEmpty());
+            // meta
+            assertTrue(firstClass.get("attendees").isArray());
+            assertEquals("Test", firstClass.get("attendees").get(0).asText());
         }
     }
 
@@ -81,10 +83,9 @@ class ClassesApiTest extends BaseApiTest {
             assertTrue(newClass.isObject(), "is not an object");
             assertTrue(newClass.get("classId").asText().matches(CLASS_ID_PATTERN));
             assertEquals("19:00 - 20:00", newClass.get("name").asText());
-            assertEquals(0, newClass.get("attendees").asInt());
-            assertEquals("Offline group", newClass.get("classFormat").asText());
+            assertEquals("Offline group", newClass.get("format").asText());
             assertEquals("BIS - 5", newClass.get("material").asText());
-            assertEquals("Elementary", newClass.get("classLevel").asText());
+            assertEquals("Elementary", newClass.get("level").asText());
         }
     }
 
@@ -93,7 +94,7 @@ class ClassesApiTest extends BaseApiTest {
         try (HttpClient httpClient = HttpClient.newBuilder().build()) {
             HttpRequest httpRequest = HttpRequest.newBuilder()
                     .header("Cookie", jSessionIdHolder.get())
-                    .uri(new URI("http://localhost:8080/api/v1/classes/desna-4xRg7"))
+                    .uri(new URI("http://localhost:8080/api/v1/classes/desna-4xRg8"))
                     .DELETE()
                     .build();
 
