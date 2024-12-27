@@ -1,13 +1,13 @@
 <script>
 import WordsheetTable from "@/components/classes/WordsheetTable.vue";
+import SearchInput from "@/components/search/SearchInput.vue";
 import SearchResultsPreview from "@/components/search/SearchResultsPreview.vue";
 
 import {applyCaption} from '@/js/utils.js'
 import {fetchWordsheet, updateReadiness, updateName, addToWordsheet} from '@/js/classes-api.js';
-import {searchWordData} from '@/js/words-search-api.js';
 
 export default {
-  components: {SearchResultsPreview, WordsheetTable},
+  components: {SearchResultsPreview, WordsheetTable, SearchInput},
   props: ['classId', 'wordsheetId'],
   data() {
     return {
@@ -41,17 +41,8 @@ export default {
       }
       console.log('No changes detected in property [name] for wordsheet id =', this.wordsheetId);
     },
-    async onSearch() {
-      let form = document.getElementById('search-words-form');
-      let inputField = document.getElementById('ai-search-input');
-      // send request and clean input field on success
-      let formData = new FormData(form);
-      let searchRequest = formData.get('words');
-      const response = await searchWordData(searchRequest)
-      this.searchResult = await response.json();
-      if (response.ok && this.searchResult.hasOwnProperty('explanations') && this.searchResult.explanations.length > 0) {
-        inputField.value = '';
-      }
+    onSearch(result) {
+      this.searchResult = result;
     },
     onReady() {
       updateReadiness(this.classId, this.wordsheetId, true)
@@ -97,20 +88,7 @@ export default {
 
     <div class="d-flex justify-content-center p-4">
       <div style="padding-top:7px;" class="col-md-4 form-group pull-right">
-        <form id="search-words-form" action="" method="get" class="form-inline" v-on:submit.prevent="onSearch">
-          <div class="form-group">
-            <div class="input-group">
-              <input id="ai-search-input" type="text" class="form-control" name="words" placeholder="Search for..."
-                     autocomplete="off"
-                     required>
-              <span class="input-group-btn">
-                <button type="submit" class="btn btn-md btn-default border">
-                  <i class="bi bi-search"></i>
-                </button>
-              </span>
-            </div>
-          </div>
-        </form>
+        <search-input @wordsheet-search-submit="onSearch" v-bind="{onSearchEventName: 'wordsheet-search-submit'}"/>
       </div>
     </div>
 

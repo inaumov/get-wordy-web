@@ -3,21 +3,27 @@ import ActionButtons from "@/components/cards/ActionButtons.vue";
 
 import {generateCards} from '@/js/cards.js';
 import {textToArray} from '@/js/utils.js';
+import SearchInput from "@/components/search/SearchInput.vue";
+import SearchResultsPreview from "@/components/search/SearchResultsPreview.vue";
 
 export default {
-  components: {ActionButtons},
+  components: {SearchResultsPreview, SearchInput, ActionButtons},
   props: ['dictionaryId'],
   data() {
     return {
+      searchResult: {
+        explanations: []
+      }
     }
   },
   methods: {
-    onSubmit: function () {
-      let form = document.getElementById('generate-cards-form');
-      let formData = new FormData(form);
-      const wordsArr = textToArray(formData.get('words'));
-      generateCards(this.dictionaryId, wordsArr);
-    }
+    onSearch(result) {
+      // generateCards(this.dictionaryId, wordsArr);
+      this.searchResult = result;
+    },
+    handleAddWord() {
+
+    },
   },
 };
 
@@ -27,21 +33,13 @@ export default {
 
   <action-buttons/>
 
-  <div class="container" id="generate-cards-panel">
-    <div class="row justify-content-center pb-5">
-      <div class="col-8 border p-5 rounded">
-        <form action="" id="generate-cards-form" v-on:submit.prevent="onSubmit()">
-          <div class="mb-3">
-            <label for="text" class="form-label">Input new words to generate cards</label>
-            <textarea class="form-control" rows="5" id="text" name="words" autocomplete="off" required/>
-          </div>
-          <button type="submit" class="btn btn-lg">
-            <i class="bi bi-save"></i> Submit
-          </button>
-        </form>
-      </div>
+  <div class="d-flex justify-content-center p-4" id="generate-cards-panel">
+    <div style="padding-top:7px;" class="col-md-4 form-group pull-right">
+      <search-input @generate-cards-result="onSearch" v-bind="{onSearchEventName: 'generate-cards-result'}"/>
     </div>
   </div>
+
+  <search-results-preview @add-to-wordsheet="handleAddWord" v-bind="{previewData: this.searchResult}"/>
 
 </template>
 

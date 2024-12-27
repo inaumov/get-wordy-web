@@ -39,7 +39,7 @@ export default {
           <p><strong>{{ previewData.value }}</strong> ({{ explanation.partOfSpeech }})</p>
           <p>{{ previewData.transcription }}</p>
           <p class="meaning"><strong>Meaning:</strong> {{ explanation.meaning }}</p>
-          <div v-if="explanation.sentences && explanation.sentences.length > 0" class="inContext">
+          <div v-if="explanation.inContext && explanation.inContext.length > 0" class="inContext">
             <strong>In Context:</strong>
             <ul>
               <li v-for="(sentence, index) in explanation.inContext" :key="index">
