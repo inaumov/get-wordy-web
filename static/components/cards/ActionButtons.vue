@@ -17,9 +17,6 @@ export default {
         <router-link :to="{ name : 'generate'}" class="btn btn-lg">
           <i class="bi bi-bricks"></i> Generate
         </router-link>
-        <router-link :to="{ name : 'add-card'}" class="btn btn-lg">
-          <i class="bi bi-plus-circle"></i> Add manually
-        </router-link>
       </div>
     </div>
   </div>
