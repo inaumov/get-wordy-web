@@ -36,6 +36,15 @@ export default {
           });
       console.log("Selected class: id = ", classItem['classId'], ", name = ", classItem['name'])
     },
+    navigateToEditClass(classItem) {
+      this.router.push({
+            name: 'add-new-class',
+            params: {
+              classId: classItem['classId']
+            }
+          });
+      console.log("Selected class: id = ", classItem['classId'], ", name = ", classItem['name'])
+    },
     addNewClass() {
       this.router.push({
         name: 'add-new-class'
@@ -84,7 +93,7 @@ export default {
       <div class="row">
         <div class="col-md-4 card" v-for="classItem in classList"
              :key="classItem['classId']"
-             @click="navigateToWordsheetList(classItem)">
+             @click="navigateToEditClass(classItem)">
           <div class="card-body">
             <span class="class-id">Class ID: {{ classItem['classId'] }}</span>
             <div>
