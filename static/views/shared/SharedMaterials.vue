@@ -3,7 +3,7 @@ import {fetchWordsheetList} from '@/js/classes-api.js';
 import {applyCaption} from '@/js/utils.js'
 
 export default {
-  name: 'WordsheetListView',
+  name: 'SharedMaterialsView',
   props: ['classId'],
   data() {
     return {
@@ -31,20 +31,8 @@ export default {
 </script>
 
 <template>
-
   <div v-if="hasWordsheet" class="container p-4" id="wordsheet-list">
-    <h4 class="pb-4">Class name >> word sheets</h4>
-
-    <div class="row pb-4">
-      <div class="col">
-        <div class="d-flex flex-column align-items-end">
-          <button class="btn" v-on:click="" title="Add word sheet">
-            <i class="bi bi-folder-plus"></i>
-            Add new
-          </button>
-        </div>
-      </div>
-    </div>
+    <h4 class="pb-4">Shared word sheets</h4>
 
     <div
         v-for="wordsheet in wordsheetList"
@@ -52,32 +40,20 @@ export default {
         class="mb-4 bg-light bg-opacity-10 border border-danger-subtle rounded">
 
       <!-- make the whole element as clickable-->
-      <router-link
-          :to="{ name: 'wordsheet', params: { classId: this.classId, wordsheetId : wordsheet['wordsheetId']}, query: { name: wordsheet['name'] }}"
-          class="row p-3 text-decoration-none text-dark">
+      <router-link v-for="wordsheet in wordsheetList"
+                   :key="wordsheet['wordsheetId']"
+                   :to="{ name: 'wordsheet-preview', params: { classId: this.classId, wordsheetId : wordsheet['wordsheetId']}, query: { name: wordsheet['name'] }}"
+                   class="row p-3 text-decoration-none text-dark">
 
         <span class="col-8">
           {{ wordsheet['name'] }}
         </span>
 
         <!-- displaying total count as a badge in a separate column -->
-        <div class="col-3 text-end">
+        <div class="col-4 text-end">
           <span class="badge bg-info rounded-pill">{{ wordsheet['wordsTotal'] }} words</span>
         </div>
 
-        <!-- displaying whether the item is shared or not (optional property) -->
-        <div class="col-1 text-end">
-          <span
-              v-if="wordsheet['isShared']"
-              class="badge bg-success text-white"
-              data-bs-toggle="tooltip"
-              title="This wordsheet is available now for associated student">
-            Shared
-          </span>
-          <span v-else class="badge bg-secondary text-white">
-            Not shared yet
-          </span>
-        </div>
       </router-link>
 
     </div>

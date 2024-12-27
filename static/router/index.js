@@ -5,6 +5,7 @@ import DictionariesView from "@/views/DictionariesView.vue";
 import NotFoundView from "@/views/error/NotFoundView.vue";
 import ClassListView from "@/views/ClassListView.vue";
 import ManageClassView from "@/views/classes/ManageClassView.vue";
+import SharedMaterials from "@/views/shared/SharedMaterials.vue";
 
 const router = createRouter({
     history: createWebHistory(import.meta.env.BASE_URL),
@@ -18,6 +19,11 @@ const router = createRouter({
             path: '/Dictionaries',
             name: 'dictionaries',
             component: DictionariesView
+        },
+        {
+            path: '/Classroom',
+            name: 'classroom',
+            component: SharedMaterials
         },
         {
             path: '/ClassList',
@@ -98,6 +104,20 @@ const router = createRouter({
             // this generates a separate chunk (Settings.[hash].js) for this route
             // which is lazy-loaded when the route is visited.
             component: () => import('@/views/classes/WordSheetView.vue'),
+            props: (route) => (
+                {
+                    classId: route.params.classId,
+                    wordsheetId: route.params.wordsheetId
+                }
+            ),
+        },
+        {
+            path: '/Materials/:classId/Wordsheet/:wordsheetId',
+            name: 'wordsheet-preview',
+            // route level code-splitting
+            // this generates a separate chunk (Settings.[hash].js) for this route
+            // which is lazy-loaded when the route is visited.
+            component: () => import('@/views/shared/WordsPreview.vue'),
             props: (route) => (
                 {
                     classId: route.params.classId,
