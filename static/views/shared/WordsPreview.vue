@@ -79,7 +79,7 @@ export default {
           </button>
           <button v-else class="btn add-btn" @click="add(item)" title="Add to learn">
             <i class="bi bi-journal-plus"></i>
-            Pick to learn
+            Add to learn
           </button>
         </div>
       </div>

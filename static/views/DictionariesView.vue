@@ -29,6 +29,8 @@ export default {
 
 <template>
   <div v-if="hasDictionaries" class="container p-4" id="content">
+    <h4 class="pb-4">My dictionaries</h4>
+
     <div id="dictionary" class="card text-center" v-for="dictionary in dictionaries">
       <img v-bind:src="dictionary['picture']" class="card-img-top mx-auto d-block" v-bind:alt="dictionary['name']">
       <div class="card-body">
@@ -45,7 +47,7 @@ export default {
   </div>
 </template>
 
-<style scoped>
+<style>
 
 div#dictionary.card {
   border-radius: 40px;
