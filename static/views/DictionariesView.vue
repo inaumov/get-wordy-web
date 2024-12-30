@@ -1,12 +1,17 @@
 <script>
 import {fetchDictionaries} from '@/js/dictionaries.js';
-import {applyCaption} from '@/js/utils.js'
 
 export default {
   name: 'DictionariesView',
   data() {
     return {
       dictionaries: [],
+      favoriteWords: {
+        "dictionaryId": 5,
+        "name": "Favorite words",
+        "picture": "https://cdn-icons-png.flaticon.com/512/4208/4208408.png",
+        "cardsTotal": 6
+      },
     }
   },
   methods: {
@@ -17,17 +22,33 @@ export default {
   },
   mounted() {
     this.getData()
-    applyCaption('My dictionaries')
   },
   computed: {
     hasDictionaries() {
       return this.dictionaries && this.dictionaries.length > 0;
+    },
+    hasFavoriteWords() {
+      return true;
     }
   }
 };
 </script>
 
 <template>
+  <div v-if="hasFavoriteWords" class="container p-4" id="active-vocabulary">
+    <div id="favorite_words" class="card text-center">
+      <img v-bind:src="favoriteWords['picture']" class="card-img-top mx-auto d-block"
+           v-bind:alt="favoriteWords['name']">
+      <div class="card-body">
+        <h5 class="card-title">{{ favoriteWords['name'] }}</h5>
+        <router-link class="btn btn-primary"
+                     :to="{ name: 'all-cards', params: { dictionaryId : favoriteWords['dictionaryId']}, query: { dictionaryName: favoriteWords['name'] }}">
+          {{ favoriteWords['cardsTotal'] }}
+        </router-link>
+      </div>
+    </div>
+  </div>
+
   <div v-if="hasDictionaries" class="container p-4" id="content">
     <h4 class="pb-4">My dictionaries</h4>
 
@@ -49,6 +70,7 @@ export default {
 
 <style>
 
+div#favorite_words.card,
 div#dictionary.card {
   border-radius: 40px;
   overflow: hidden;
@@ -59,20 +81,24 @@ div#dictionary.card {
   display: inline-block;
 }
 
+div#favorite_words.card:hover,
 div#dictionary.card:hover {
   box-shadow: 0 6px 30px rgba(0, 0, 0, 0.1),
   0 10px 8px rgba(0, 0, 0, 0.015);
 }
 
+div#favorite_words.card .card-body .card-title,
 div#dictionary.card .card-body .card-title {
   font-weight: 600;
   font-size: 24px;
 }
 
+div#favorite_words.card:hover > img,
 div#dictionary.card:hover > img {
   transform: scale(1.2);
 }
 
+div#favorite_words.card img,
 div#dictionary.card img {
   padding: 75px;
   margin-top: -40px;
@@ -83,6 +109,7 @@ div#dictionary.card img {
   height: auto;
 }
 
+div#favorite_words.card .btn,
 div#dictionary.card .btn {
   background: #e9ecef;
   border: 0;
@@ -94,11 +121,13 @@ div#dictionary.card .btn {
   transition: all 0.2s ease;
 }
 
+div#favorite_words.card .btn:hover,
 div#dictionary.card .btn:hover {
   background: #d63384;
   color: #e9ecef;
 }
 
+div#favorite_words.card .btn:focus,
 div#dictionary.card .btn:focus {
   background: #d63384;
   outline: 0;

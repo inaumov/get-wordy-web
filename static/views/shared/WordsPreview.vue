@@ -8,7 +8,7 @@ export default {
     return {
       name: 'Wordsheet',
       words: [],
-      isAddedToLearn: false,
+      isAddedToFavorite: false,
     }
   },
   methods: {
@@ -20,11 +20,11 @@ export default {
     },
     remove(item) {
       this.$emit('stop-to-learn', item);
-      this.isAddedToLearn = false;
+      this.isAddedToFavorite = false;
     },
     add(item) {
       this.$emit('add-to-learn', item);
-      this.isAddedToLearn = true;
+      this.isAddedToFavorite = true;
     },
   },
   mounted() {
@@ -73,13 +73,11 @@ export default {
           </div>
         </div>
         <div class="actions">
-          <button v-if="isAddedToLearn" class="btn remove-btn" @click="remove(item)" title="Stop learning">
-            <i class="bi bi-journal-minus"></i>
-            Stop learning
+          <button v-if="isAddedToFavorite" class="btn btn-lg remove-btn" @click="remove(item)" title="Remove from favorite words">
+            <i class="bi bi-star-fill"></i>
           </button>
-          <button v-else class="btn add-btn" @click="add(item)" title="Add to learn">
-            <i class="bi bi-journal-plus"></i>
-            Add to learn
+          <button v-else class="btn btn-lg add-btn" @click="add(item)" title="Add to favorite words">
+            <i class="bi bi-star"></i>
           </button>
         </div>
       </div>
