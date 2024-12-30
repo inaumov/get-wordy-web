@@ -10,10 +10,19 @@ export default {
   data() {
     return {
       days: ["sun", "mon", "tue", "wen", "thu", "fri", "sat"],
+      selectedDays: [],
     }
   },
   methods: {
     onSubmit: function () {
+      // reset any previous validation state
+      this.$refs.classDays.classList.remove('is-invalid');
+      // validate the selected days
+      if (this.selectedDays.length === 0) {
+        // if no days are selected, apply the 'is-invalid' class
+        this.$refs.classDays.classList.add('is-invalid');
+        return;
+      }
       let form = document.getElementById('start-class-form');
       let formData = new FormData(form);
 
@@ -48,7 +57,7 @@ export default {
         <!-- first row: class name and class format -->
         <div class="row mb-3">
           <div class="col-6">
-            <label for="name" class="form-label">Class name<i>*</i></label>
+            <label for="name" class="form-label">Class name (or time slot)<i>*</i></label>
             <input type="text" class="form-control" id="name" name="name" autocomplete="off" required>
           </div>
           <div class="col-6">
@@ -71,7 +80,32 @@ export default {
           </div>
         </div>
 
-        <!-- third row: notes (textarea) -->
+        <!-- third row: class days selection -->
+        <div class="row mb-3">
+          <div class="col-12">
+            <label for="classDays" class="form-label">Select the days the class takes place<i>*</i></label>
+            <div ref="classDays" id="classDays" class="d-flex flex-wrap">
+              <div v-for="(day, index) in days" :key="index" class="form-check form-check-inline">
+                <input
+                    type="checkbox"
+                    :id="day"
+                    :name="day"
+                    :value="day"
+                    class="form-check-input"
+                    v-model="selectedDays"
+                >
+                <label class="form-check-label" :for="day" style="text-transform: capitalize;">
+                  {{ day }}
+                </label>
+              </div>
+            </div>
+            <div v-if="selectedDays.length === 0" class="invalid-feedback">
+              Please select at least one day.
+            </div>
+          </div>
+        </div>
+
+        <!-- last row: notes (textarea) -->
         <div class="row mb-3">
           <div class="col-12">
             <label for="notes" class="form-label">Any additional notes</label>
