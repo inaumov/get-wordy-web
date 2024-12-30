@@ -1,10 +1,10 @@
 <script>
 import {fetchClasses} from '@/js/classes-api.js';
-import {applyCaption} from '@/js/utils.js'
+import {getFullDayName} from '@/js/utils.js'
 import {useRouter} from "vue-router";
 
 export default {
-  props: ['dayOfWeek'],
+  props: ['day'],
   name: 'ClassListView',
   setup() {
     let router = useRouter();
@@ -16,8 +16,9 @@ export default {
     }
   },
   methods: {
+    getFullDayName,
     async getData() {
-      const response = await fetchClasses(this.dayOfWeek);
+      const response = await fetchClasses(this.day);
       let items = await response.json();
       this.classList = items.map(item => {
         // add the 'hasAttendees' property based on the condition
@@ -81,16 +82,15 @@ export default {
   },
   mounted() {
     this.getData()
-    applyCaption('Desna Academy')
   }
 };
 </script>
 
 <template>
-  <div v-if="hasClasses" class="container mt-5">
+  <div v-if="hasClasses" class="container p-4">
+    <h4 class="pb-4">{{ getFullDayName(day) }}</h4>
     <div class="day-groups">
-      <h3 class="my-3">{{ dayOfWeek }}</h3>
-      <div class="row">
+      <div class="row mx-1">
         <div class="col-md-4 card" v-for="classItem in classList"
              :key="classItem['classId']"
              @click="navigateToEditClass(classItem)">
@@ -98,7 +98,7 @@ export default {
             <span class="class-id">Class ID: {{ classItem['classId'] }}</span>
             <div>
               <div class="class-details">
-                <span>{{ classItem['name'] }}</span>
+                <span><strong>Name / Time slot</strong> : {{ classItem['name'] }}</span>
               </div>
               <div class="class-details">
                 <span><strong>Attendees</strong>:</span>
