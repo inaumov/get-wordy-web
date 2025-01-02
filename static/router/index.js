@@ -8,6 +8,7 @@ import ManageClassView from "@/views/classes/ManageClassView.vue";
 import SharedMaterials from "@/views/shared/SharedMaterials.vue";
 import ScheduleView from "@/views/classes/ScheduleView.vue";
 import ClassDetailsView from "@/views/classes/ClassDetailsView.vue";
+import TemplatesView from "@/views/classes/TemplatesView.vue";
 
 const router = createRouter({
     history: createWebHistory(import.meta.env.BASE_URL),
@@ -45,6 +46,25 @@ const router = createRouter({
             props: (route) => (
                 {
                     classId: route.params.classId,
+                }
+            ),
+        },
+        {
+            path: '/Templates',
+            name: 'templates',
+            component: TemplatesView
+        },
+        {
+            path: '/Templates/:templateId',
+            name: 'template-preview',
+            // route level code-splitting
+            // this generates a separate chunk (Settings.[hash].js) for this route
+            // which is lazy-loaded when the route is visited.
+            component: () => import('@/views/shared/WordsPreview.vue'),
+            props: (route) => (
+                {
+                    classId: route.params.classId,
+                    vocabId: route.params.templateId
                 }
             ),
         },

@@ -1,4 +1,5 @@
 const classAPI = import.meta.env.VITE_BACKEND_API + "classes";
+const templatesAPI = import.meta.env.VITE_BACKEND_API + "templates";
 
 export function fetchClasses(dayOfWeek) {
     let headers = new Headers();
@@ -180,5 +181,20 @@ export function removeFromVocabulary(classId, vocabularyId, wordId) {
     let deleteRequest = new Request(classAPI + "/" + classId + "/vocabularies/" + vocabularyId, initObject);
 
     return fetch(deleteRequest)
+        .catch(err => console.log("HTTP error: ", err));
+}
+
+export function fetchTemplates() {
+    let headers = new Headers();
+    headers.append('Content-Type', 'application/json');
+
+    let initObject = {
+        method: 'GET',
+        headers: headers,
+    };
+
+    let dictionariesRequest = new Request(templatesAPI, initObject);
+
+    return fetch(dictionariesRequest)
         .catch(err => console.log("HTTP error: ", err));
 }
