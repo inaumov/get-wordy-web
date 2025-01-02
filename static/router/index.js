@@ -130,8 +130,8 @@ const router = createRouter({
             ),
         },
         {
-            path: '/Materials/:classId/Wordsheet/:wordsheetId',
-            name: 'wordsheet-preview',
+            path: '/Materials/:classId/Vocabularies/:vocabId',
+            name: 'vocabulary-preview',
             // route level code-splitting
             // this generates a separate chunk (Settings.[hash].js) for this route
             // which is lazy-loaded when the route is visited.
@@ -139,22 +139,7 @@ const router = createRouter({
             props: (route) => (
                 {
                     classId: route.params.classId,
-                    wordsheetId: route.params.wordsheetId
-                }
-            ),
-        },
-        {
-            path: '/Class/:classId/Wordsheet/:wordsheetId/:word',
-            name: 'edit-word',
-            // route level code-splitting
-            // this generates a separate chunk (Settings.[hash].js) for this route
-            // which is lazy-loaded when the route is visited.
-            component: () => import('@/views/error/NotFoundView.vue'),
-            props: (route) => (
-                {
-                    classId: route.params.classId,
-                    wordsheetId: route.params.wordsheetId,
-                    word: route.params.word
+                    vocabId: route.params.vocabId
                 }
             ),
         },

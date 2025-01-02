@@ -2,7 +2,7 @@
 import {getVocabularies} from '@/js/classes-api.js';
 
 export default {
-  name: 'WordsheetListView',
+  name: 'ClassVocabularies',
   props: ['classId'],
   data() {
     return {
@@ -38,7 +38,7 @@ export default {
 
       <!-- make the whole element as clickable-->
       <router-link
-          :to="{ name: 'vocabulary', params: { classId: this.classId, vocabId : vocabulary['vocabId']}, query: { name: vocabulary['name'] }}"
+          :to="{ name: 'vocabulary', params: { classId: this.classId, vocabId : vocabulary['vocabId']}}"
           class="row p-3 text-decoration-none text-dark">
 
         <span class="col-8">

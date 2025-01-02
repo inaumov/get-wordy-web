@@ -1,8 +1,8 @@
 <script>
-import {fetchWordsheet} from "@/js/classes-api.js";
+import {getVocabulary} from "@/js/classes-api.js";
 
 export default {
-  props: ['classId', 'vocabularyId'],
+  props: ['classId', 'vocabId'],
   data() {
     return {
       name: '',
@@ -12,10 +12,10 @@ export default {
   },
   methods: {
     async getData() {
-      const response = await fetchWordsheet(this.classId, this.vocabularyId);
-      const wordsheet = await response.json();
-      this.name = wordsheet['name'];
-      this.words = wordsheet['items'] || [];
+      const response = await getVocabulary(this.classId, this.vocabId);
+      const vocabulary = await response.json();
+      this.name = vocabulary['name'];
+      this.words = vocabulary['words'] || [];
     },
     remove(item) {
       this.$emit('stop-to-learn', item);
