@@ -1,5 +1,5 @@
 <script>
-import {fetchWordsheetList} from '@/js/classes-api.js';
+import {getVocabularies} from '@/js/classes-api.js';
 
 export default {
   name: 'WordsheetListView',
@@ -11,7 +11,7 @@ export default {
   },
   methods: {
     async getData() {
-      const response = await fetchWordsheetList(this.classId);
+      const response = await getVocabularies(this.classId);
       this.vocabularies = await response.json();
     }
   },
@@ -38,7 +38,7 @@ export default {
 
       <!-- make the whole element as clickable-->
       <router-link
-          :to="{ name: 'wordsheet', params: { classId: this.classId, wordsheetId : vocabulary['vocabId']}, query: { name: vocabulary['name'] }}"
+          :to="{ name: 'vocabulary', params: { classId: this.classId, vocabId : vocabulary['vocabId']}, query: { name: vocabulary['name'] }}"
           class="row p-3 text-decoration-none text-dark">
 
         <span class="col-8">

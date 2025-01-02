@@ -1,17 +1,17 @@
 <script>
-import {deleteFromWordsheet} from "@/js/classes-api.js";
+import {removeFromVocabulary} from "@/js/classes-api.js";
 
 export default {
-  props: ['classId', 'wordsheetId', 'items'],
+  props: ['classId', 'vocabId', 'items'],
   data() {
     return {
       // items: []
     }
   },
   methods: {
-    deleteItemFromWordsheet(word) {
+    removeWord(word) {
       const wordId = word['wordId'];
-      deleteFromWordsheet(this.classId, this.wordsheetId, wordId)
+      removeFromVocabulary(this.classId, this.vocabId, wordId)
           .then(response => {
             if (response.ok) {
               const index = this.items.findIndex(obj => obj['wordId'] === wordId)
@@ -52,11 +52,11 @@ export default {
         </td>
         <td style="text-align: right">
           <div id="actions">
-            <router-link :to="{name: 'edit-word', params: {wordsheetId: this.wordsheetId, word: item.word['value']}}"
+            <router-link :to="{name: 'edit-word', params: {vocabId: this.vocabId, word: item.word['value']}}"
                          class="btn btn-lg" title="Edit word">
               <i class="bi bi-pencil-square"></i>
             </router-link>
-            <button class="btn btn-lg" @click="deleteItemFromWordsheet(item)" title="Delete">
+            <button class="btn btn-lg" @click="removeWord(item)" title="Delete">
               <i class="bi bi-x-lg"></i>
             </button>
           </div>

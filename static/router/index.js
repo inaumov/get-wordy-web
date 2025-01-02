@@ -1,13 +1,13 @@
 import {createRouter, createWebHistory} from 'vue-router'
 import MainView from "@/views/MainView.vue";
-import WordSheetListView from "@/views/classes/WordSheetListView.vue";
+import ClassVocabularies from "@/views/classes/ClassVocabularies.vue";
 import DictionariesView from "@/views/DictionariesView.vue";
 import NotFoundView from "@/views/error/NotFoundView.vue";
 import ClassListView from "@/views/ClassListView.vue";
 import ManageClassView from "@/views/classes/ManageClassView.vue";
 import SharedMaterials from "@/views/shared/SharedMaterials.vue";
 import ScheduleView from "@/views/classes/ScheduleView.vue";
-import ClassDetails from "@/views/classes/ClassDetails.vue";
+import ClassDetailsView from "@/views/classes/ClassDetailsView.vue";
 
 const router = createRouter({
     history: createWebHistory(import.meta.env.BASE_URL),
@@ -33,7 +33,7 @@ const router = createRouter({
             component: SharedMaterials
         },
         {
-            path: '/Classes/:day',
+            path: '/Schedule/:day',
             name: 'classes',
             component: ClassListView,
             props: true,
@@ -41,7 +41,7 @@ const router = createRouter({
         {
             path: '/Classes/:day/:classId',
             name: 'class-details',
-            component: ClassDetails,
+            component: ClassDetailsView,
             props: (route) => (
                 {
                     classId: route.params.classId,
@@ -106,9 +106,9 @@ const router = createRouter({
             component: ManageClassView
         },
         {
-            path: '/Classes/:day/:classId/Vocabularies',
+            path: '/Classes/:classId/Vocabularies',
             name: 'class-vocabularies',
-            component: WordSheetListView,
+            component: ClassVocabularies,
             props: (route) => (
                 {
                     classId: route.params.classId
@@ -116,16 +116,16 @@ const router = createRouter({
             ),
         },
         {
-            path: '/Class/:classId/Wordsheet/:wordsheetId',
-            name: 'wordsheet',
+            path: '/Classes/:classId/Vocabulary/:vocabId',
+            name: 'vocabulary',
             // route level code-splitting
             // this generates a separate chunk (Settings.[hash].js) for this route
             // which is lazy-loaded when the route is visited.
-            component: () => import('@/views/classes/WordSheetView.vue'),
+            component: () => import('@/views/classes/Vocabulary.vue'),
             props: (route) => (
                 {
                     classId: route.params.classId,
-                    wordsheetId: route.params.wordsheetId
+                    vocabId: route.params.vocabId
                 }
             ),
         },

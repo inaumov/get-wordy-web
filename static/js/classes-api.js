@@ -34,6 +34,39 @@ export function createClass(classInfo) {
 
 }
 
+export function updateClassInfo(classInfo) {
+    let headers = new Headers();
+    headers.append('Content-Type', 'application/json');
+
+    let request = classInfo;
+    console.log('Update class info request = ', request);
+
+    let initObject = {
+        method: 'PUT',
+        headers: headers,
+        body: JSON.stringify(request),
+    };
+    let createRequest = new Request(classAPI, initObject);
+    return fetch(createRequest)
+        .catch(err => console.log("HTTP error: ", err));
+
+}
+
+export function getClass(classId) {
+    let headers = new Headers();
+    headers.append('Content-Type', 'application/json');
+
+    let initObject = {
+        method: 'GET',
+        headers: headers,
+    };
+
+    let classByIdRequest = new Request(classAPI + "/" + classId, initObject);
+
+    return fetch(classByIdRequest)
+        .catch(err => console.log("HTTP error: ", err));
+}
+
 export function deleteClass(classId) {
     let headers = new Headers();
 
@@ -48,7 +81,7 @@ export function deleteClass(classId) {
         .catch(err => console.log("HTTP error: ", err));
 }
 
-export function fetchWordsheetList(classId) {
+export function getVocabularies(classId) {
     let headers = new Headers();
     headers.append('Content-Type', 'application/json');
 
@@ -57,13 +90,13 @@ export function fetchWordsheetList(classId) {
         headers: headers,
     };
 
-    let wordsheetRequest = new Request(classAPI + '/' + classId + '/wordsheets', initObject);
+    let getRequest = new Request(classAPI + '/' + classId + '/vocabularies', initObject);
 
-    return fetch(wordsheetRequest)
+    return fetch(getRequest)
         .catch(err => console.log("HTTP error: ", err));
 }
 
-export function fetchWordsheet(classId, wordsheetId) {
+export function getVocabulary(classId, vocabularyId) {
     let headers = new Headers();
     headers.append('Content-Type', 'application/json');
 
@@ -71,13 +104,13 @@ export function fetchWordsheet(classId, wordsheetId) {
         method: 'GET', headers: headers,
     };
 
-    let wordsheetRequest = new Request(classAPI + '/' + classId + '/wordsheets/' + wordsheetId, initObject);
+    let getRequest = new Request(classAPI + '/' + classId + '/vocabularies/' + vocabularyId, initObject);
 
-    return fetch(wordsheetRequest)
+    return fetch(getRequest)
         .catch(err => console.log("HTTP error: ", err));
 }
 
-export function updateName(classId, wordsheetId, name) {
+export function updateVocabularyName(classId, vocabularyId, name) {
     let headers = new Headers();
     headers.append('Content-Type', 'application/json');
 
@@ -91,13 +124,13 @@ export function updateName(classId, wordsheetId, name) {
         body: JSON.stringify(jsonRequest),
     };
 
-    let patchRequest = new Request(classAPI + "/" + classId + "/wordsheets/" + wordsheetId, initObject);
+    let patchRequest = new Request(classAPI + "/" + classId + "/vocabularies/" + vocabularyId, initObject);
 
     return fetch(patchRequest)
         .catch(err => console.log("HTTP error: ", err));
 }
 
-export function updateReadiness(classId, wordsheetId, isReady) {
+export function updateReadiness(classId, vocabularyId, isReady) {
     let headers = new Headers();
     headers.append('Content-Type', 'application/json');
 
@@ -111,13 +144,13 @@ export function updateReadiness(classId, wordsheetId, isReady) {
         body: JSON.stringify(jsonRequest),
     };
 
-    let patchRequest = new Request(classAPI + "/" + classId + "/wordsheets/" + wordsheetId, initObject);
+    let patchRequest = new Request(classAPI + "/" + classId + "/vocabularies/" + vocabularyId, initObject);
 
     return fetch(patchRequest)
         .catch(err => console.log("HTTP error: ", err));
 }
 
-export function addToWordsheet(classId, wordsheetId, wordData) {
+export function addToVocabulary(classId, vocabularyId, wordData) {
 
     let headers = new Headers();
     headers.append('Content-Type', 'application/json');
@@ -127,21 +160,24 @@ export function addToWordsheet(classId, wordsheetId, wordData) {
         headers: headers,
         body: JSON.stringify(wordData),
     };
-    let createRequest = new Request(classAPI + "/" + classId + "/wordsheets/" + wordsheetId + "/words", initObject);
+    let createRequest = new Request(classAPI + "/" + classId + "/vocabularies/" + vocabularyId, initObject);
 
     return fetch(createRequest)
         .catch(err => console.log("HTTP error: ", err));
 }
 
-export function deleteFromWordsheet(classId, wordsheetId, wordId) {
+export function removeFromVocabulary(classId, vocabularyId, wordId) {
     let headers = new Headers();
 
     let initObject = {
         method: 'DELETE',
-        headers: headers
+        headers: headers,
+        body: JSON.stringify({
+            wordId: wordId
+        }),
     };
 
-    let deleteRequest = new Request(classAPI + "/" + classId + "/wordsheets/" + wordsheetId+ "/words/" + wordId, initObject);
+    let deleteRequest = new Request(classAPI + "/" + classId + "/vocabularies/" + vocabularyId, initObject);
 
     return fetch(deleteRequest)
         .catch(err => console.log("HTTP error: ", err));
