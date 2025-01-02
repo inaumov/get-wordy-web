@@ -1,19 +1,18 @@
 <script>
 import {fetchWordsheet} from "@/js/classes-api.js";
-import {applyCaption} from "@/js/utils.js";
 
 export default {
-  props: ['classId', 'wordsheetId'],
+  props: ['classId', 'vocabularyId'],
   data() {
     return {
-      name: 'Wordsheet',
+      name: '',
       words: [],
       isAddedToFavorite: false,
     }
   },
   methods: {
     async getData() {
-      const response = await fetchWordsheet(this.classId, this.wordsheetId);
+      const response = await fetchWordsheet(this.classId, this.vocabularyId);
       const wordsheet = await response.json();
       this.name = wordsheet['name'];
       this.words = wordsheet['items'] || [];
@@ -29,8 +28,6 @@ export default {
   },
   mounted() {
     this.getData()
-    applyCaption(this.name || 'Wordsheet')
-    console.log("Selected wordsheet: id = ", this.wordsheetId, ", name = ", this.name)
   }
 };
 </script>

@@ -3,7 +3,6 @@ import WordsheetTable from "@/components/classes/WordsheetTable.vue";
 import SearchInput from "@/components/search/SearchInput.vue";
 import SearchResultsPreview from "@/components/search/SearchResultsPreview.vue";
 
-import {applyCaption} from '@/js/utils.js'
 import {fetchWordsheet, updateReadiness, updateName, addToWordsheet} from '@/js/classes-api.js';
 
 export default {
@@ -70,8 +69,6 @@ export default {
   },
   mounted() {
     this.getData()
-    applyCaption(this.name || 'Wordsheet')
-    console.log("Selected wordsheet: id = ", this.wordsheetId, ", name = ", this.name)
   }
 };
 
@@ -99,7 +96,7 @@ export default {
     <!-- submit / back Buttons -->
     <div class="d-flex justify-content-end p-4">
       <div class="col-6 text-start">
-        <router-link :to="{name: 'class-wordsheet-list'}" class="btn btn-secondary" title="Back">Back</router-link>
+        <router-link :to="{name: 'class-vocabularies'}" class="btn btn-secondary" title="Back">Back</router-link>
       </div>
       <div class="col-6 text-end">
         <button type="button" class="btn btn-primary border btn-md" v-on:click="onReady">

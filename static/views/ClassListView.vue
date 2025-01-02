@@ -28,18 +28,9 @@ export default {
         };
       });
     },
-    navigateToWordsheetList(classItem) {
+    navigateToClassDetails(classItem) {
       this.router.push({
-            name: 'class-wordsheet-list',
-            params: {
-              classId: classItem['classId']
-            }
-          });
-      console.log("Selected class: id = ", classItem['classId'], ", name = ", classItem['name'])
-    },
-    navigateToEditClass(classItem) {
-      this.router.push({
-            name: 'add-new-class',
+            name: 'class-details',
             params: {
               classId: classItem['classId']
             }
@@ -87,13 +78,17 @@ export default {
 </script>
 
 <template>
+  <div class="p-4 d-flex flex-column align-items-start">
+    <router-link :to="{name: 'schedule'}" class="btn btn-secondary" title="Back">Back</router-link>
+  </div>
+
   <div v-if="hasClasses" class="container p-4">
     <h4 class="pb-4">{{ getFullDayName(day) }}</h4>
     <div class="day-groups">
       <div class="row mx-1">
         <div class="col-md-4 card" v-for="classItem in classList"
              :key="classItem['classId']"
-             @click="navigateToEditClass(classItem)">
+             @click="navigateToClassDetails(classItem)">
           <div class="card-body">
             <span class="class-id">Class ID: {{ classItem['classId'] }}</span>
             <div>

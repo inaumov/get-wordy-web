@@ -7,6 +7,7 @@ import ClassListView from "@/views/ClassListView.vue";
 import ManageClassView from "@/views/classes/ManageClassView.vue";
 import SharedMaterials from "@/views/shared/SharedMaterials.vue";
 import ScheduleView from "@/views/classes/ScheduleView.vue";
+import ClassDetails from "@/views/classes/ClassDetails.vue";
 
 const router = createRouter({
     history: createWebHistory(import.meta.env.BASE_URL),
@@ -32,10 +33,20 @@ const router = createRouter({
             component: SharedMaterials
         },
         {
-            path: '/Schedule/:day/Classes',
+            path: '/Classes/:day',
             name: 'classes',
             component: ClassListView,
             props: true,
+        },
+        {
+            path: '/Classes/:day/:classId',
+            name: 'class-details',
+            component: ClassDetails,
+            props: (route) => (
+                {
+                    classId: route.params.classId,
+                }
+            ),
         },
         {
             path: '/Dictionaries/:dictionaryId/Cards',
@@ -95,8 +106,8 @@ const router = createRouter({
             component: ManageClassView
         },
         {
-            path: '/Class/:classId',
-            name: 'class-wordsheet-list',
+            path: '/Classes/:day/:classId/Vocabularies',
+            name: 'class-vocabularies',
             component: WordSheetListView,
             props: (route) => (
                 {
