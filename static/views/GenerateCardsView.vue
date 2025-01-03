@@ -1,8 +1,6 @@
 <script>
 import ActionButtons from "@/components/cards/ActionButtons.vue";
 
-import {generateCards} from '@/js/cards.js';
-import {textToArray} from '@/js/utils.js';
 import SearchInput from "@/components/search/SearchInput.vue";
 import SearchResultsPreview from "@/components/search/SearchResultsPreview.vue";
 
@@ -18,10 +16,9 @@ export default {
   },
   methods: {
     onSearch(result) {
-      // generateCards(this.dictionaryId, wordsArr);
       this.searchResult = result;
     },
-    handleAddWord() {
+    handleAddNewCard() {
 
     },
   },
@@ -39,7 +36,7 @@ export default {
     </div>
   </div>
 
-  <search-results-preview @add-to-wordsheet="handleAddWord" v-bind="{previewData: this.searchResult}"/>
+  <search-results-preview @add-to-wordsheet="handleAddNewCard" v-bind="{previewData: this.searchResult}"/>
 
 </template>
 

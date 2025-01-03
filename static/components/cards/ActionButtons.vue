@@ -12,10 +12,10 @@ export default {
           <i class="bi bi-card-list"></i> All cards
         </router-link>
         <router-link :to="{ name : 'play-game'}" class="btn btn-lg" @click="forceRerender">
-          <i class="bi bi-emoji-smile-upside-down"></i> Try game
+          <i class="bi bi-emoji-smile-upside-down"></i> Exercise
         </router-link>
         <router-link :to="{ name : 'generate'}" class="btn btn-lg">
-          <i class="bi bi-bricks"></i> Generate
+          <i class="bi bi-bricks"></i> Search new words
         </router-link>
       </div>
     </div>

@@ -52,6 +52,18 @@ export default {
   <div v-if="hasDictionaries" class="container p-4" id="content">
     <h4 class="pb-4">My dictionaries</h4>
 
+    <div class="row">
+      <div class="col" id="settings">
+        <div class="button-group d-flex flex-column align-items-end">
+
+          <router-link to="/Settings" class="btn btn-lg">
+            <i class="bi bi-gear"></i>
+          </router-link>
+
+        </div>
+      </div>
+    </div>
+
     <div id="dictionary" class="card text-center" v-for="dictionary in dictionaries">
       <img v-bind:src="dictionary['picture']" class="card-img-top mx-auto d-block" v-bind:alt="dictionary['name']">
       <div class="card-body">

@@ -81,9 +81,6 @@ export default {
             <button class="btn btn-lg" @click="resetScore(card)" v-if="canBeReset(card)" title="Reset score">
               <i class="bi bi-arrow-repeat"></i>
             </button>
-            <router-link :to="{name: 'edit-card', params: {dictionaryId: this.dictionaryId, cardId: card['cardId']}}" class="btn btn-lg" title="Edit card">
-              <i class="bi bi-pencil-square"></i>
-            </router-link>
             <button class="btn btn-lg" @click="deleteCard(card)" title="Delete">
               <i class="bi bi-x-lg"></i>
             </button>
