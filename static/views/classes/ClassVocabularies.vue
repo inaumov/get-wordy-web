@@ -28,8 +28,8 @@ export default {
 
 <template>
 
-  <div v-if="hasVocabs" class="container p-4" id="vocabularies">
-    <h4 class="pb-4">Vocabularies</h4>
+  <div v-if="hasVocabs" class="container" id="vocabularies">
+    <h4 class="">Vocabularies</h4>
 
     <div
         v-for="vocabulary in vocabularies"

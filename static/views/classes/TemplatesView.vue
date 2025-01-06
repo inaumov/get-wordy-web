@@ -27,20 +27,19 @@ export default {
 
 <template>
 
-  <div v-if="hasTemplates" class="container p-4" id="templates">
+  <div v-if="hasTemplates" class="p-4" id="templates">
     <h4 class="pb-4">Prepared vocabularies</h4>
 
-    <div class="row pb-4">
-      <div class="col">
+      <div class="pb-3">
         <div class="d-flex flex-column align-items-end">
-          <button class="btn btn-lg" v-on:click="" title="Add template vocabulary">
+          <button class="btn btn-md" v-on:click="" title="Add template vocabulary">
             <i class="bi bi-file-plus"></i>
             Add template
           </button>
         </div>
       </div>
-    </div>
 
+  <div class="container">
     <div
         v-for="template in vocabularies"
         :key="template['templateId']"
@@ -62,6 +61,7 @@ export default {
       </router-link>
 
     </div>
+  </div>
   </div>
 
   <div v-else class="d-flex justify-content-center p-5">

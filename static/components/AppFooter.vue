@@ -1,8 +1,8 @@
 <template>
   <footer class="footer mt-auto text-muted">
-    <div class="container p-5 text-center">
+    <div class="container py-5 text-center">
       <p>
-        <a href="/">Back to home</a>
+        <a href="/">Back to main page</a>
       </p>
       <p>Get Wordy App :: Boost vocabulary effectively</p>
     </div>

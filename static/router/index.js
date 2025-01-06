@@ -1,14 +1,12 @@
 import {createRouter, createWebHistory} from 'vue-router'
+import LandingPage from "@/pages/LandingPage.vue";
 import MainView from "@/views/MainView.vue";
 import ClassVocabularies from "@/views/classes/ClassVocabularies.vue";
 import DictionariesView from "@/views/DictionariesView.vue";
-import NotFoundView from "@/views/error/NotFoundView.vue";
 import ClassListView from "@/views/ClassListView.vue";
-import ManageClassView from "@/views/classes/ManageClassView.vue";
 import SharedMaterials from "@/views/shared/SharedMaterials.vue";
 import ScheduleView from "@/views/classes/ScheduleView.vue";
 import ClassDetailsView from "@/views/classes/ClassDetailsView.vue";
-import TemplatesView from "@/views/classes/TemplatesView.vue";
 
 const router = createRouter({
     history: createWebHistory(import.meta.env.BASE_URL),
@@ -16,12 +14,17 @@ const router = createRouter({
         {
             path: '/',
             name: 'home',
-            component: MainView
+            component: LandingPage,
         },
+        {
+            path: "/Dashboard",
+            component: MainView,
+            children: [
+        // components rendered inside Dashboard
         {
             path: '/Schedule',
             name: 'schedule',
-            component: ScheduleView,
+            component: ScheduleView
         },
         {
             path: '/Dictionaries',
@@ -35,12 +38,12 @@ const router = createRouter({
         },
         {
             path: '/Schedule/:day',
-            name: 'classes',
+            name: 'day-classes',
             component: ClassListView,
             props: true,
         },
         {
-            path: '/Classes/:day/:classId',
+            path: '/Classes/:classId',
             name: 'class-details',
             component: ClassDetailsView,
             props: (route) => (
@@ -52,28 +55,32 @@ const router = createRouter({
         {
             path: '/Templates',
             name: 'templates',
-            component: TemplatesView
+            component: () => import('@/views/classes/TemplatesView.vue'),
         },
         {
             path: '/Templates/:templateId',
             name: 'template-preview',
-            // route level code-splitting
-            // this generates a separate chunk (Settings.[hash].js) for this route
-            // which is lazy-loaded when the route is visited.
             component: () => import('@/views/shared/WordsPreview.vue'),
             props: (route) => (
                 {
-                    classId: route.params.classId,
                     vocabId: route.params.templateId
+                }
+            ),
+        },
+        {
+            path: '/Templates/:templateId/Words/:wordId',
+            name: 'edit-explanation',
+            component: () => import('@/views/EditCardView.vue'),
+            props: (route) => (
+                {
+                    vocabId: route.params.templateId,
+                    wordId: route.params.wordId
                 }
             ),
         },
         {
             path: '/Dictionaries/:dictionaryId/Cards',
             name: 'all-cards',
-            // route level code-splitting
-            // this generates a separate chunk (Settings.[hash].js) for this route
-            // which is lazy-loaded when the route is visited.
             component: () => import('@/views/CardsView.vue'),
             props: (route) => (
                 {
@@ -83,7 +90,7 @@ const router = createRouter({
             ),
         },
         {
-            path: '/Dictionaries/:dictionaryId/PlayGame',
+            path: '/Dictionaries/:dictionaryId/Exercise',
             name: 'play-game',
             // route level code-splitting
             // this generates a separate chunk (Settings.[hash].js) for this route
@@ -92,7 +99,7 @@ const router = createRouter({
             props: true
         },
         {
-            path: '/Dictionaries/:dictionaryId/Generate',
+            path: '/Dictionaries/:dictionaryId/Search',
             name: 'generate',
             // route level code-splitting
             // this generates a separate chunk (Settings.[hash].js) for this route
@@ -110,20 +117,9 @@ const router = createRouter({
             props: true
         },
         {
-            path: '/Dictionaries/:dictionaryId/Cards/:cardId',
-            name: 'edit-card',
-            component: () => import('@/views/EditCardView.vue'),
-            props: (route) => (
-                {
-                    dictionaryId: route.params.dictionaryId,
-                    cardId: route.params.cardId
-                }
-            ),
-        },
-        {
             path: '/Class',
             name: 'add-new-class',
-            component: ManageClassView
+            component: () => import('@/views/classes/ManageClassView.vue')
         },
         {
             path: '/Classes/:classId/Vocabularies',
@@ -136,7 +132,7 @@ const router = createRouter({
             ),
         },
         {
-            path: '/Classes/:classId/Vocabulary/:vocabId',
+            path: '/Classes/:classId/Vocabularies/:vocabId',
             name: 'vocabulary',
             // route level code-splitting
             // this generates a separate chunk (Settings.[hash].js) for this route
@@ -149,6 +145,20 @@ const router = createRouter({
                 }
             ),
         },
+                {
+                    path: '/Classes/:classId/Vocabularies/:vocabId/Explanation/:wordId',
+                    name: 'edit-explanation',
+                    // route level code-splitting
+                    // this generates a separate chunk (Settings.[hash].js) for this route
+                    // which is lazy-loaded when the route is visited.
+                    component: () => import('@/views/EditCardView.vue'),
+                    props: (route) => (
+                        {
+                            vocabId: route.params.vocabId,
+                            wordId: route.params.wordId
+                        }
+                    ),
+                },
         {
             path: '/Materials/:classId/Vocabularies/:vocabId',
             name: 'vocabulary-preview',
@@ -171,10 +181,13 @@ const router = createRouter({
             // which is lazy-loaded when the route is visited.
             component: () => import('@/views/SettingsView.vue')
         },
+        // finish children components declaration
+            ],
+        },
         {
             path: '/:catchAll(.*)',
             name: 'not-found',
-            component: NotFoundView
+            component: () => import('@/pages/404Page.vue')
         }
     ]
 })

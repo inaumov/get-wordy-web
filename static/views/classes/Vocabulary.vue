@@ -76,12 +76,12 @@ export default {
 
 <template>
   <div class="d-flex justify-content-start p-4">
-    <router-link :to="{name: 'class-vocabularies'}" class="btn btn-secondary" title="Back">Back</router-link>
+    <router-link :to="{name: 'class-details'}" class="btn btn-secondary" title="Back">Back</router-link>
   </div>
 
   <div class="container">
 
-    <div class="d-flex justify-content-center pt-5">
+    <div class="d-flex justify-content-center py-2">
       <span contenteditable="true" class="h4 p-1" v-text="name" v-on:blur="onNameEdit">
       </span>
     </div>
@@ -96,7 +96,7 @@ export default {
 
     <wordsheet-table v-bind="{classId: this.classId, vocabId: this.vocabId, items: this.wordsList}"/>
 
-    <!-- submit / back Buttons -->
+    <!-- submit -->
     <div class="d-flex justify-content-end p-4">
         <button type="button" class="btn btn-primary border btn-md" v-on:click="onReady">
           Ready

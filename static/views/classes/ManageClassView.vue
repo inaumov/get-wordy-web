@@ -37,7 +37,7 @@ export default {
           .then(response => {
             if (response.ok) {
               this.router.push({
-                name: 'class-list'
+                name: 'day-classes'
               });
             }
             console.log("POST new class has been requested. Response.status =", response.status);
@@ -49,7 +49,10 @@ export default {
 </script>
 
 <template>
-  <div class="container mt-5 d-flex justify-content-center">
+  <div class="p-4 d-flex flex-column align-items-start">
+    <router-link :to="{name: 'schedule'}" class="btn btn-secondary" title="Back">Back</router-link>
+  </div>
+  <div class="container p-4 d-flex justify-content-center">
     <div class="w-100" style="max-width: 800px;">
       <h2 class="mb-4">Create class</h2>
       <form id="start-class-form" @submit.prevent="onSubmit">
@@ -117,9 +120,6 @@ export default {
 
         <!-- submit / back Buttons -->
         <div class="row py-4">
-          <div class="col-6 text-start">
-            <router-link :to="{name: 'home'}" class="btn btn-secondary" title="Back">Back</router-link>
-          </div>
           <div class="col-6 text-end">
             <button type="submit" class="btn btn-primary">Save</button>
           </div>

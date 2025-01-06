@@ -33,11 +33,11 @@ export default {
 
 <template>
   <div class="p-4 d-flex flex-column align-items-start">
-    <router-link :to="{name: 'classes'}" class="btn btn-secondary" title="Back">Back</router-link>
+    <router-link :to="{name: 'schedule'}" class="btn btn-secondary" title="Back">Back</router-link>
   </div>
 
-  <div class="container mt-4">
-    <h4 class="pb-4">{{ className }}</h4>
+  <div class="p-4">
+    <h4 class="">{{ className }}</h4>
 
     <!-- Tabs Navigation -->
     <ul class="nav nav-tabs" id="classDetailsTabs" role="tablist">

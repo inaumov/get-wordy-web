@@ -4,8 +4,8 @@ import ClassVocabularies from "@/views/classes/ClassVocabularies.vue";
 </script>
 
 <template>
-  <div class="row p-4">
-    <div class="col">
+  <div class="">
+    <div class="pt-3">
       <div class="d-flex flex-column align-items-end">
         <button class="btn btn-md" v-on:click="" title="Add printable materials">
           <i class="bi bi-file-earmark-pdf"></i>

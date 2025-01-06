@@ -52,8 +52,8 @@ export default {
         </td>
         <td style="text-align: right">
           <div id="actions">
-            <router-link :to="{name: 'edit-word', params: {vocabId: this.vocabId, word: item.word['value']}}"
-                         class="btn btn-lg" title="Edit word">
+            <router-link :to="{name: 'edit-explanation', params: {vocabId: this.vocabId, wordId: item['wordId']}}"
+                         class="btn btn-lg" title="Edit word explanation">
               <i class="bi bi-pencil-square"></i>
             </router-link>
             <button class="btn btn-lg" @click="removeWord(item)" title="Delete">

@@ -2,7 +2,6 @@
 import ActionButtons from "@/components/cards/ActionButtons.vue";
 import CardsTable from "@/components/cards/CardsTable.vue";
 
-import {applyCaption} from '@/js/utils.js'
 import {fetchCards} from '@/js/cards.js';
 
 export default {
@@ -21,7 +20,6 @@ export default {
   },
   mounted() {
     this.getData()
-    applyCaption(this.dictionaryName)
     console.log("Selected dictionary: id = ", this.dictionaryId, ", name = ", this.dictionaryName)
   }
 };
@@ -29,7 +27,7 @@ export default {
 </script>
 
 <template>
-
+  <h4>{{this.dictionaryName}}</h4>
   <action-buttons/>
   <cards-table v-bind="{dictionaryId: this.dictionaryId, cards: this.cards}"/>
 

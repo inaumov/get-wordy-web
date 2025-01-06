@@ -15,7 +15,7 @@ export default {
     },
     navigateToClasses(day) {
       // navigate to the page showing classes for the selected day
-      this.$router.push({name: 'classes', params: {day}});
+      this.$router.push({name: 'day-classes', params: {day}});
       console.log(`Navigate to classes for ${day}`);
     },
   },
@@ -24,7 +24,7 @@ export default {
 </script>
 
 <template>
-  <div class="container mt-5">
+  <div class="container p-4">
     <div class="row justify-content-center text-center">
       <div
           v-for="(day, index) in days"
