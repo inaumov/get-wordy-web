@@ -2,6 +2,7 @@ package get.wordy.rest;
 
 import get.wordy.ai.AiService;
 import get.wordy.ai.model.GetExplanationResult;
+import get.wordy.model.Explanation;
 import get.wordy.model.WordSearchResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,8 +24,8 @@ public class WordsController {
     }
 
     @GetMapping
-    public ResponseEntity<WordSearchResponse> getWordSheet(Principal user,
-                                                           @RequestParam(value = "value") String searchRequest) {
+    public ResponseEntity<WordSearchResponse> searchForWord(Principal user,
+                                                            @RequestParam(value = "value") String searchRequest) {
         LOG.info("Starting search initiation for the word/phrase = {}, by user = {}", searchRequest, user.getName());
         GetExplanationResult searchResult = aiService.requestWordSearch(searchRequest);
         return new ResponseEntity<>(toResponse(searchResult), HttpStatus.OK);
@@ -37,7 +38,7 @@ public class WordsController {
                 .explanations(searchResult
                         .getExplanations()
                         .stream()
-                        .map(res -> WordSearchResponse.ExplanationResponse.builder()
+                        .map(res -> Explanation.builder()
                                 .partOfSpeech(res.getPartOfSpeech())
                                 .meaning(res.getMeaning())
                                 .inContext(res.getSentences())

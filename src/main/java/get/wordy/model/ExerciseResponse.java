@@ -4,9 +4,9 @@ import java.util.List;
 
 public record ExerciseResponse(
         int cardId,
-        int wordId,
-        WordResponse word,
-        List<SentenceResponse> sentences
+        String value,
+        Explanation explanation,
+        List<SentenceResponse> exerciseSentences
 ) {
 
 }

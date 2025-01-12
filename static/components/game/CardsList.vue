@@ -40,8 +40,8 @@ export default {
       <div class="col" v-for="card in cards">
         <div class="card">
           <div class="card-body">
-            <h4 class="card-title">{{ card.word.value }}</h4>
-            <p class="card-text">{{ card.word.meaning }}</p>
+            <h4 class="card-title">{{ card.value }}</h4>
+            <p class="card-text">{{ card.explanation.meaning }}</p>
           </div>
         </div>
       </div>

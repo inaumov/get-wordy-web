@@ -3,9 +3,10 @@ package get.wordy.rest;
 import get.wordy.core.api.IClassService;
 import get.wordy.core.api.bean.ClassInfo;
 import get.wordy.core.api.bean.Word;
-import get.wordy.core.api.bean.WordsheetHeader;
+import get.wordy.core.api.bean.VocabHeader;
 import get.wordy.core.api.id.OwnerId;
 import get.wordy.model.*;
+import get.wordy.model.WordResponse;
 import jakarta.validation.Valid;
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.RandomStringUtils;
@@ -38,7 +39,7 @@ public class ClassController {
     @GetMapping
     public ResponseEntity<List<ClassInfoResponse>> getClasses(Principal user,
                                                               @RequestParam(value = "filter", required = false) String dayOfWeek) {
-        LOG.info("Getting {} classes list for the user = {}", StringUtils.hasText(dayOfWeek) ? dayOfWeek : "all", user.getName());
+        LOG.info("Getting {} classes managed by the user = {}", StringUtils.hasText(dayOfWeek) ? dayOfWeek : "all", user.getName());
 
         List<ClassInfoResponse> response = classService.getClasses(createUserOwnerId(user), dayOfWeek)
                 .stream()
@@ -74,109 +75,109 @@ public class ClassController {
                 .build();
     }
 
-    @GetMapping(value = "/{classId}/wordsheets")
-    public ResponseEntity<List<WordsheetResponse>> getWordSheets(Principal user,
-                                                                 @PathVariable("classId") String classId) {
-        LOG.info("Getting wordsheet list for the class id = {}", classId);
+    @GetMapping(value = "/{classId}/vocabularies")
+    public ResponseEntity<List<VocabularyResponse>> getVocabularies(Principal user,
+                                                                    @PathVariable("classId") String classId) {
+        LOG.info("Getting vocabularies for the class id = {}", classId);
 
-        List<WordsheetResponse> wordsheetsList = classService.getWordsheetList(createUserOwnerId(user), classId)
+        List<VocabularyResponse> vocabulariesResponse = classService.getVocabularies(createUserOwnerId(user), classId)
                 .stream()
                 .map(this::toResponse)
                 .toList();
 
-        if (wordsheetsList.isEmpty()) {
-            LOG.info("No wordsheets found for the class = {}", classId);
+        if (vocabulariesResponse.isEmpty()) {
+            LOG.info("No vocabularies found for the class = {}", classId);
             return new ResponseEntity<>(Collections.emptyList(), HttpStatus.OK);
         }
-        return new ResponseEntity<>(wordsheetsList, HttpStatus.OK);
+        return new ResponseEntity<>(vocabulariesResponse, HttpStatus.OK);
     }
 
-    @PostMapping("/{classId}/wordsheets")
-    public ResponseEntity<WordsheetResponse> addWordSheet(Principal user,
-                                                          @PathVariable("classId") String classId,
-                                                          @Valid @RequestBody WordsheetRequest wordsheetRequest) {
-        LOG.info("Adding a new wordsheet = {} for the class = {}", wordsheetRequest.name(), classId);
+    @PostMapping("/{classId}/vocabularies")
+    public ResponseEntity<VocabularyResponse> addVocabulary(Principal user,
+                                                            @PathVariable("classId") String classId,
+                                                            @Valid @RequestBody VocabularyRequest vocabularyRequest) {
+        LOG.info("Adding a new vocabulary = {} for the class = {}", vocabularyRequest.name(), classId);
 
-        var wordsheet = classService.createWordsheet(createUserOwnerId(user), classId, wordsheetRequest.name());
-        WordsheetResponse response = toResponse(wordsheet);
-        return ResponseEntity.created(URI.create("/{classId}/wordsheet/" + wordsheet.wordsheetId()))
+        var vocabulary = classService.createVocabulary(createUserOwnerId(user), classId, vocabularyRequest.name());
+        VocabularyResponse response = toResponse(vocabulary);
+        return ResponseEntity.created(URI.create("/{classId}/vocabulary/" + vocabulary.vocabId()))
                 .body(response);
     }
 
-    @GetMapping(value = "/{classId}/wordsheets/{wordsheetId}")
-    public ResponseEntity<Map<String, Object>> getWordSheet(Principal user,
-                                                            @PathVariable("classId") String classId,
-                                                            @PathVariable("wordsheetId") int wordsheetId) {
+    @GetMapping(value = "/{classId}/vocabularies/{vocabId}")
+    public ResponseEntity<Map<String, Object>> getVocabulary(Principal user,
+                                                             @PathVariable("classId") String classId,
+                                                             @PathVariable("vocabId") int vocabId) {
 
-        LOG.info("Getting a wordsheet for the class id = {}, and wordsheet id = {}", classId, wordsheetId);
+        LOG.info("Getting a vocabulary for the class id = {}, and vocabulary id = {}", classId, vocabId);
 
-        List<Word> wordsheetItems = classService.getWords(createUserOwnerId(user), classId, wordsheetId);
+        List<Word> vocabWords = classService.getWords(createUserOwnerId(user), classId, vocabId);
 
-        if (wordsheetItems.isEmpty()) {
-            LOG.info("No wordsheet found for the wordsheet id = {}", wordsheetId);
+        if (vocabWords.isEmpty()) {
+            LOG.info("No vocabulary found by id = {}", vocabId);
             return new ResponseEntity<>(Collections.emptyMap(), HttpStatus.OK);
         }
-        Map<String, Object> wordsheetResponse = Map.of(
-                "wordsheetId", wordsheetId,
+        Map<String, Object> vocabularyResponse = Map.of(
+                "vocabId", vocabId,
                 "name", "Test",
-                "items", wordsheetItems
+                "words", vocabWords
                         .stream()
-                        .map(this::toWordSheetItem)
+                        .map(this::toWordResponse)
                         .toList()
         );
 
-        return new ResponseEntity<>(wordsheetResponse, HttpStatus.OK);
+        return new ResponseEntity<>(vocabularyResponse, HttpStatus.OK);
     }
 
-    @PatchMapping("/{classId}/wordsheets/{wordsheetId}")
-    public ResponseEntity<WordsheetResponse> partialUpdate(Principal user,
-                                                           @PathVariable("classId") String classId,
-                                                           @PathVariable("wordsheetId") int wordsheetId,
-                                                           @RequestBody WordsheetRequest partialUpdate) {
-        LOG.info("Updating wordsheet id = {} for the class = {}", wordsheetId, classId);
+    @PatchMapping("/{classId}/vocabularies/{vocabId}")
+    public ResponseEntity<VocabularyResponse> partialUpdate(Principal user,
+                                                            @PathVariable("classId") String classId,
+                                                            @PathVariable("vocabId") int vocabId,
+                                                            @RequestBody VocabularyRequest partialUpdate) {
+        LOG.info("Updating vocabulary id = {} for the class = {}", vocabId, classId);
 
         // handle name change
         if (StringUtils.hasText(partialUpdate.name())) {
-            classService.renameWordsheet(createUserOwnerId(user), classId, wordsheetId, partialUpdate.name());
+            classService.renameVocabulary(createUserOwnerId(user), classId, vocabId, partialUpdate.name());
         }
         // handle availability change
         if (BooleanUtils.isTrue(partialUpdate.isShared())) {
-            classService.makeWordsheetIsShared(createUserOwnerId(user), classId, wordsheetId, true);
+            classService.makeVocabularyIsShared(createUserOwnerId(user), classId, vocabId, true);
         }
         return ResponseEntity
                 .noContent()
                 .build();
     }
 
-    @PostMapping(value = "/{classId}/wordsheets/{wordsheetId}/words")
-    public ResponseEntity<WordsheetItemResponse> addToWordSheet(Principal user,
-                                                                @PathVariable("classId") String classId,
-                                                                @PathVariable("wordsheetId") int wordsheetId,
-                                                                @Valid @RequestBody WordsheetItemRequest request, UriComponentsBuilder ucBuilder) {
+    @PostMapping(value = "/{classId}/vocabularies/{vocabId}/words")
+    public ResponseEntity<WordResponse> addToVocabulary(Principal user,
+                                                        @PathVariable("classId") String classId,
+                                                        @PathVariable("vocabId") int vocabId,
+                                                        @Valid @RequestBody WordIdRequest wordId, UriComponentsBuilder ucBuilder) {
 
-        LOG.info("Receiving a new word to add request to wordsheet id = {}. User = {}, class id = {}", wordsheetId, user.getName(), classId);
+        LOG.info("Receiving a new word to add request to vocabulary id = {}. User = {}, class id = {}", vocabId, user.getName(), classId);
 
-        Word addedItem = classService.addToWordsheet(createUserOwnerId(user), classId, wordsheetId, request.wordId());
+        Word addedToVocabulary = classService.addToVocabulary(createUserOwnerId(user), classId, vocabId, wordId.wordId());
 
         HttpHeaders headers = new HttpHeaders();
         headers.setLocation(ucBuilder
-                .path("/{classId}/wordsheets/{wordsheetId}/words/{wordId}")
-                .buildAndExpand(classId, wordsheetId, addedItem.getId())
+                .path("/{classId}/vocabularies/{vocabId}/words/{wordId}")
+                .buildAndExpand(classId, vocabId, addedToVocabulary.getId())
                 .toUri()
         );
-        WordsheetItemResponse response = toWordSheetItem(addedItem);
+        WordResponse response = toWordResponse(addedToVocabulary);
         return new ResponseEntity<>(response, headers, HttpStatus.CREATED);
     }
 
-    @DeleteMapping(value = "/{classId}/wordsheets/{wordsheetId}/words/{wordId}")
-    public ResponseEntity<WordsheetItemResponse> removeFromWordsheet(Principal user,
-                                                                     @PathVariable("classId") String classId,
-                                                                     @PathVariable("wordsheetId") int wordsheetId,
-                                                                     @PathVariable("wordId") int wordId) {
+    @DeleteMapping(value = "/{classId}/vocabularies/{vocabId}/words/{wordId}")
+    public ResponseEntity<Void> removeFromVocabulary(Principal user,
+                                                     @PathVariable("classId") String classId,
+                                                     @PathVariable("vocabId") int vocabId,
+                                                     @PathVariable("wordId") int wordId) {
 
-        LOG.info("Deleting a word = {} from wordsheet id = {} for the user = {}, classId id = {}", wordId, wordsheetId, user.getName(), classId);
+        LOG.info("Deleting a word = {} from vocabulary id = {} for the user = {}, classId id = {}", wordId, vocabId, user.getName(), classId);
 
-        classService.removeFromWordsheet(createUserOwnerId(user), classId, wordsheetId, wordId);
+        classService.removeFromVocabulary(createUserOwnerId(user), classId, vocabId, wordId);
 
         return ResponseEntity
                 .noContent()
@@ -198,30 +199,26 @@ public class ClassController {
         );
     }
 
-    private WordsheetItemResponse toWordSheetItem(Word word) {
-        return new WordsheetItemResponse(
-                word.getId(),
-                toWordResponse(word),
-                word.getSentences()
-        );
-    }
-
     private WordResponse toWordResponse(Word word) {
         return new WordResponse(
                 word.getId(),
                 word.getValue(),
-                word.getPartOfSpeech(),
                 word.getTranscription(),
-                word.getMeaning()
+                Explanation.builder()
+                        .partOfSpeech(word.getPartOfSpeech())
+                        .meaning(word.getMeaning())
+                        .inContext(word.getSentences())
+                        .collocations(word.getCollocations())
+                        .build()
         );
     }
 
-    private WordsheetResponse toResponse(WordsheetHeader wordsheetHeader) {
-        return new WordsheetResponse(
-                wordsheetHeader.wordsheetId(),
-                wordsheetHeader.name(),
-                wordsheetHeader.wordsTotal(),
-                wordsheetHeader.isShared()
+    private VocabularyResponse toResponse(VocabHeader vocabHeader) {
+        return new VocabularyResponse(
+                vocabHeader.vocabId(),
+                vocabHeader.name(),
+                vocabHeader.wordsTotal(),
+                vocabHeader.isShared()
         );
     }
 

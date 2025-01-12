@@ -21,7 +21,7 @@ export default {
           let clearedInput = inputLetters
               .join('')
               .replace('\xa0', ' ');
-          let isAnswerCorrect = clearedInput === this.displayed.word.value;
+          let isAnswerCorrect = clearedInput === this.displayed.value;
           // pre save card id
           if (isAnswerCorrect) {
             let currentCardId = this.displayed['cardId'];
@@ -50,7 +50,7 @@ export default {
       button.setAttribute('disabled', 'true');
     },
     prepareLetters() {
-      let str = this.displayed.word['value'];
+      let str = this.displayed['value'];
       const actualArr = [...str];
       let shuffledArr = [];
       do {
@@ -82,7 +82,7 @@ export default {
           Card {{ nextCardNumber }}
         </p>
         <p class="card-text text-center" style="font-size: larger">
-          {{ displayed.word['meaning'] }}
+          {{ displayed.explanation['meaning'] }}
         </p>
       </div>
     </div>
