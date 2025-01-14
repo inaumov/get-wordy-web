@@ -1,6 +1,6 @@
 package get.wordy.rest;
 
-import get.wordy.core.IVocabularyService;
+import get.wordy.core.api.IWordExplanationService;
 import get.wordy.core.api.bean.Word;
 import get.wordy.core.api.id.OwnerId;
 import get.wordy.model.Explanation;
@@ -24,10 +24,10 @@ import java.security.Principal;
 public class ExplanationsController extends HttpServlet {
     private static final Logger LOG = LoggerFactory.getLogger(ExplanationsController.class);
 
-    private final IVocabularyService vocabularyService;
+    private final IWordExplanationService explanationsService;
 
-    public ExplanationsController(IVocabularyService vocabularyService) {
-        this.vocabularyService = vocabularyService;
+    public ExplanationsController(IWordExplanationService explanationsService) {
+        this.explanationsService = explanationsService;
     }
 
     @GetMapping(value = "/{vocabId}/explanations/{wordId}")
@@ -36,7 +36,7 @@ public class ExplanationsController extends HttpServlet {
                                                        @PathVariable("wordId") int wordId) {
 
         LOG.info("Getting word explanation = {} for the user = {}, vocabulary id = {}", wordId, user.getName(), vocabId);
-        Word word = vocabularyService.getWordExplanation(createOwnerId(user), wordId);
+        Word word = explanationsService.getWordExplanation(createOwnerId(user), wordId);
         WordResponse wordResponse = toWordResponse(word);
         return new ResponseEntity<>(wordResponse, HttpStatus.OK);
     }
@@ -49,7 +49,7 @@ public class ExplanationsController extends HttpServlet {
         LOG.info("Adding a new word explanation for the user = {}, vocabulary id = {}", user.getName(), vocabId);
 
         Word entity = toEntity(wordRequest);
-        Word wordAdded = vocabularyService.addWordExplanation(createOwnerId(user), vocabId, entity);
+        Word wordAdded = explanationsService.addWordExplanation(createOwnerId(user), vocabId, entity);
 
         HttpHeaders headers = new HttpHeaders();
         headers.setLocation(ucBuilder
@@ -72,7 +72,7 @@ public class ExplanationsController extends HttpServlet {
         Word entity = toEntity(wordRequest)
                 .withId(wordRequest.getWordId());
 
-        Word wordUpdated = vocabularyService.updateWordExplanation(createOwnerId(user), vocabId, entity);
+        Word wordUpdated = explanationsService.updateWordExplanation(createOwnerId(user), vocabId, entity);
 
         HttpHeaders headers = new HttpHeaders();
         headers.setLocation(ucBuilder
@@ -90,7 +90,7 @@ public class ExplanationsController extends HttpServlet {
                                                              @PathVariable("wordId") int wordId) {
         LOG.info("Removing a word explanation = {} for the user = {}, vocabulary id = {}", wordId, user.getName(), vocabId);
 
-        vocabularyService.deleteWordExplanationPermanently(createOwnerId(user), vocabId, wordId);
+        explanationsService.deleteWordExplanationPermanently(createOwnerId(user), vocabId, wordId);
 
         return ResponseEntity
                 .noContent()
