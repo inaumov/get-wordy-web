@@ -6,7 +6,7 @@ public record DictionaryRequest(
         int id,
         @NotBlank
         String name,
-        String picture
+        String pictureUrl
 ) {
 
 }

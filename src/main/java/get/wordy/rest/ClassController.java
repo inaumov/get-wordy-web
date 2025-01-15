@@ -1,9 +1,10 @@
 package get.wordy.rest;
 
-import get.wordy.core.api.IClassService;
+import get.wordy.core.api.IClassInfoService;
+import get.wordy.core.api.IVocabularyService;
 import get.wordy.core.api.bean.ClassInfo;
 import get.wordy.core.api.bean.Word;
-import get.wordy.core.api.bean.VocabHeader;
+import get.wordy.core.api.bean.Vocabulary;
 import get.wordy.core.api.id.OwnerId;
 import get.wordy.model.*;
 import get.wordy.model.WordResponse;
@@ -23,6 +24,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 import java.net.URI;
 import java.security.Principal;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/classes")
@@ -30,22 +32,31 @@ import java.util.*;
 public class ClassController {
     private static final Logger LOG = LoggerFactory.getLogger(ClassController.class);
 
-    private final IClassService classService;
+    private final IClassInfoService classService;
+    private final IVocabularyService vocabularyService;
 
-    public ClassController(IClassService classService) {
+    public ClassController(IClassInfoService classService, IVocabularyService vocabularyService) {
         this.classService = classService;
+        this.vocabularyService = vocabularyService;
     }
 
     @GetMapping
-    public ResponseEntity<List<ClassInfoResponse>> getClasses(Principal user,
-                                                              @RequestParam(value = "filter", required = false) String dayOfWeek) {
+    public ResponseEntity<Map<String, List<ClassInfoResponse>>> getClasses(Principal user,
+                                                                           @RequestParam(value = "filter", required = false) String dayOfWeek) {
         LOG.info("Getting {} classes managed by the user = {}", StringUtils.hasText(dayOfWeek) ? dayOfWeek : "all", user.getName());
 
-        List<ClassInfoResponse> response = classService.getClasses(createUserOwnerId(user), dayOfWeek)
+        Map<String, List<ClassInfoResponse>> response = classService.getClasses(createUserOwnerId(user), dayOfWeek)
+                .entrySet()
                 .stream()
-                .map(ClassInfoResponse::new)
-                .map(this::enrichWithAttendees)
-                .toList();
+                .collect(Collectors.toMap(
+                        Map.Entry::getKey,
+                        entry ->
+                                entry.getValue()
+                                        .stream()
+                                        .map(ClassInfoResponse::new)
+                                        .map(this::enrichWithAttendees)
+                                        .toList()
+                ));
 
         return ResponseEntity.ok(response);
     }
@@ -80,7 +91,7 @@ public class ClassController {
                                                                     @PathVariable("classId") String classId) {
         LOG.info("Getting vocabularies for the class id = {}", classId);
 
-        List<VocabularyResponse> vocabulariesResponse = classService.getVocabularies(createUserOwnerId(user), classId)
+        List<VocabularyResponse> vocabulariesResponse = vocabularyService.getVocabularies(createClassOwnerId(classId))
                 .stream()
                 .map(this::toResponse)
                 .toList();
@@ -98,9 +109,9 @@ public class ClassController {
                                                             @Valid @RequestBody VocabularyRequest vocabularyRequest) {
         LOG.info("Adding a new vocabulary = {} for the class = {}", vocabularyRequest.name(), classId);
 
-        var vocabulary = classService.createVocabulary(createUserOwnerId(user), classId, vocabularyRequest.name());
+        var vocabulary = vocabularyService.createVocabulary(createClassOwnerId(classId), vocabularyRequest.name(), null);
         VocabularyResponse response = toResponse(vocabulary);
-        return ResponseEntity.created(URI.create("/{classId}/vocabulary/" + vocabulary.vocabId()))
+        return ResponseEntity.created(URI.create("/{classId}/vocabulary/" + vocabulary.getVocabId()))
                 .body(response);
     }
 
@@ -111,7 +122,7 @@ public class ClassController {
 
         LOG.info("Getting a vocabulary for the class id = {}, and vocabulary id = {}", classId, vocabId);
 
-        List<Word> vocabWords = classService.getWords(createUserOwnerId(user), classId, vocabId);
+        List<Word> vocabWords = vocabularyService.getWords(createClassOwnerId(classId), vocabId);
 
         if (vocabWords.isEmpty()) {
             LOG.info("No vocabulary found by id = {}", vocabId);
@@ -138,11 +149,11 @@ public class ClassController {
 
         // handle name change
         if (StringUtils.hasText(partialUpdate.name())) {
-            classService.renameVocabulary(createUserOwnerId(user), classId, vocabId, partialUpdate.name());
+            vocabularyService.renameVocabulary(createClassOwnerId(classId), vocabId, partialUpdate.name());
         }
         // handle availability change
         if (BooleanUtils.isTrue(partialUpdate.isShared())) {
-            classService.makeVocabularyIsShared(createUserOwnerId(user), classId, vocabId, true);
+            vocabularyService.makeVocabularyIsShared(createClassOwnerId(classId), vocabId, true);
         }
         return ResponseEntity
                 .noContent()
@@ -157,7 +168,7 @@ public class ClassController {
 
         LOG.info("Receiving a new word to add request to vocabulary id = {}. User = {}, class id = {}", vocabId, user.getName(), classId);
 
-        Word addedToVocabulary = classService.addToVocabulary(createUserOwnerId(user), classId, vocabId, wordId.wordId());
+        Word addedToVocabulary = vocabularyService.addToVocabulary(createClassOwnerId(classId), vocabId, wordId.wordId());
 
         HttpHeaders headers = new HttpHeaders();
         headers.setLocation(ucBuilder
@@ -177,7 +188,7 @@ public class ClassController {
 
         LOG.info("Deleting a word = {} from vocabulary id = {} for the user = {}, classId id = {}", wordId, vocabId, user.getName(), classId);
 
-        classService.removeFromVocabulary(createUserOwnerId(user), classId, vocabId, wordId);
+        vocabularyService.removeFromVocabulary(createClassOwnerId(classId), vocabId, wordId);
 
         return ResponseEntity
                 .noContent()
@@ -188,6 +199,10 @@ public class ClassController {
         return new OwnerId(user.getName(), "user");
     }
 
+    private OwnerId createClassOwnerId(String classId) {
+        return new OwnerId(classId, "class");
+    }
+
     public ClassInfo copyClassInfo(ClassInfoRequest request) {
         return new ClassInfo(
                 "desna-" + RandomStringUtils.secure().nextAlphanumeric(5),
@@ -195,7 +210,8 @@ public class ClassController {
                 request.getFormat(),
                 request.getLevel(),
                 request.getMaterial(),
-                request.getNotes()
+                request.getNotes(),
+                null
         );
     }
 
@@ -213,11 +229,11 @@ public class ClassController {
         );
     }
 
-    private VocabularyResponse toResponse(VocabHeader vocabHeader) {
+    private VocabularyResponse toResponse(Vocabulary vocabHeader) {
         return new VocabularyResponse(
-                vocabHeader.vocabId(),
-                vocabHeader.name(),
-                vocabHeader.wordsTotal(),
+                vocabHeader.getVocabId(),
+                vocabHeader.getName(),
+                vocabHeader.getWordsTotal(),
                 vocabHeader.isShared()
         );
     }
