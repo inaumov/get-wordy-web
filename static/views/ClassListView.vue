@@ -19,14 +19,17 @@ export default {
     getFullDayName,
     async getData() {
       const response = await fetchClasses(this.day);
-      let items = await response.json();
-      this.classList = items.map(item => {
+      let dayClasses = await response.json();
+      this.classList = dayClasses.hasOwnProperty(this.day) ? dayClasses[this.day].map(item => {
         // add the 'hasAttendees' property based on the condition
         return {
           ...item, // spread the existing properties
-          hasAttendees: item['attendees'] && item['attendees'].length >= 1
+          hasAttendees: item['attendees'] && item['attendees'].length >= 1,
+          timeSlots: item['schedules'].map(x => {
+            return this.formatTimeSlot(x)
+          })
         };
-      });
+      }) : [];
     },
     navigateToClassDetails(classItem) {
       this.router.push({
@@ -64,7 +67,15 @@ export default {
       }
       // return the class based on the shuffled color order for the class
       return classItem.colorOrder[index % classItem.colorOrder.length];
-    }
+    },
+    formatTimeSlot(timeSlot) {
+      const formatTime = (time) =>
+          new Date(`1970-01-01T${time}`).toLocaleTimeString([], {
+            hour: '2-digit',
+            minute: '2-digit',
+          });
+      return `${timeSlot['dayOfWeek']} : ${formatTime(timeSlot.startTime)} - ${formatTime(timeSlot.endTime)}`;
+    },
   },
   computed: {
     hasClasses() {
@@ -90,10 +101,24 @@ export default {
              :key="classItem['classId']"
              @click="navigateToClassDetails(classItem)">
           <div class="card-body">
-            <span class="class-id">Class ID: {{ classItem['classId'] }}</span>
             <div>
               <div class="class-details">
-                <span><strong>Name / Time slot</strong> : {{ classItem['name'] }}</span>
+                <span><strong>Name</strong> : {{ classItem['name'] }}</span>
+              </div>
+              <div class="class-details">
+                <span><strong>Time slots</strong> :</span>
+                <div v-if="classItem.timeSlots">
+                  <span
+                      v-for="(timeSlot, slotIndex) in classItem.timeSlots"
+                      :key="slotIndex"
+                      :class="getBadgeClass(classItem, slotIndex)"
+                      class="badge">
+                        {{ timeSlot }}
+                  </span>
+                </div>
+                <div v-else>
+                  None
+                </div>
               </div>
               <div class="class-details">
                 <span><strong>Attendees</strong>:</span>
@@ -125,7 +150,7 @@ export default {
             </div>
           </div>
         </div>
-        <div class="col-md-4 card" @click="addNewClass()"
+        <div v-if="false" class="col-md-4 card" @click="addNewClass()"
              data-bs-toggle="tooltip"
              data-bs-placement="right"
              title="Start a new class"
