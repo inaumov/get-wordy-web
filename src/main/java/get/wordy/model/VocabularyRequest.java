@@ -1,6 +1,6 @@
 package get.wordy.model;
 
-public record WordsheetRequest(
+public record VocabularyRequest(
         String name,
         Boolean isShared
 ) {

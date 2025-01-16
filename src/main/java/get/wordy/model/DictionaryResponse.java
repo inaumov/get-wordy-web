@@ -1,9 +1,9 @@
 package get.wordy.model;
 
 public record DictionaryResponse(
-        int dictionaryId,
+        int vocabId,
         String name,
-        String picture,
-        int cardsTotal
+        String pictureUrl,
+        int wordsTotal
 ) {
 }

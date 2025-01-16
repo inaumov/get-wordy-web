@@ -1,20 +1,17 @@
 package get.wordy.rest;
 
 import get.wordy.core.api.id.OwnerId;
-import get.wordy.spelling.SentenceSplitter;
+import get.wordy.model.Explanation;
 import get.wordy.core.api.IDictionaryService;
 import get.wordy.core.api.bean.*;
 import get.wordy.model.*;
 import jakarta.servlet.http.HttpServlet;
-import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.util.UriComponentsBuilder;
 
 import java.security.Principal;
 import java.util.*;
@@ -31,13 +28,13 @@ public class CardsController extends HttpServlet {
     }
 
     @GetMapping(value = "/{dictionaryId}/cards")
-    public ResponseEntity<List<CardListResponse>> getCards(Principal user, @PathVariable("dictionaryId") int dictionaryId) {
+    public ResponseEntity<List<CardResponse>> getCards(Principal user, @PathVariable("dictionaryId") int dictionaryId) {
 
         LOG.info("Getting all cards for the user = {}, dictionary id = {}", user.getName(), dictionaryId);
 
-        List<CardListResponse> cards = dictionaryService.getCards(createOwnerId(user), dictionaryId)
+        List<CardResponse> cards = dictionaryService.getCards(createOwnerId(user), dictionaryId)
                 .stream()
-                .map(this::toCardListResponse)
+                .map(this::toCardResponse)
                 .toList();
 
         if (cards.isEmpty()) {
@@ -80,78 +77,10 @@ public class CardsController extends HttpServlet {
                 .build();
     }
 
-    @GetMapping(value = "/{dictionaryId}/cards/{cardId}")
-    public ResponseEntity<CardResponse> getCard(Principal user,
-                                                @PathVariable("dictionaryId") int dictionaryId,
-                                                @PathVariable("cardId") int cardId) {
-
-        LOG.info("Getting card = {} for the user = {}, dictionary id = {}", cardId, user.getName(), dictionaryId);
-        Card card = dictionaryService.loadCard(cardId);
-        CardResponse cardResponse = toCardResponse(card);
-        return new ResponseEntity<>(cardResponse, HttpStatus.OK);
-    }
-
-    @PostMapping(value = "/{dictionaryId}/cards")
-    public ResponseEntity<CardResponse> addCard(Principal user,
-                                                @PathVariable("dictionaryId") int dictionaryId,
-                                                @Valid @RequestBody CardRequest cardRequest, UriComponentsBuilder ucBuilder) {
-
-        LOG.info("Adding a new card for the user = {}, dictionary id = {}", user.getName(), dictionaryId);
-
-        Card card = new Card();
-        WordRequest word = cardRequest.word();
-        card.setWord(toWordEntity(word));
-        card.setSentences(cardRequest.sentences()
-                .stream()
-                .map(strSentence -> withClosestMatch(strSentence, cardRequest.getKeyword()))
-                .toList());
-        card.setCollocations(cardRequest.collocations());
-        Card addedCard = dictionaryService.addCard(dictionaryId, card);
-
-        HttpHeaders headers = new HttpHeaders();
-        headers.setLocation(ucBuilder
-                .path("/dictionaries/{dictionaryId}/cards/{cardId}")
-                .buildAndExpand(dictionaryId, card.getId())
-                .toUri()
-        );
-        CardResponse cardResponse = toCardResponse(addedCard);
-        return new ResponseEntity<>(cardResponse, headers, HttpStatus.CREATED);
-    }
-
-    @PutMapping(value = "/{dictionaryId}/cards")
-    public ResponseEntity<CardResponse> updateCard(Principal user,
-                                                   UriComponentsBuilder ucBuilder,
-                                                   @PathVariable("dictionaryId") int dictionaryId,
-                                                   @Valid @RequestBody UpdateCardRequest cardRequest) {
-
-        LOG.info("Update a card for the user = {}, dictionary id = {}", user.getName(), dictionaryId);
-
-        Card card = new Card();
-        card.setId(cardRequest.cardId());
-        card.setWordId(cardRequest.wordId());
-        Word wordEntity = toWordEntity(cardRequest.word());
-        card.setWord(wordEntity.withId(cardRequest.wordId()));
-        card.setSentences(cardRequest.sentences()
-                .stream()
-                .map(strSentence -> withClosestMatch(strSentence, cardRequest.getKeyword()))
-                .toList());
-        card.setCollocations(cardRequest.collocations());
-        Card addedCard = dictionaryService.updateCard(dictionaryId, card);
-
-        HttpHeaders headers = new HttpHeaders();
-        headers.setLocation(ucBuilder
-                .path("/dictionaries/{dictionaryId}/cards/{cardId}")
-                .buildAndExpand(dictionaryId, card.getId())
-                .toUri()
-        );
-        CardResponse cardResponse = toCardResponse(addedCard);
-        return new ResponseEntity<>(cardResponse, headers, HttpStatus.OK);
-    }
-
     @PutMapping(value = "/{dictionaryId}/cards/{cardId}/resetScore")
-    public ResponseEntity<CardResponse> resetCard(Principal user,
-                                                  @PathVariable("dictionaryId") int dictionaryId,
-                                                  @PathVariable("cardId") int cardId) {
+    public ResponseEntity<Void> resetCard(Principal user,
+                                          @PathVariable("dictionaryId") int dictionaryId,
+                                          @PathVariable("cardId") int cardId) {
         LOG.info("Resetting a card = {} for the user = {}, dictionary id = {}", cardId, user.getName(), dictionaryId);
 
         dictionaryService.resetScore(cardId);
@@ -161,19 +90,7 @@ public class CardsController extends HttpServlet {
                 .build();
     }
 
-    @DeleteMapping(value = "/{dictionaryId}/cards/{cardId}")
-    public ResponseEntity<CardResponse> deleteCard(Principal user,
-                                                   @PathVariable("dictionaryId") int dictionaryId,
-                                                   @PathVariable("cardId") int cardId) {
-        LOG.info("Deleting a card = {} for the user = {}, dictionary id = {}", cardId, user.getName(), dictionaryId);
-
-        dictionaryService.deleteCard(createOwnerId(user), dictionaryId, cardId);
-
-        return ResponseEntity
-                .noContent()
-                .build();
-    }
-
+/*
     @PostMapping(value = "/{dictionaryId}/generate")
     public ResponseEntity<List<CardResponse>> generate(Principal user,
                                                        @PathVariable("dictionaryId") int dictionaryId,
@@ -191,57 +108,31 @@ public class CardsController extends HttpServlet {
 
         return new ResponseEntity<>(cards, HttpStatus.ACCEPTED);
     }
-
-    private Word toWordEntity(WordRequest wordRequest) {
-        return new Word(0,
-                wordRequest.value(),
-                wordRequest.partOfSpeech(),
-                wordRequest.transcription(),
-                wordRequest.meaning()
-        );
-    }
-
-    private CardListResponse toCardListResponse(Card card) {
-        return new CardListResponse(
-                card.getId(),
-                card.getWordId(),
-                toWordResponse(card.getWord()),
-                card.getStrSentences(),
-                card.getCollocations(),
-                card.getStatus(),
-                card.getScore(),
-                card.getInsertedAt()
-        );
-    }
+*/
 
     private CardResponse toCardResponse(Card card) {
         return new CardResponse(
                 card.getId(),
-                card.getWordId(),
-                toWordResponse(card.getWord()),
-                toSentencesResponse(card.getSentences()),
-                card.getCollocations(),
                 card.getStatus(),
                 card.getScore(),
-                card.getInsertedAt()
-        );
-    }
-
-    private WordResponse toWordResponse(Word word) {
-        return new WordResponse(
-                word.getId(),
-                word.getValue(),
-                word.getPartOfSpeech(),
-                word.getTranscription(),
-                word.getMeaning()
+                card.getWord().getValue(),
+                Explanation.builder()
+                        .partOfSpeech(card.getWord().getPartOfSpeech())
+                        .meaning(card.getWord().getMeaning())
+                        .collocations(card.getWord().getCollocations())
+                        .inContext(card.getStrSentences())
+                        .build()
         );
     }
 
     private ExerciseResponse toExerciseResponse(Exercise exercise) {
         return new ExerciseResponse(
                 exercise.getCardId(),
-                exercise.getWordId(),
-                toWordResponse(exercise.getWord()),
+                exercise.getWord().getValue(),
+                Explanation.builder()
+                        .partOfSpeech(exercise.getWord().getPartOfSpeech())
+                        .meaning(exercise.getWord().getMeaning())
+                        .build(),
                 toSentencesResponse(exercise.getSentences())
         );
     }
@@ -260,17 +151,6 @@ public class CardsController extends HttpServlet {
                     }
                 })
                 .toList();
-    }
-
-    private static Sentence withClosestMatch(String strSentence, String keyword) {
-        Sentence sentence = new Sentence(strSentence);
-        Optional<SentenceSplitter.Chunks> sentenceChunks = SentenceSplitter.splitByClosestMatch(strSentence, keyword);
-        return sentenceChunks
-                .map(chunks -> {
-                    LOG.debug("Sentence split for \"{}\", with keyword \"{}\" closest match: {}", strSentence, keyword, chunks);
-                    return sentence.withMatchedWords(chunks.matchedWords());
-                })
-                .orElse(sentence);
     }
 
     private String prepareReplacedSentence(String originalSentence, String matchedWords) {

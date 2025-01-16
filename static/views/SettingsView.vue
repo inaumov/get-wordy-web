@@ -55,7 +55,7 @@ export default {
               .then(response => {
                 if (response.ok) {
                   dictionary['picture'] = ""; // update model
-                  console.log('Property [picture] has been changed to empty, for dictionary id =', selectedDictionaryId);
+                  console.log('Property [pictureUrl] has been changed to empty, for dictionary id =', selectedDictionaryId);
                 }
                 console.log("PATCH dictionary has been requested. Response.status =", response.status);
               });
@@ -65,13 +65,13 @@ export default {
             .then(response => {
               if (response.ok) {
                 dictionary['picture'] = currVal; // update model
-                console.log('Property [picture] has been changed to:', currVal, ', for dictionary id =', selectedDictionaryId);
+                console.log('Property [pictureUrl] has been changed to:', currVal, ', for dictionary id =', selectedDictionaryId);
               }
               console.log("PATCH dictionary has been requested. Response.status =", response.status);
             });
         return;
       }
-      console.log('No changes detected in property [picture] for dictionary id =', selectedDictionaryId);
+      console.log('No changes detected in property [pictureUrl] for dictionary id =', selectedDictionaryId);
     },
     deleteDictionary(id) {
       deleteDictionary(id)
@@ -111,7 +111,7 @@ export default {
         <td>
           <div style="display: flex">
             <div style="width: 95.33%">
-              <span contenteditable="true" class="p-1" v-text="dictionary.picture"
+              <span contenteditable="true" class="p-1" v-text="dictionary.pictureUrl"
                     v-on:blur="onPictureEdit"
                     v-on:focusin="onSelectElement(dictionary)"
               >

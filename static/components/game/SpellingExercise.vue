@@ -16,7 +16,7 @@ export default {
     answer: {
       handler(input) {
         let currentCardId = this.displayed['cardId'];
-        let allAnswers = new Set([this.displayed.word.value, this.spellingExercise['matchedWords']]);
+        let allAnswers = new Set([this.displayed.value, this.spellingExercise['matchedWords']]);
         if (allAnswers.has(input)) {
           this.highlightAnswer(true);
           this.enableNextButton();
@@ -35,7 +35,7 @@ export default {
       this.answer = '';
     },
     getRandomSentence(card) {
-      let arr = card['sentences'];
+      let arr = card['exerciseSentences'];
       return shuffle(arr)[0];
     },
     finish: function () {

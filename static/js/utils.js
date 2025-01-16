@@ -3,13 +3,10 @@ export function shuffle(arr) {
 }
 
 export function textToArray(textarea) {
-    return textarea.trim().split(/\r?\n/).filter(elm => elm);
-}
-
-export function arrayToText(strings) {
-    if (strings && Array.isArray(strings)) {
-        return strings.join('\n');
-    }
+    return textarea.trim()
+        .split("\n")                // Split the input string into an array of lines
+        .map((line) => line.trim()) // Remove leading/trailing whitespace from each line
+        .filter(Boolean);           // Remove empty lines (falsy values like "")
 }
 
 export function getFullDayName(day) {

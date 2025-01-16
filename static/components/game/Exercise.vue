@@ -10,7 +10,7 @@ export default {
       totalCards: 0,
       displayed: {
         cardId: '',
-        word: {}
+        explanation: {}
       },
       shuffledCards: [],
       nextIndex: 0,

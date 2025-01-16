@@ -57,21 +57,21 @@ export default {
       </thead>
       <tbody>
       <tr v-for="card in cards">
-        <td>{{ card.word.value }} ({{ card.word.partOfSpeech }})</td>
-        <td>{{ card.word.transcription }}</td>
-        <td>{{ card.word.meaning }}</td>
+        <td>{{ card.value }} ({{ card.explanation.partOfSpeech }})</td>
+        <td>{{ card.transcription }}</td>
+        <td>{{ card.explanation.meaning }}</td>
         <td class="text-nowrap">{{ toReadableStatus(card.status) }}</td>
         <td>{{ card.score }}</td>
         <td>
-          <ul class="list-unstyled" v-if="card.sentences">
-            <li v-for="sentence in card.sentences">
+          <ul class="list-unstyled" v-if="card.explanation.inContext">
+            <li v-for="sentence in card.explanation.inContext">
               {{ sentence }}
             </li>
           </ul>
         </td>
         <td>
-          <ul class="list-unstyled" v-if="card.collocations">
-            <li v-for="collocation in card.collocations">
+          <ul class="list-unstyled" v-if="card.explanation.collocations">
+            <li v-for="collocation in card.explanation.collocations">
               {{ collocation }}
             </li>
           </ul>

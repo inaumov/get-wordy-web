@@ -42,15 +42,15 @@ class DictionariesApiTest extends BaseApiTest {
 
             boolean foundOneExpected = false;
             for (JsonNode dictionary : jsonNode) {
-                assertTrue(dictionary.get("dictionaryId").asInt() > 0);
+                assertTrue(dictionary.get("vocabId").asInt() > 0);
                 assertFalse(dictionary.get("name").asText().isBlank());
                 if ("Random words".equals(dictionary.get("name").asText())) {
-                    assertTrue(dictionary.get("cardsTotal").asInt() > 0);
-                    assertTrue(dictionary.get("picture").asText().matches(IMAGE_URL_PATTERN));
+                    assertTrue(dictionary.get("wordsTotal").asInt() > 0);
+                    assertTrue(dictionary.get("pictureUrl").asText().matches(IMAGE_URL_PATTERN));
                     foundOneExpected = true;
                 }
-                assertTrue(dictionary.has("picture"));
-                assertTrue(dictionary.has("cardsTotal"));
+                assertTrue(dictionary.has("pictureUrl"));
+                assertTrue(dictionary.has("wordsTotal"));
             }
             if (!foundOneExpected) {
                 fail("no expected dictionary");
@@ -97,10 +97,10 @@ class DictionariesApiTest extends BaseApiTest {
             // all minimal checks
             var dictionary = jsonMapper.readTree(responseBody);
             assertTrue(dictionary.isObject(), "is not an object");
-            assertTrue(dictionary.get("dictionaryId").asInt() > 0, "cardId must be greater than 0");
+            assertTrue(dictionary.get("vocabId").asInt() > 0, "cardId must be greater than 0");
             assertEquals("New dictionary. Test", dictionary.get("name").asText());
-            assertTrue(dictionary.get("picture").asText().matches(IMAGE_URL_PATTERN));
-            assertEquals(0, dictionary.get("cardsTotal").asInt());
+            assertTrue(dictionary.get("pictureUrl").asText().matches(IMAGE_URL_PATTERN));
+            assertEquals(0, dictionary.get("wordsTotal").asInt());
         }
     }
 

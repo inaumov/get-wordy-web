@@ -1,6 +1,6 @@
 package get.wordy.model;
 
-public record WordsheetItemRequest(
+public record WordIdRequest(
         int wordId
 ) {
 

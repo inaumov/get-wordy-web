@@ -1,7 +1,7 @@
 package get.wordy.model;
 
-public record WordsheetResponse(
-        int wordsheetId,
+public record VocabularyResponse(
+        int vocabId,
         String name,
         int wordsTotal,
         boolean isShared

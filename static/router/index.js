@@ -108,15 +108,6 @@ const router = createRouter({
             props: true
         },
         {
-            path: '/Dictionaries/:dictionaryId/AddCard',
-            name: 'add-card',
-            // route level code-splitting
-            // this generates a separate chunk (Settings.[hash].js) for this route
-            // which is lazy-loaded when the route is visited.
-            component: () => import('@/views/AddCardView.vue'),
-            props: true
-        },
-        {
             path: '/Class',
             name: 'add-new-class',
             component: () => import('@/views/classes/ManageClassView.vue')
@@ -146,11 +137,14 @@ const router = createRouter({
             ),
         },
                 {
+                    path: '/Classes/:classId/Vocabularies/:vocabId/Explanation',
+                    name: 'add-explanation',
+                    component: () => import('@/views/AddCardView.vue'),
+                    props: true
+                },
+                {
                     path: '/Classes/:classId/Vocabularies/:vocabId/Explanation/:wordId',
                     name: 'edit-explanation',
-                    // route level code-splitting
-                    // this generates a separate chunk (Settings.[hash].js) for this route
-                    // which is lazy-loaded when the route is visited.
                     component: () => import('@/views/EditCardView.vue'),
                     props: (route) => (
                         {

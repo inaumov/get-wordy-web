@@ -1,7 +1,7 @@
 package get.wordy.rest;
 
-import get.wordy.core.api.IDictionaryService;
-import get.wordy.core.api.bean.Dictionary;
+import get.wordy.core.api.IVocabularyService;
+import get.wordy.core.api.bean.Vocabulary;
 import get.wordy.core.api.id.OwnerId;
 import get.wordy.model.DictionaryRequest;
 import get.wordy.model.DictionaryResponse;
@@ -25,18 +25,18 @@ import java.util.List;
 public class DictionariesController {
     private static final Logger LOG = LoggerFactory.getLogger(DictionariesController.class);
 
-    private final IDictionaryService dictionaryService;
+    private final IVocabularyService vocabularyService;
 
     @Autowired
-    public DictionariesController(IDictionaryService dictionaryService) {
-        this.dictionaryService = dictionaryService;
+    public DictionariesController(IVocabularyService vocabularyService) {
+        this.vocabularyService = vocabularyService;
     }
 
     @GetMapping(value = "/dictionaries")
     public ResponseEntity<List<DictionaryResponse>> getUserDictionaries(Principal user) {
         LOG.info("Getting dictionary list for the user = {}", user.getName());
 
-        List<DictionaryResponse> dictionaries = dictionaryService.getDictionaries(createOwnerId(user))
+        List<DictionaryResponse> dictionaries = vocabularyService.getVocabularies(createOwnerId(user))
                 .stream()
                 .map(this::toResponse)
                 .toList();
@@ -53,9 +53,9 @@ public class DictionariesController {
                                                                @Valid @RequestBody DictionaryRequest dictionaryRequest) {
         LOG.info("Creating a new dictionary = {} for the user = {}", dictionaryRequest.name(), user.getName());
 
-        Dictionary dictionary = dictionaryService.createDictionary(createOwnerId(user), dictionaryRequest.name(), dictionaryRequest.picture());
+        Vocabulary dictionary = vocabularyService.createVocabulary(createOwnerId(user), dictionaryRequest.name(), dictionaryRequest.pictureUrl());
         DictionaryResponse response = toResponse(dictionary);
-        return ResponseEntity.created(URI.create("/dictionaries/" + response.dictionaryId()))
+        return ResponseEntity.created(URI.create("/dictionaries/" + response.vocabId()))
                 .body(response);
     }
 
@@ -68,13 +68,13 @@ public class DictionariesController {
 
         // handle name change
         if (StringUtils.hasText(partialUpdate.name())) {
-            dictionaryService.renameDictionary(createOwnerId(user), id, partialUpdate.name());
+            vocabularyService.renameVocabulary(createOwnerId(user), id, partialUpdate.name());
         }
-        // handle picture change
+        // handle pictureUrl change
         if (forceRemovePicture) {
-            dictionaryService.changeDictionaryPicture(createOwnerId(user), id, null);
-        } else if (StringUtils.hasText(partialUpdate.picture())) {
-            dictionaryService.changeDictionaryPicture(createOwnerId(user), id, partialUpdate.picture());
+            vocabularyService.changeVocabularyPicture(createOwnerId(user), id, null);
+        } else if (StringUtils.hasText(partialUpdate.pictureUrl())) {
+            vocabularyService.changeVocabularyPicture(createOwnerId(user), id, partialUpdate.pictureUrl());
         }
         return ResponseEntity
                 .noContent()
@@ -86,7 +86,7 @@ public class DictionariesController {
                                                                @PathVariable("dictionaryId") int dictionaryId) {
         LOG.info("Deleting a dictionary for the user = {}, dictionary id = {}", user.getName(), dictionaryId);
 
-        dictionaryService.deleteDictionary(createOwnerId(user), dictionaryId);
+        vocabularyService.deleteVocabulary(createOwnerId(user), dictionaryId);
 
         return ResponseEntity
                 .noContent()
@@ -97,12 +97,12 @@ public class DictionariesController {
         return new OwnerId(user.getName(), "1");
     }
 
-    private DictionaryResponse toResponse(Dictionary dictionary) {
+    private DictionaryResponse toResponse(Vocabulary vocabulary) {
         return new DictionaryResponse(
-                dictionary.getId(),
-                dictionary.getName(),
-                dictionary.getPicture(),
-                dictionary.getCardsTotal()
+                vocabulary.getVocabId(),
+                vocabulary.getName(),
+                vocabulary.getPictureUrl(),
+                vocabulary.getWordsTotal()
         );
     }
 

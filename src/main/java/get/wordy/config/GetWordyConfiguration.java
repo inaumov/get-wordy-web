@@ -1,13 +1,14 @@
 package get.wordy.config;
 
-import get.wordy.core.ClassService;
+import get.wordy.core.ClassInfoService;
 import get.wordy.core.DictionaryService;
-import get.wordy.core.api.IClassService;
+import get.wordy.core.api.IClassInfoService;
 import get.wordy.core.api.IDictionaryService;
+import get.wordy.core.api.IVocabularyService;
 import get.wordy.core.dao.impl.CardHeadlineDao;
 import get.wordy.core.dao.impl.ClassesDao;
 import get.wordy.core.dao.impl.DaoFactory;
-import get.wordy.core.dao.impl.WordsheetDao;
+import get.wordy.core.dao.impl.VocabularyDao;
 import get.wordy.core.db.LocalTxManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -50,9 +51,9 @@ public class GetWordyConfiguration implements WebMvcConfigurer {
     public IDictionaryService dictionaryService(DataSource dataSource, NamedParameterJdbcTemplate jdbcTemplate) {
         LocalTxManager txManager = LocalTxManager.withDataSource(dataSource);
         DaoFactory factory = DaoFactory.withTxManager(txManager);
-        LOG.info("Creating dictionary service for data source = {}", dataSource);
+        LOG.info("Creating vocabulary service for data source = {}", dataSource);
         return new DictionaryService(
-                factory.getDictionaryDao(),
+                new VocabularyDao(jdbcTemplate),
                 factory.getWordDao(),
                 factory.getCardDao(),
                 new CardHeadlineDao(jdbcTemplate),
@@ -61,14 +62,16 @@ public class GetWordyConfiguration implements WebMvcConfigurer {
     }
 
     @Bean
-    public IClassService classService(DataSource dataSource, NamedParameterJdbcTemplate jdbcTemplate) {
+    public IVocabularyService vocabularyService(IDictionaryService dictionaryService) {
+        return (IVocabularyService) dictionaryService;
+    }
+
+    @Bean
+    public IClassInfoService classService(DataSource dataSource, NamedParameterJdbcTemplate jdbcTemplate) {
         LocalTxManager txManager = LocalTxManager.withDataSource(dataSource);
-        DaoFactory factory = DaoFactory.withTxManager(txManager);
         LOG.info("Creating classes service for data source = {}", dataSource);
-        return new ClassService(
+        return new ClassInfoService(
                 new ClassesDao(jdbcTemplate),
-                factory.getWordDao(),
-                new WordsheetDao(jdbcTemplate),
                 txManager
         );
     }

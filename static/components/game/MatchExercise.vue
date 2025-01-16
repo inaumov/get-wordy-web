@@ -51,7 +51,7 @@ export default {
     prepareMatches: function () {
       const arr = shuffle(this.cards);
       // simplify to key value
-      this.preparedMatches = arr.map(i => ({id: i.cardId, value: i.word.value}));
+      this.preparedMatches = arr.map(i => ({id: i.cardId, value: i.value}));
     },
     nextExercise: function () {
       this.$emit("nextStep", 'UnscrambleExercise', this.cards);
@@ -75,7 +75,7 @@ export default {
           Card {{ nextCardNumber }}
         </p>
         <p class="card-text text-center" style="font-size: larger">
-          {{ displayed.word['meaning'] }}
+          {{ displayed.explanation['meaning'] }}
         </p>
       </div>
     </div>
