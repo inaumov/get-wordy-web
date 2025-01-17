@@ -1,6 +1,10 @@
-<script setup>
+<script>
 import ClassVocabularies from "@/views/classes/ClassVocabularies.vue";
 
+export default {
+  components: {ClassVocabularies},
+  props: ['classId'],
+}
 </script>
 
 <template>
@@ -23,7 +27,7 @@ import ClassVocabularies from "@/views/classes/ClassVocabularies.vue";
     </div>
   </div>
 
-  <ClassVocabularies/>
+  <ClassVocabularies v-bind="{classId: this.classId}"/>
 
 </template>
 

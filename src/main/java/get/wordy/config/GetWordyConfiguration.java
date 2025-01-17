@@ -1,8 +1,8 @@
 package get.wordy.config;
 
-import get.wordy.core.ClassInfoService;
+import get.wordy.core.ClassService;
 import get.wordy.core.DictionaryService;
-import get.wordy.core.api.IClassInfoService;
+import get.wordy.core.api.IClassService;
 import get.wordy.core.api.IDictionaryService;
 import get.wordy.core.api.IVocabularyService;
 import get.wordy.core.dao.impl.CardHeadlineDao;
@@ -67,10 +67,10 @@ public class GetWordyConfiguration implements WebMvcConfigurer {
     }
 
     @Bean
-    public IClassInfoService classService(DataSource dataSource, NamedParameterJdbcTemplate jdbcTemplate) {
+    public IClassService classService(DataSource dataSource, NamedParameterJdbcTemplate jdbcTemplate) {
         LocalTxManager txManager = LocalTxManager.withDataSource(dataSource);
         LOG.info("Creating classes service for data source = {}", dataSource);
-        return new ClassInfoService(
+        return new ClassService(
                 new ClassesDao(jdbcTemplate),
                 txManager
         );

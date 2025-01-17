@@ -93,7 +93,7 @@ export default {
           role="tabpanel"
           aria-labelledby="materials-tab"
       >
-        <Materials/>
+        <Materials v-bind="{classId: this.classId}"/>
       </div>
       <div
           class="tab-pane fade"

@@ -1,6 +1,6 @@
 package get.wordy.rest;
 
-import get.wordy.core.api.IClassInfoService;
+import get.wordy.core.api.IClassService;
 import get.wordy.core.api.IVocabularyService;
 import get.wordy.core.api.bean.ClassInfo;
 import get.wordy.core.api.bean.Word;
@@ -24,7 +24,6 @@ import org.springframework.web.util.UriComponentsBuilder;
 import java.net.URI;
 import java.security.Principal;
 import java.util.*;
-import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/classes")
@@ -32,33 +31,43 @@ import java.util.stream.Collectors;
 public class ClassController {
     private static final Logger LOG = LoggerFactory.getLogger(ClassController.class);
 
-    private final IClassInfoService classService;
+    private final IClassService classService;
     private final IVocabularyService vocabularyService;
 
-    public ClassController(IClassInfoService classService, IVocabularyService vocabularyService) {
+    public ClassController(IClassService classService, IVocabularyService vocabularyService) {
         this.classService = classService;
         this.vocabularyService = vocabularyService;
     }
 
     @GetMapping
-    public ResponseEntity<Map<String, List<ClassInfoResponse>>> getClasses(Principal user,
-                                                                           @RequestParam(value = "filter", required = false) String dayOfWeek) {
-        LOG.info("Getting {} classes managed by the user = {}", StringUtils.hasText(dayOfWeek) ? dayOfWeek : "all", user.getName());
+    public ResponseEntity<Map<String, List<ClassInfoResponse>>> getClassesInfo(Principal user,
+                                                                               @RequestParam(value = "filter", required = false) Optional<String> dayOfWeekFilter) {
+        LOG.info("Getting {} classes info managed by the user = {}", dayOfWeekFilter.isEmpty() ? "all" : dayOfWeekFilter, user.getName());
 
-        Map<String, List<ClassInfoResponse>> response = classService.getClasses(createUserOwnerId(user), dayOfWeek)
-                .entrySet()
+        // fetch classes and filter by dayOfWeek at the data source level if a filter is provided
+        List<ClassInfoResponse> classes = classService.getClassesInfo(createUserOwnerId(user))
                 .stream()
-                .collect(Collectors.toMap(
-                        Map.Entry::getKey,
-                        entry ->
-                                entry.getValue()
-                                        .stream()
-                                        .map(ClassInfoResponse::new)
-                                        .map(this::enrichWithAttendees)
-                                        .toList()
-                ));
+                .map(ClassInfoResponse::new)
+                .map(this::enrichWithAttendees)
+                .filter(classInfo ->
+                        dayOfWeekFilter.isEmpty() ||
+                                classInfo.getSchedules().stream()
+                                        .anyMatch(schedule -> schedule.getDayOfWeek().equalsIgnoreCase(dayOfWeekFilter.get())))
+                .toList();
 
-        return ResponseEntity.ok(response);
+        // group classes by day, while maintaining original order
+        Map<String, List<ClassInfoResponse>> groupedClasses = new TreeMap<>();
+        for (ClassInfoResponse classInfo : classes) {
+            for (ClassInfo.ClassSchedule schedule : classInfo.getSchedules()) {
+                String day = schedule.getDayOfWeek().toLowerCase(); // ensure uniformity
+                if (dayOfWeekFilter.isEmpty() || day.equalsIgnoreCase(dayOfWeekFilter.get())) {
+                    groupedClasses.computeIfAbsent(day, k -> new ArrayList<>())
+                            .add(classInfo);
+                }
+            }
+        }
+
+        return ResponseEntity.ok(groupedClasses);
     }
 
     private ClassInfoResponse enrichWithAttendees(ClassInfoResponse response) {
@@ -66,20 +75,33 @@ public class ClassController {
     }
 
     @PostMapping
-    public ResponseEntity<ClassInfoResponse> addClass(Principal user, @Valid @RequestBody ClassInfoRequest classInfoRequest) {
+    public ResponseEntity<ClassInfoResponse> addClassInfo(Principal user,
+                                                          @Valid @RequestBody ClassInfoRequest classInfoRequest) {
 
-        LOG.info("Add new class = {} request for the user = {}", classInfoRequest.getName(), user.getName());
+        LOG.info("Add new class info = {} request for the user = {}", classInfoRequest.getName(), user.getName());
 
-        var savedClass = classService.saveClass(createUserOwnerId(user), copyClassInfo(classInfoRequest));
+        var savedClass = classService.saveClassInfo(createUserOwnerId(user), copyClassInfo(classInfoRequest));
         return ResponseEntity.created(URI.create("/" + savedClass.getClassId()))
                 .body(new ClassInfoResponse(savedClass));
     }
 
-    @DeleteMapping(value = "/{classId}")
-    public ResponseEntity<ClassInfo> deleteClass(Principal user, @PathVariable("classId") String classId) {
-        LOG.info("Deleting a class for the user = {}, class id = {}", user.getName(), classId);
+    @GetMapping(value = "/{classId}")
+    public ResponseEntity<ClassInfoResponse> getClassInfo(Principal user,
+                                                          @PathVariable("classId") String classId) {
+        LOG.info("Getting a class info for the user = {}, class id = {}", user.getName(), classId);
 
-        classService.deleteClass(createUserOwnerId(user), classId);
+        Optional<ClassInfoResponse> response = Optional.of(classService.findClassInfo(createUserOwnerId(user), classId))
+                .map(ClassInfoResponse::new)
+                .map(this::enrichWithAttendees);
+
+        return ResponseEntity.ok(response.orElseThrow());
+    }
+
+    @DeleteMapping(value = "/{classId}")
+    public ResponseEntity<ClassInfo> deleteClassInfo(Principal user, @PathVariable("classId") String classId) {
+        LOG.info("Deleting a class info for the user = {}, class id = {}", user.getName(), classId);
+
+        classService.deleteClassInfo(createUserOwnerId(user), classId);
 
         return ResponseEntity
                 .noContent()
