@@ -34,6 +34,7 @@ export default {
                 </button>
               </span>
       </div>
+      <small class="form-text text-muted">Enter a word or phrase and click Search.</small>
     </div>
   </form>
 </template>

@@ -40,12 +40,12 @@ export default {
       </thead>
       <tbody>
       <tr v-for="item in items">
-        <td>{{ item.word.value }} ({{ item.word.partOfSpeech }})</td>
-        <td>{{ item.word.transcription }}</td>
-        <td>{{ item.word.meaning }}</td>
+        <td>{{ item.value }} ({{ item.explanation?.partOfSpeech }})</td>
+        <td>{{ item.transcription }}</td>
+        <td>{{ item.explanation?.meaning }}</td>
         <td>
-          <ul class="list-unstyled" v-if="item.sentences">
-            <li v-for="sentence in item.sentences">
+          <ul class="list-unstyled" v-if="item.explanation?.inContext">
+            <li v-for="sentence in item.explanation?.inContext">
               {{ sentence }}
             </li>
           </ul>

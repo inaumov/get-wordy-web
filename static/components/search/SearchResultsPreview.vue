@@ -2,35 +2,26 @@
 export default {
   props: ['previewData'],
   methods: {
-    add(explanation) {
+    add(selectedExplanation) {
       // transformation logic to go further
-      let transformed = {
-        word: {
-          value: this.previewData.value,
-          partOfSpeech: explanation.partOfSpeech,
-          transcription: this.previewData.transcription,
-          meaning: explanation.meaning
-        },
-        sentences: explanation.inContext,
-        collocations: explanation.collocations
+      const copy = {
+        wordId: this.previewData.wordId,
+        value: this.previewData.value,
+        transcription: this.previewData.transcription,
+        explanation: {...selectedExplanation}
       };
-      this.$emit('add-to-wordsheet', transformed);
-      console.log('Add to wordsheet clicked for:', transformed);
-      this.remove(explanation)
-    },
-    remove(explanation) {
-      const index = this.previewData.explanations.indexOf(explanation);
-      if (index !== -1) {
-        this.previewData.explanations.splice(index, 1); // remove the item from the list
-      }
+      this.$emit('add-to-vocabulary', copy);
     },
   },
 };
 </script>
 
 <template>
-  <div class="p-4">
-    <div v-if="previewData" class="word-row">
+  <div class="p-3">
+    <div v-if="previewData?.value" class="text-center">
+      <p>Choose one of the following explanations:</p>
+    </div>
+    <div v-if="previewData?.value" class="word-row">
       <div class="word-preview"
            v-for="explanation in previewData.explanations"
            :key="previewData.value"
@@ -49,9 +40,6 @@ export default {
           </div>
         </div>
         <div class="actions">
-          <button class="btn btn-lg remove-btn" @click="remove(explanation)" title="Close">
-            <i class="bi bi-x-circle close-icon"></i>
-          </button>
           <button class="btn btn-lg add-btn" @click="add(explanation)" title="Add to word sheet">
             <i class="bi bi-check-circle add-icon"></i>
           </button>
@@ -59,7 +47,7 @@ export default {
       </div>
     </div>
     <div v-else class="text-center">
-      <p>Type any word to get your search preview</p>
+      <p>The search preview will appear below after you click Search.</p>
     </div>
   </div>
 </template>

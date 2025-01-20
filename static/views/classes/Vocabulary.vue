@@ -3,7 +3,7 @@ import WordsheetTable from "@/components/classes/WordsheetTable.vue";
 import SearchInput from "@/components/search/SearchInput.vue";
 import SearchResultsPreview from "@/components/search/SearchResultsPreview.vue";
 
-import {getVocabulary, updateReadiness, updateVocabularyName, addToVocabulary} from '@/js/classes-api.js';
+import {getVocabulary, publish, updateVocabularyName, addToVocabulary} from '@/js/classes-api.js';
 
 export default {
   components: {SearchResultsPreview, WordsheetTable, SearchInput},
@@ -11,10 +11,9 @@ export default {
   data() {
     return {
       name: '',
+      isShared: false,
       wordsList: [],
-      searchResult: {
-        explanations: []
-      }
+      foundExplanations: {}
     }
   },
   methods: {
@@ -22,6 +21,7 @@ export default {
       const response = await getVocabulary(this.classId, this.vocabId);
       const vocabulary = await response.json();
       this.name = vocabulary['name'];
+      this.isShared = vocabulary['isShared'];
       this.wordsList = vocabulary['words'] || [];
     },
     onNameEdit(event) {
@@ -40,11 +40,14 @@ export default {
       }
       console.log('No changes detected in property [name] for vocabularies id =', this.vocabId);
     },
-    onSearch(result) {
-      this.searchResult = result;
+    onSearch(searchResult) {
+      this.foundExplanations = searchResult;
+    },
+    reset() {
+      this.foundExplanations = {}; // reset on success
     },
     onReady() {
-      updateReadiness(this.classId, this.vocabId, true)
+      publish(this.classId, this.vocabId, true)
           .then(response => {
             if (response.ok) {
               console.log('Property [isShared] has been changed to:', true, ', for vocabulary id =', this.vocabId);
@@ -52,19 +55,27 @@ export default {
             console.log("PATCH vocabularies has been requested. Response.status =", response.status);
           });
     },
-    handleAddWord(word) {
-      if (!this.wordsList.some((item) => item === word)) { // todo maybe more narrow check
-        addToVocabulary(this.classId, this.vocabId, word)
+    handleAddToVocabulary(wordExplanation) {
+      if (!this.vocabularyContains(wordExplanation)) {
+        addToVocabulary(this.classId, this.vocabId, wordExplanation)
             .then(response => {
               if (response.ok) {
                 let itemAdded = response.json();
                 this.wordsList.push(itemAdded);
-                console.log("POST new word has been requested. Response.id =", itemAdded['id']);
+                this.reset();
+              } else {
+                alert('Error');
               }
             })
       } else {
         alert('This word is already added.');
       }
+    },
+    vocabularyContains(wordExplanation) {
+      return this.wordsList.some((item) => {
+        return item.value === wordExplanation.value
+            && item.explanation.partOfSpeech === wordExplanation.explanation.partOfSpeech
+      });
     },
   },
   mounted() {
@@ -92,14 +103,14 @@ export default {
       </div>
     </div>
 
-    <search-results-preview @add-to-wordsheet="handleAddWord" v-bind="{previewData: this.searchResult}"/>
+    <search-results-preview @add-to-vocabulary="handleAddToVocabulary" v-bind="{previewData: this.foundExplanations}"/>
 
     <wordsheet-table v-bind="{classId: this.classId, vocabId: this.vocabId, items: this.wordsList}"/>
 
     <!-- submit -->
     <div class="d-flex justify-content-end p-4">
         <button type="button" class="btn btn-primary border btn-md" v-on:click="onReady">
-          Ready
+          {{this.isShared ? 'Publish' : 'Unpublish'}}
         </button>
     </div>
 

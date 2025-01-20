@@ -131,7 +131,7 @@ export function updateVocabularyName(classId, vocabularyId, name) {
         .catch(err => console.log("HTTP error: ", err));
 }
 
-export function updateReadiness(classId, vocabularyId, isReady) {
+export function publish(classId, vocabularyId, isReady) {
     let headers = new Headers();
     headers.append('Content-Type', 'application/json');
 
