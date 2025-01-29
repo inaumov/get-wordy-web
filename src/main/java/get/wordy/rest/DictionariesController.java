@@ -21,7 +21,7 @@ import java.util.Collections;
 import java.util.List;
 
 @RestController
-@PreAuthorize("hasAuthority('P_MANAGE_OWN_DICTIONARIES')")
+@PreAuthorize("hasAuthority('P_MANAGE_OWN_VOCAB')")
 public class DictionariesController {
     private static final Logger LOG = LoggerFactory.getLogger(DictionariesController.class);
 
@@ -94,7 +94,7 @@ public class DictionariesController {
     }
 
     private static OwnerId createOwnerId(Principal user) {
-        return new OwnerId(user.getName(), "1");
+        return new OwnerId(user.getName(), "user");
     }
 
     private DictionaryResponse toResponse(Vocabulary vocabulary) {

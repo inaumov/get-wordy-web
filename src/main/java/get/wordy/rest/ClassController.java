@@ -245,7 +245,7 @@ public class ClassController {
                 Explanation.builder()
                         .partOfSpeech(word.getPartOfSpeech())
                         .meaning(word.getMeaning())
-                        .inContext(word.getSentences())
+                        .inContext(word.getStrSentences())
                         .collocations(word.getCollocations())
                         .build()
         );

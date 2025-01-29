@@ -10,6 +10,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
@@ -17,7 +18,8 @@ import java.security.Principal;
 import java.util.*;
 
 @RestController
-@RequestMapping(value = "/dictionaries")
+@PreAuthorize("hasAuthority('P_MANAGE_OWN_VOCAB')")
+@RequestMapping(value = "/user/vocabularies")
 public class CardsController extends HttpServlet {
     private static final Logger LOG = LoggerFactory.getLogger(CardsController.class);
 
@@ -27,12 +29,12 @@ public class CardsController extends HttpServlet {
         this.dictionaryService = dictionaryService;
     }
 
-    @GetMapping(value = "/{dictionaryId}/cards")
-    public ResponseEntity<List<CardResponse>> getCards(Principal user, @PathVariable("dictionaryId") int dictionaryId) {
+    @GetMapping(value = "/{vocabId}/cards")
+    public ResponseEntity<List<CardResponse>> getCards(Principal user, @PathVariable("vocabId") int vocabId) {
 
-        LOG.info("Getting all cards for the user = {}, dictionary id = {}", user.getName(), dictionaryId);
+        LOG.info("Getting all cards for the user = {}, vocab id = {}", user.getName(), vocabId);
 
-        List<CardResponse> cards = dictionaryService.getCards(createOwnerId(user), dictionaryId)
+        List<CardResponse> cards = dictionaryService.getCards(createOwnerId(user), vocabId)
                 .stream()
                 .map(this::toCardResponse)
                 .toList();
@@ -44,14 +46,14 @@ public class CardsController extends HttpServlet {
         return new ResponseEntity<>(cards, HttpStatus.OK);
     }
 
-    @GetMapping(value = "/{dictionaryId}/exercise")
+    @GetMapping(value = "/{vocabId}/exercise")
     public ResponseEntity<List<ExerciseResponse>> getCardsForExercise(Principal user,
-                                                                      @PathVariable("dictionaryId") int dictionaryId,
+                                                                      @PathVariable("vocabId") int vocabId,
                                                                       @RequestParam(value = "limit", required = false, defaultValue = "5") int limit) {
 
-        LOG.info("Getting cards to exercise for the user = {}, dictionary id = {}", user.getName(), dictionaryId);
+        LOG.info("Getting cards to exercise for the user = {}, vocab id = {}", user.getName(), vocabId);
 
-        List<ExerciseResponse> cards = dictionaryService.getCardsForExercise(createOwnerId(user), dictionaryId, limit)
+        List<ExerciseResponse> cards = dictionaryService.getCardsForExercise(createOwnerId(user), vocabId, limit)
                 .stream()
                 .map(this::toExerciseResponse)
                 .toList();
@@ -63,27 +65,27 @@ public class CardsController extends HttpServlet {
         return new ResponseEntity<>(cards, HttpStatus.OK);
     }
 
-    @PutMapping(value = "/{dictionaryId}/exercise")
+    @PutMapping(value = "/{vocabId}/exercise")
     public ResponseEntity<Void> submitExerciseResult(Principal user,
-                                                     @PathVariable("dictionaryId") int dictionaryId,
+                                                     @PathVariable("vocabId") int vocabId,
                                                      @RequestBody int[] cardIds) {
 
         LOG.info("Submitting exercise result for the user = {} and cards: {}", user.getName(), Arrays.toString(cardIds));
 
-        dictionaryService.increaseScoreUp(dictionaryId, cardIds, 25);
+        dictionaryService.increaseScoreUp(createOwnerId(user), vocabId, cardIds, 12);
 
         return ResponseEntity
                 .accepted()
                 .build();
     }
 
-    @PutMapping(value = "/{dictionaryId}/cards/{cardId}/resetScore")
+    @PutMapping(value = "/{vocabId}/cards/{cardId}/resetScore")
     public ResponseEntity<Void> resetCard(Principal user,
-                                          @PathVariable("dictionaryId") int dictionaryId,
+                                          @PathVariable("vocabId") int vocabId,
                                           @PathVariable("cardId") int cardId) {
-        LOG.info("Resetting a card = {} for the user = {}, dictionary id = {}", cardId, user.getName(), dictionaryId);
+        LOG.info("Resetting a card = {} for the user = {}, vocab id = {}", cardId, user.getName(), vocabId);
 
-        dictionaryService.resetScore(cardId);
+        dictionaryService.resetScore(createOwnerId(user), cardId);
 
         return ResponseEntity
                 .accepted()
@@ -120,7 +122,7 @@ public class CardsController extends HttpServlet {
                         .partOfSpeech(card.getWord().getPartOfSpeech())
                         .meaning(card.getWord().getMeaning())
                         .collocations(card.getWord().getCollocations())
-                        .inContext(card.getStrSentences())
+                        .inContext(card.getWord().getStrSentences())
                         .build()
         );
     }
@@ -170,7 +172,7 @@ public class CardsController extends HttpServlet {
     }
 
     private static OwnerId createOwnerId(Principal user) {
-        return new OwnerId(user.getName(), "1");
+        return new OwnerId(user.getName(), "user");
     }
 
 }

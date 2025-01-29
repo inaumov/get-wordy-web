@@ -47,7 +47,7 @@ export default {
   },
   methods: {
     fetchUserData() {
-      this.permissions = ['P_MANAGE_OWN_DICTIONARIES'];
+      this.permissions = ['P_MANAGE_OWN_VOCAB'];
       this.permissions = ['P_SHARED_CLASS'];
       this.permissions = ['P_MANAGE_CLASSES'];
     },

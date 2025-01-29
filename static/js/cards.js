@@ -1,6 +1,6 @@
-const dictionariesAPI = import.meta.env.VITE_BACKEND_API + "dictionaries";
+const vocabsAPI = import.meta.env.VITE_BACKEND_API + "user/vocabularies";
 
-export function fetchCards(dictionaryId) {
+export function fetchCards(vocabId) {
     let headers = new Headers();
     headers.append('Content-Type', 'application/json');
 
@@ -8,13 +8,13 @@ export function fetchCards(dictionaryId) {
         method: 'GET', headers: headers,
     };
 
-    let cardsRequest = new Request(dictionariesAPI + "/" + dictionaryId + "/cards", initObject);
+    let cardsRequest = new Request(vocabsAPI + "/" + vocabId + "/cards", initObject);
 
     return fetch(cardsRequest)
         .catch(err => console.log("HTTP error: ", err));
 }
 
-export function fetchCardsForExercise(dictionaryId, limit) {
+export function fetchCardsForExercise(vocabId, limit) {
     let headers = new Headers();
     headers.append('Content-Type', 'application/json');
 
@@ -22,13 +22,13 @@ export function fetchCardsForExercise(dictionaryId, limit) {
         method: 'GET', headers: headers,
     };
 
-    let cardsRequest = new Request(dictionariesAPI + "/" + dictionaryId + "/exercise?limit=" + limit, initObject);
+    let cardsRequest = new Request(vocabsAPI + "/" + vocabId + "/exercise?limit=" + limit, initObject);
 
     return fetch(cardsRequest)
         .catch(err => console.log("HTTP error: ", err));
 }
 
-export function submitResultForExercise(dictionaryId, cardIds) {
+export function submitResultForExercise(vocabId, cardIds) {
     let headers = new Headers();
     headers.append('Content-Type', 'application/json');
 
@@ -37,7 +37,7 @@ export function submitResultForExercise(dictionaryId, cardIds) {
         headers: headers,
         body: JSON.stringify(cardIds),
     };
-    let putRequest = new Request(dictionariesAPI + "/" + dictionaryId + "/exercise", initObject);
+    let putRequest = new Request(vocabsAPI + "/" + vocabId + "/exercise", initObject);
     return fetch(putRequest)
         .catch(err => console.log("HTTP error: ", err));
 }
@@ -56,7 +56,7 @@ export function toReadableStatus(status) {
     }
 }
 
-export function deleteCard(dictionaryId, cardId) {
+export function deleteCard(vocabId, cardId) {
     let headers = new Headers();
 
     let initObject = {
@@ -64,13 +64,13 @@ export function deleteCard(dictionaryId, cardId) {
         headers: headers
     };
 
-    let patchRequest = new Request(dictionariesAPI + "/" + dictionaryId + "/cards/" + cardId, initObject);
+    let patchRequest = new Request(vocabsAPI + "/" + vocabId + "/cards/" + cardId, initObject);
 
     return fetch(patchRequest)
         .catch(err => console.log("HTTP error: ", err));
 }
 
-export function resetScore(dictionaryId, cardId) {
+export function resetScore(vocabId, cardId) {
     let headers = new Headers();
 
     let initObject = {
@@ -78,7 +78,7 @@ export function resetScore(dictionaryId, cardId) {
         headers: headers
     };
 
-    let patchRequest = new Request(dictionariesAPI + "/" + dictionaryId + "/cards/" + cardId + "/resetScore", initObject);
+    let patchRequest = new Request(vocabsAPI + "/" + vocabId + "/cards/" + cardId + "/resetScore", initObject);
 
     return fetch(patchRequest)
         .catch(err => console.log("HTTP error: ", err));

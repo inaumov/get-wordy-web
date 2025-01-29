@@ -50,13 +50,13 @@ CREATE TABLE group_authorities
 INSERT INTO groups (id, group_name)
 VALUES (1, 'individual_users');
 INSERT INTO groups (id, group_name)
-VALUES (2, 'students');
+VALUES (2, 'learners');
 INSERT INTO groups (id, group_name)
 VALUES (3, 'tutors');
 
 INSERT INTO group_authorities (group_id, authority)
 VALUES (1, 'P_MANAGE_OWN_CARDS');
 INSERT INTO group_authorities (group_id, authority)
-VALUES (1, 'P_MANAGE_OWN_DICTIONARIES');
+VALUES (1, 'P_MANAGE_OWN_VOCAB');
 INSERT INTO group_authorities (group_id, authority)
 VALUES (3, 'P_MANAGE_CLASSES');
