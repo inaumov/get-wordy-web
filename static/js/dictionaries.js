@@ -1,4 +1,4 @@
-const dictionariesAPI = import.meta.env.VITE_BACKEND_API + "dictionaries";
+const vocabsAPI = import.meta.env.VITE_BACKEND_API + "user/vocabularies";
 
 export function fetchDictionaries() {
     let headers = new Headers();
@@ -9,13 +9,13 @@ export function fetchDictionaries() {
         headers: headers,
     };
 
-    let dictionariesRequest = new Request(dictionariesAPI, initObject);
+    let fetchAllRequest = new Request(vocabsAPI, initObject);
 
-    return fetch(dictionariesRequest)
+    return fetch(fetchAllRequest)
         .catch(err => console.log("HTTP error: ", err));
 }
 
-export function updateName(dictionaryId, name) {
+export function updateName(vocabId, name) {
     let headers = new Headers();
     headers.append('Content-Type', 'application/json');
 
@@ -29,13 +29,13 @@ export function updateName(dictionaryId, name) {
         body: JSON.stringify(jsonRequest),
     };
 
-    let patchRequest = new Request(dictionariesAPI + "/" + dictionaryId, initObject);
+    let patchRequest = new Request(vocabsAPI + "/" + vocabId, initObject);
 
     return fetch(patchRequest)
         .catch(err => console.log("HTTP error: ", err));
 }
 
-export function updatePicture(dictionaryId, picture, forceRemovePicture) {
+export function updatePicture(vocabId, picture, forceRemovePicture) {
     let headers = new Headers();
     headers.append('Content-Type', 'application/json');
 
@@ -53,13 +53,13 @@ export function updatePicture(dictionaryId, picture, forceRemovePicture) {
     if (forceRemovePicture) {
         queryString += "forceRemovePicture=true";
     }
-    let patchRequest = new Request(dictionariesAPI + "/" + dictionaryId + queryString, initObject);
+    let patchRequest = new Request(vocabsAPI + "/" + vocabId + queryString, initObject);
 
     return fetch(patchRequest)
         .catch(err => console.log("HTTP error: ", err));
 }
 
-export function deleteDictionary(dictionaryId) {
+export function deleteDictionary(vocabId) {
     let headers = new Headers();
 
     let initObject = {
@@ -67,7 +67,7 @@ export function deleteDictionary(dictionaryId) {
         headers: headers
     };
 
-    let patchRequest = new Request(dictionariesAPI + "/" + dictionaryId, initObject);
+    let patchRequest = new Request(vocabsAPI + "/" + vocabId, initObject);
 
     return fetch(patchRequest)
         .catch(err => console.log("HTTP error: ", err));

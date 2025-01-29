@@ -22,6 +22,7 @@ import java.util.List;
 
 @RestController
 @PreAuthorize("hasAuthority('P_MANAGE_OWN_VOCAB')")
+@RequestMapping(value = "/user/vocabularies")
 public class DictionariesController {
     private static final Logger LOG = LoggerFactory.getLogger(DictionariesController.class);
 
@@ -32,61 +33,61 @@ public class DictionariesController {
         this.vocabularyService = vocabularyService;
     }
 
-    @GetMapping(value = "/dictionaries")
-    public ResponseEntity<List<DictionaryResponse>> getUserDictionaries(Principal user) {
-        LOG.info("Getting dictionary list for the user = {}", user.getName());
+    @GetMapping
+    public ResponseEntity<List<DictionaryResponse>> getUserVocabularies(Principal user) {
+        LOG.info("Getting vocabularies for the user = {}", user.getName());
 
-        List<DictionaryResponse> dictionaries = vocabularyService.getVocabularies(createOwnerId(user))
+        List<DictionaryResponse> vocabularies = vocabularyService.getVocabularies(createOwnerId(user))
                 .stream()
                 .map(this::toResponse)
                 .toList();
 
-        if (dictionaries.isEmpty()) {
-            LOG.info("No dictionaries found for the user = {}", user.getName());
+        if (vocabularies.isEmpty()) {
+            LOG.info("No vocabularies found for the user = {}", user.getName());
             return new ResponseEntity<>(Collections.emptyList(), HttpStatus.OK);
         }
-        return new ResponseEntity<>(dictionaries, HttpStatus.OK);
+        return new ResponseEntity<>(vocabularies, HttpStatus.OK);
     }
 
-    @PostMapping("/dictionaries")
-    public ResponseEntity<DictionaryResponse> createDictionary(Principal user,
+    @PostMapping
+    public ResponseEntity<DictionaryResponse> createVocabulary(Principal user,
                                                                @Valid @RequestBody DictionaryRequest dictionaryRequest) {
-        LOG.info("Creating a new dictionary = {} for the user = {}", dictionaryRequest.name(), user.getName());
+        LOG.info("Creating a new vocabulary = {} for the user = {}", dictionaryRequest.name(), user.getName());
 
-        Vocabulary dictionary = vocabularyService.createVocabulary(createOwnerId(user), dictionaryRequest.name(), dictionaryRequest.pictureUrl());
-        DictionaryResponse response = toResponse(dictionary);
-        return ResponseEntity.created(URI.create("/dictionaries/" + response.vocabId()))
+        Vocabulary vocabulary = vocabularyService.createVocabulary(createOwnerId(user), dictionaryRequest.name(), dictionaryRequest.pictureUrl());
+        DictionaryResponse response = toResponse(vocabulary);
+        return ResponseEntity.created(URI.create("/vocabularies/" + response.vocabId()))
                 .body(response);
     }
 
-    @PatchMapping("/dictionaries/{id}")
+    @PatchMapping("/{vocabId}")
     public ResponseEntity<DictionaryResponse> partialUpdate(Principal user,
-                                                            @PathVariable("id") int id,
+                                                            @PathVariable("vocabId") int vocabId,
                                                             @RequestBody DictionaryRequest partialUpdate,
                                                             @RequestParam(value = "forceRemovePicture", required = false) boolean forceRemovePicture) {
-        LOG.info("Updating dictionary for the user = {}, id = {}", user.getName(), id);
+        LOG.info("Updating vocabulary for the user = {}, vocab id = {}", user.getName(), vocabId);
 
         // handle name change
         if (StringUtils.hasText(partialUpdate.name())) {
-            vocabularyService.renameVocabulary(createOwnerId(user), id, partialUpdate.name());
+            vocabularyService.renameVocabulary(createOwnerId(user), vocabId, partialUpdate.name());
         }
         // handle pictureUrl change
         if (forceRemovePicture) {
-            vocabularyService.changeVocabularyPicture(createOwnerId(user), id, null);
+            vocabularyService.changeVocabularyPicture(createOwnerId(user), vocabId, null);
         } else if (StringUtils.hasText(partialUpdate.pictureUrl())) {
-            vocabularyService.changeVocabularyPicture(createOwnerId(user), id, partialUpdate.pictureUrl());
+            vocabularyService.changeVocabularyPicture(createOwnerId(user), vocabId, partialUpdate.pictureUrl());
         }
         return ResponseEntity
                 .noContent()
                 .build();
     }
 
-    @DeleteMapping(value = "/dictionaries/{dictionaryId}")
-    public ResponseEntity<DictionaryResponse> deleteDictionary(Principal user,
-                                                               @PathVariable("dictionaryId") int dictionaryId) {
-        LOG.info("Deleting a dictionary for the user = {}, dictionary id = {}", user.getName(), dictionaryId);
+    @DeleteMapping(value = "/{vocabId}")
+    public ResponseEntity<DictionaryResponse> deleteVocabulary(Principal user,
+                                                               @PathVariable("vocabId") int vocabId) {
+        LOG.info("Deleting a vocabulary for the user = {}, by id = {}", user.getName(), vocabId);
 
-        vocabularyService.deleteVocabulary(createOwnerId(user), dictionaryId);
+        vocabularyService.deleteVocabulary(createOwnerId(user), vocabId);
 
         return ResponseEntity
                 .noContent()

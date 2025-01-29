@@ -23,7 +23,7 @@ class DictionariesApiTest extends BaseApiTest {
         try (HttpClient httpClient = HttpClient.newBuilder().build()) {
             HttpRequest httpRequest = HttpRequest.newBuilder()
                     .header("Cookie", jSessionIdHolder.get())
-                    .uri(new URI("http://localhost:8080/api/v1/dictionaries"))
+                    .uri(new URI("http://localhost:8080/api/v1/user/vocabularies"))
                     .build();
 
             HttpResponse<String> httpResponse = httpClient.send(httpRequest, HttpResponse.BodyHandlers.ofString());
@@ -66,7 +66,7 @@ class DictionariesApiTest extends BaseApiTest {
             HttpRequest httpRequest = HttpRequest.newBuilder()
                     .header("Cookie", jSessionIdHolder.get())
                     .headers("Content-Type", MediaType.APPLICATION_JSON_VALUE)
-                    .uri(new URI("http://localhost:8080/api/v1/dictionaries/1/exercise"))
+                    .uri(new URI("http://localhost:8080/api/v1/user/vocabularies/1/exercise"))
                     .PUT(HttpRequest.BodyPublishers.ofString(jsonMapper.writeValueAsString(cardIds)))
                     .build();
 
@@ -83,7 +83,7 @@ class DictionariesApiTest extends BaseApiTest {
             HttpRequest httpRequest = HttpRequest.newBuilder()
                     .header("Cookie", jSessionIdHolder.get())
                     .headers("Content-Type", MediaType.APPLICATION_JSON_VALUE)
-                    .uri(new URI("http://localhost:8080/api/v1/dictionaries"))
+                    .uri(new URI("http://localhost:8080/api/v1/user/vocabularies"))
                     .POST(HttpRequest.BodyPublishers.ofFile(Paths.get("src/test/resources/json/dictionaries/createDictionary.json")))
                     .build();
 
@@ -109,7 +109,7 @@ class DictionariesApiTest extends BaseApiTest {
         try (HttpClient httpClient = HttpClient.newBuilder().build()) {
             HttpRequest httpRequest = HttpRequest.newBuilder()
                     .header("Cookie", jSessionIdHolder.get())
-                    .uri(new URI("http://localhost:8080/api/v1/dictionaries/8"))
+                    .uri(new URI("http://localhost:8080/api/v1/user/vocabularies/8"))
                     .DELETE()
                     .build();
 

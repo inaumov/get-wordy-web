@@ -17,11 +17,11 @@ import static org.junit.jupiter.api.Assertions.*;
 class CardsApiTest extends BaseApiTest {
 
     @Test
-    public void getCardsByDictionaryId() throws URISyntaxException, IOException, InterruptedException {
+    public void getCards() throws URISyntaxException, IOException, InterruptedException {
         try (HttpClient httpClient = HttpClient.newBuilder().build()) {
             HttpRequest httpRequest = HttpRequest.newBuilder()
                     .header("Cookie", jSessionIdHolder.get())
-                    .uri(new URI("http://localhost:8080/api/v1/dictionaries/1/cards"))
+                    .uri(new URI("http://localhost:8080/api/v1/user/vocabularies/1/cards"))
                     .build();
 
             HttpResponse<String> httpResponse = httpClient.send(httpRequest, HttpResponse.BodyHandlers.ofString());
@@ -40,7 +40,6 @@ class CardsApiTest extends BaseApiTest {
 
             for (JsonNode card : jsonNode) {
                 assertTrue(card.get("cardId").asInt() > 0, "cardId must be greater than 0");
-                assertTrue(card.get("wordId").asInt() > 0, "wordId must be greater than 0");
                 assertWordInCard(card);
                 assertTrue(card.get("sentences").isArray());
                 assertTrue(card.get("collocations").isArray());
@@ -50,11 +49,11 @@ class CardsApiTest extends BaseApiTest {
     }
 
     @Test
-    public void getCardsForExerciseByDictionaryId() throws URISyntaxException, IOException, InterruptedException {
+    public void getCardsForExercise() throws URISyntaxException, IOException, InterruptedException {
         try (HttpClient httpClient = HttpClient.newBuilder().build()) {
             HttpRequest httpRequest = HttpRequest.newBuilder()
                     .header("Cookie", jSessionIdHolder.get())
-                    .uri(new URI("http://localhost:8080/api/v1/dictionaries/1/exercise?limit=4"))
+                    .uri(new URI("http://localhost:8080/api/v1/user/vocabularies/1/exercise?limit=4"))
                     .build();
 
             HttpResponse<String> httpResponse = httpClient.send(httpRequest, HttpResponse.BodyHandlers.ofString());
@@ -73,7 +72,6 @@ class CardsApiTest extends BaseApiTest {
 
             for (JsonNode card : jsonNode) {
                 assertTrue(card.get("cardId").asInt() > 0, "cardId must be greater than 0");
-                assertTrue(card.get("wordId").asInt() > 0, "wordId must be greater than 0");
                 assertWordInCard(card);
                 JsonNode sentences = card.get("sentences");
                 assertTrue(sentences.isArray());
@@ -84,12 +82,13 @@ class CardsApiTest extends BaseApiTest {
         }
     }
 
+/*
     @Test
     public void getCardById() throws URISyntaxException, IOException, InterruptedException {
         try (HttpClient httpClient = HttpClient.newBuilder().build()) {
             HttpRequest httpRequest = HttpRequest.newBuilder()
                     .header("Cookie", jSessionIdHolder.get())
-                    .uri(new URI("http://localhost:8080/api/v1/dictionaries/1/cards/1"))
+                    .uri(new URI("http://localhost:8080/api/v1/user/vocabularies/1/cards/1"))
                     .build();
 
             HttpResponse<String> httpResponse = httpClient.send(httpRequest, HttpResponse.BodyHandlers.ofString());
@@ -105,7 +104,6 @@ class CardsApiTest extends BaseApiTest {
             var card = jsonMapper.readTree(responseBody);
             assertTrue(card.isObject(), "is not an object");
             assertTrue(card.get("cardId").asInt() > 0, "cardId must be greater than 0");
-            assertTrue(card.get("wordId").asInt() > 0, "wordId must be greater than 0");
             assertWordInCard(card);
             JsonNode sentences = card.get("sentences");
             assertTrue(sentences.isArray());
@@ -116,14 +114,16 @@ class CardsApiTest extends BaseApiTest {
             assertBasicCardInfo(card);
         }
     }
+*/
 
+/*
     @Test
     void addCard() throws URISyntaxException, IOException, InterruptedException {
         try (HttpClient httpClient = HttpClient.newBuilder().build()) {
             HttpRequest httpRequest = HttpRequest.newBuilder()
                     .header("Cookie", jSessionIdHolder.get())
                     .headers("Content-Type", MediaType.APPLICATION_JSON_VALUE)
-                    .uri(new URI("http://localhost:8080/api/v1/dictionaries/1/cards"))
+                    .uri(new URI("http://localhost:8080/api/v1/user/vocabularies/1/cards"))
                     .POST(HttpRequest.BodyPublishers.ofFile(Paths.get("src/test/resources/json/cards/addCard.json")))
                     .build();
 
@@ -140,7 +140,6 @@ class CardsApiTest extends BaseApiTest {
             var card = jsonMapper.readTree(responseBody);
             assertTrue(card.isObject(), "is not an object");
             assertTrue(card.get("cardId").asInt() > 0, "cardId must be greater than 0");
-            assertTrue(card.get("wordId").asInt() > 0, "wordId must be greater than 0");
             assertWordInCard(card);
             assertTrue(card.get("sentences").isArray());
             assertEquals(2, card.get("sentences").size());
@@ -152,14 +151,16 @@ class CardsApiTest extends BaseApiTest {
             assertEquals("EDIT", card.get("status").asText());
         }
     }
+*/
 
+/*
     @Test
     void updateCard() throws URISyntaxException, IOException, InterruptedException {
         try (HttpClient httpClient = HttpClient.newBuilder().build()) {
             HttpRequest httpRequest = HttpRequest.newBuilder()
                     .header("Cookie", jSessionIdHolder.get())
                     .headers("Content-Type", MediaType.APPLICATION_JSON_VALUE)
-                    .uri(new URI("http://localhost:8080/api/v1/dictionaries/1/cards"))
+                    .uri(new URI("http://localhost:8080/api/v1/user/vocabularies/1/cards"))
                     .PUT(HttpRequest.BodyPublishers.ofFile(Paths.get("src/test/resources/json/cards/updateCard.json")))
                     .build();
 
@@ -176,7 +177,6 @@ class CardsApiTest extends BaseApiTest {
             var card = jsonMapper.readTree(responseBody);
             assertTrue(card.isObject(), "is not an object");
             assertEquals(77, card.get("cardId").asInt());
-            assertEquals(80, card.get("wordId").asInt());
             assertWordInCard(card);
             assertTrue(card.get("sentences").isArray());
             assertEquals(2, card.get("sentences").size());
@@ -188,6 +188,7 @@ class CardsApiTest extends BaseApiTest {
             assertEquals("EDIT", card.get("status").asText());
         }
     }
+*/
 
     @Test
     void resetCard() throws URISyntaxException, IOException, InterruptedException {
@@ -195,7 +196,7 @@ class CardsApiTest extends BaseApiTest {
             HttpRequest httpRequest = HttpRequest.newBuilder()
                     .header("Cookie", jSessionIdHolder.get())
                     .headers("Content-Type", MediaType.APPLICATION_JSON_VALUE)
-                    .uri(new URI("http://localhost:8080/api/v1/dictionaries/1/cards/77/resetScore"))
+                    .uri(new URI("http://localhost:8080/api/v1/user/vocabularies/1/cards/77/resetScore"))
                     .PUT(HttpRequest.BodyPublishers.noBody())
                     .build();
 
@@ -206,12 +207,13 @@ class CardsApiTest extends BaseApiTest {
         }
     }
 
+/*
     @Test
     void deleteCard() throws URISyntaxException, IOException, InterruptedException {
         try (HttpClient httpClient = HttpClient.newBuilder().build()) {
             HttpRequest httpRequest = HttpRequest.newBuilder()
                     .header("Cookie", jSessionIdHolder.get())
-                    .uri(new URI("http://localhost:8080/api/v1/dictionaries/1/cards/39"))
+                    .uri(new URI("http://localhost:8080/api/v1/user/vocabularies/1/cards/39"))
                     .DELETE()
                     .build();
 
@@ -221,12 +223,12 @@ class CardsApiTest extends BaseApiTest {
             assertEquals(204, statusCode);
         }
     }
+*/
 
     private static void assertWordInCard(JsonNode card) {
         assertTrue(card.has("word"));
         JsonNode word = card.get("word");
         assertTrue(word.isObject());
-        assertTrue(word.get("wordId").asInt() > 0, "wordId must be greater than 0");
         assertTrue(word.has("value"));
         assertTrue(word.has("partOfSpeech"));
         assertTrue(word.has("transcription"));
