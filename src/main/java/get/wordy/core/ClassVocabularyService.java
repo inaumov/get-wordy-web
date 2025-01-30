@@ -1,5 +1,6 @@
 package get.wordy.core;
 
+import get.wordy.core.api.IVocabularyService;
 import get.wordy.core.api.IWordExplanationService;
 import get.wordy.core.api.bean.Sentence;
 import get.wordy.core.api.bean.Word;
@@ -13,34 +14,53 @@ import java.util.Optional;
 
 @Service
 @Slf4j
-public class VocabularyServiceWrapper implements IWordExplanationService {
+public class ClassVocabularyService {
 
-    @Override
-    public Word getWordExplanation(OwnerId ownerId, int wordId) {
-        return null;
+    private final IWordExplanationService explanationsService;
+    private final IVocabularyService vocabularyService;
+
+    public ClassVocabularyService(IWordExplanationService explanationsService, IVocabularyService vocabularyService) {
+        this.explanationsService = explanationsService;
+        this.vocabularyService = vocabularyService;
     }
 
-    @Override
+    public Word getWordExplanation(OwnerId ownerId, int vocabId, int wordId) {
+        vocabularyService.hasVocabulary(ownerId, vocabId);
+        return explanationsService.getWordExplanation(wordId);
+    }
+
     public Word addWordExplanation(OwnerId ownerId, int vocabId, Word entity) {
-        List<Sentence> exerciseSentences = entity.getSentences()
+        vocabularyService.hasVocabulary(ownerId, vocabId);
+
+        List<Sentence> exerciseSentences = entity.getStrSentences()
                 .stream()
                 .map(strSentence -> withClosestMatch(strSentence, entity.getValue()))
                 .toList();
-        return null;
+
+        // custom word
+        Word wordAdded = explanationsService.addWordExplanation(entity);
+
+        vocabularyService.addToVocabulary(ownerId, vocabId, wordAdded.getId());
+        return wordAdded;
     }
 
-    @Override
     public Word updateWordExplanation(OwnerId ownerId, int vocabId, Word entity) {
-        List<Sentence> exerciseSentences = entity.getSentences()
+        vocabularyService.hasVocabulary(ownerId, vocabId);
+
+        List<Sentence> exerciseSentences = entity.getStrSentences()
                 .stream()
                 .map(strSentence -> withClosestMatch(strSentence, entity.getValue()))
                 .toList();
-        return null;
+
+        return explanationsService.updateWordExplanation(entity);
     }
 
-    @Override
     public void deleteWordExplanationPermanently(OwnerId ownerId, int vocabId, int wordId) {
-
+        vocabularyService.hasVocabulary(ownerId, vocabId);
+        boolean deleted = explanationsService.deleteWordExplanationPermanently(wordId);
+        if (deleted) {
+            log.info("A custom word explanation with id {} successfully deleted from vocab {}", wordId, vocabId);
+        }
     }
 
     private static Sentence withClosestMatch(String strSentence, String keyword) {

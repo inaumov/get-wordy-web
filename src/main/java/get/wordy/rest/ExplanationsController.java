@@ -1,6 +1,6 @@
 package get.wordy.rest;
 
-import get.wordy.core.api.IWordExplanationService;
+import get.wordy.core.ClassVocabularyService;
 import get.wordy.core.api.bean.Word;
 import get.wordy.core.api.id.OwnerId;
 import get.wordy.model.Explanation;
@@ -14,6 +14,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
 
@@ -21,13 +22,14 @@ import java.security.Principal;
 
 @RestController
 @RequestMapping(value = "/vocabularies")
+@PreAuthorize("hasAuthority('P_MANAGE_CLASSES')")
 public class ExplanationsController extends HttpServlet {
     private static final Logger LOG = LoggerFactory.getLogger(ExplanationsController.class);
 
-    private final IWordExplanationService explanationsService;
+    private final ClassVocabularyService vocabularyService;
 
-    public ExplanationsController(IWordExplanationService explanationsService) {
-        this.explanationsService = explanationsService;
+    public ExplanationsController(ClassVocabularyService classVocabularyService) {
+        this.vocabularyService = classVocabularyService;
     }
 
     @GetMapping(value = "/{vocabId}/explanations/{wordId}")
@@ -36,7 +38,7 @@ public class ExplanationsController extends HttpServlet {
                                                        @PathVariable("wordId") int wordId) {
 
         LOG.info("Getting word explanation = {} for the user = {}, vocabulary id = {}", wordId, user.getName(), vocabId);
-        Word word = explanationsService.getWordExplanation(createOwnerId(user), wordId);
+        Word word = vocabularyService.getWordExplanation(createOwnerId(user), vocabId, wordId);
         WordResponse wordResponse = toWordResponse(word);
         return new ResponseEntity<>(wordResponse, HttpStatus.OK);
     }
@@ -49,7 +51,7 @@ public class ExplanationsController extends HttpServlet {
         LOG.info("Adding a new word explanation for the user = {}, vocabulary id = {}", user.getName(), vocabId);
 
         Word entity = toEntity(wordRequest);
-        Word wordAdded = explanationsService.addWordExplanation(createOwnerId(user), vocabId, entity);
+        Word wordAdded = vocabularyService.addWordExplanation(createOwnerId(user), vocabId, entity);
 
         HttpHeaders headers = new HttpHeaders();
         headers.setLocation(ucBuilder
@@ -72,7 +74,7 @@ public class ExplanationsController extends HttpServlet {
         Word entity = toEntity(wordRequest)
                 .withId(wordRequest.getWordId());
 
-        Word wordUpdated = explanationsService.updateWordExplanation(createOwnerId(user), vocabId, entity);
+        Word wordUpdated = vocabularyService.updateWordExplanation(createOwnerId(user), vocabId, entity);
 
         HttpHeaders headers = new HttpHeaders();
         headers.setLocation(ucBuilder
@@ -90,7 +92,7 @@ public class ExplanationsController extends HttpServlet {
                                                              @PathVariable("wordId") int wordId) {
         LOG.info("Removing a word explanation = {} for the user = {}, vocabulary id = {}", wordId, user.getName(), vocabId);
 
-        explanationsService.deleteWordExplanationPermanently(createOwnerId(user), vocabId, wordId);
+        vocabularyService.deleteWordExplanationPermanently(createOwnerId(user), vocabId, wordId);
 
         return ResponseEntity
                 .noContent()
@@ -98,14 +100,15 @@ public class ExplanationsController extends HttpServlet {
     }
 
     private Word toEntity(WordRequest wordRequest) {
-        return new Word(0,
+        Word word = new Word(
                 wordRequest.getValue(),
                 wordRequest.getExplanation().getPartOfSpeech(),
                 wordRequest.getTranscription(),
                 wordRequest.getExplanation().getMeaning()
-        )
-                .withSentences(wordRequest.getExplanation().getInContext())
-                .withCollocations(wordRequest.getExplanation().getCollocations());
+        );
+        word.setStrSentences(wordRequest.getExplanation().getInContext());
+        word.setCollocations(wordRequest.getExplanation().getCollocations());
+        return word;
     }
 
     private WordResponse toWordResponse(Word word) {
@@ -117,13 +120,13 @@ public class ExplanationsController extends HttpServlet {
                         .partOfSpeech(word.getPartOfSpeech())
                         .meaning(word.getMeaning())
                         .collocations(word.getCollocations())
-                        .inContext(word.getSentences())
+                        .inContext(word.getStrSentences())
                         .build()
         );
     }
 
     private static OwnerId createOwnerId(Principal user) {
-        return new OwnerId(user.getName(), "1");
+        return new OwnerId(user.getName(), "class");
     }
 
 }

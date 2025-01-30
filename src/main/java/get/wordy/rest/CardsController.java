@@ -2,7 +2,7 @@ package get.wordy.rest;
 
 import get.wordy.core.api.id.OwnerId;
 import get.wordy.model.Explanation;
-import get.wordy.core.api.IDictionaryService;
+import get.wordy.core.api.IUserCardsService;
 import get.wordy.core.api.bean.*;
 import get.wordy.model.*;
 import jakarta.servlet.http.HttpServlet;
@@ -23,10 +23,10 @@ import java.util.*;
 public class CardsController extends HttpServlet {
     private static final Logger LOG = LoggerFactory.getLogger(CardsController.class);
 
-    private final IDictionaryService dictionaryService;
+    private final IUserCardsService userCardsService;
 
-    public CardsController(IDictionaryService dictionaryService) {
-        this.dictionaryService = dictionaryService;
+    public CardsController(IUserCardsService userCardsService) {
+        this.userCardsService = userCardsService;
     }
 
     @GetMapping(value = "/{vocabId}/cards")
@@ -34,7 +34,7 @@ public class CardsController extends HttpServlet {
 
         LOG.info("Getting all cards for the user = {}, vocab id = {}", user.getName(), vocabId);
 
-        List<CardResponse> cards = dictionaryService.getCards(createOwnerId(user), vocabId)
+        List<CardResponse> cards = userCardsService.getCards(createOwnerId(user), vocabId)
                 .stream()
                 .map(this::toCardResponse)
                 .toList();
@@ -53,7 +53,7 @@ public class CardsController extends HttpServlet {
 
         LOG.info("Getting cards to exercise for the user = {}, vocab id = {}", user.getName(), vocabId);
 
-        List<ExerciseResponse> cards = dictionaryService.getCardsForExercise(createOwnerId(user), vocabId, limit)
+        List<ExerciseResponse> cards = userCardsService.getCardsForExercise(createOwnerId(user), vocabId, limit)
                 .stream()
                 .map(this::toExerciseResponse)
                 .toList();
@@ -72,7 +72,7 @@ public class CardsController extends HttpServlet {
 
         LOG.info("Submitting exercise result for the user = {} and cards: {}", user.getName(), Arrays.toString(cardIds));
 
-        dictionaryService.increaseScoreUp(createOwnerId(user), vocabId, cardIds, 12);
+        userCardsService.increaseScoreUp(createOwnerId(user), vocabId, cardIds, 12);
 
         return ResponseEntity
                 .accepted()
@@ -85,7 +85,7 @@ public class CardsController extends HttpServlet {
                                           @PathVariable("cardId") int cardId) {
         LOG.info("Resetting a card = {} for the user = {}, vocab id = {}", cardId, user.getName(), vocabId);
 
-        dictionaryService.resetScore(createOwnerId(user), cardId);
+        userCardsService.resetScore(createOwnerId(user), cardId);
 
         return ResponseEntity
                 .accepted()

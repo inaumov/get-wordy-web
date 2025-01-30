@@ -1,14 +1,13 @@
 package get.wordy.config;
 
 import get.wordy.core.ClassService;
-import get.wordy.core.DictionaryService;
+import get.wordy.core.GetWordyService;
+import get.wordy.core.WordsExplanationService;
 import get.wordy.core.api.IClassService;
-import get.wordy.core.api.IDictionaryService;
+import get.wordy.core.api.IUserCardsService;
 import get.wordy.core.api.IVocabularyService;
-import get.wordy.core.dao.impl.CardHeadlineDao;
-import get.wordy.core.dao.impl.ClassesDao;
-import get.wordy.core.dao.impl.DaoFactory;
-import get.wordy.core.dao.impl.VocabularyDao;
+import get.wordy.core.api.IWordExplanationService;
+import get.wordy.core.dao.impl.*;
 import get.wordy.core.db.LocalTxManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -48,11 +47,11 @@ public class GetWordyConfiguration implements WebMvcConfigurer {
     }
 
     @Bean
-    public IDictionaryService dictionaryService(DataSource dataSource, NamedParameterJdbcTemplate jdbcTemplate) {
+    public GetWordyService coreService(DataSource dataSource, NamedParameterJdbcTemplate jdbcTemplate) {
         LocalTxManager txManager = LocalTxManager.withDataSource(dataSource);
         DaoFactory factory = DaoFactory.withTxManager(txManager);
-        LOG.info("Creating vocabulary service for data source = {}", dataSource);
-        return new DictionaryService(
+        LOG.info("Creating vocabulary and user cards service for data source = {}", dataSource);
+        return new GetWordyService(
                 new VocabularyDao(jdbcTemplate),
                 factory.getWordDao(),
                 factory.getCardDao(),
@@ -62,8 +61,13 @@ public class GetWordyConfiguration implements WebMvcConfigurer {
     }
 
     @Bean
-    public IVocabularyService vocabularyService(IDictionaryService dictionaryService) {
-        return (IVocabularyService) dictionaryService;
+    public IVocabularyService vocabularyService(GetWordyService coreService) {
+        return coreService;
+    }
+
+    @Bean
+    public IUserCardsService userCardsService(GetWordyService coreService) {
+        return coreService;
     }
 
     @Bean
@@ -72,6 +76,16 @@ public class GetWordyConfiguration implements WebMvcConfigurer {
         LOG.info("Creating classes service for data source = {}", dataSource);
         return new ClassService(
                 new ClassesDao(jdbcTemplate),
+                txManager
+        );
+    }
+
+    @Bean
+    public IWordExplanationService wordExplanationService(DataSource dataSource, NamedParameterJdbcTemplate jdbcTemplate) {
+        LocalTxManager txManager = LocalTxManager.withDataSource(dataSource);
+        LOG.info("Creating words service for data source = {}", dataSource);
+        return new WordsExplanationService(
+                new WordDao(txManager),
                 txManager
         );
     }
