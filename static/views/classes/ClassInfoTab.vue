@@ -6,13 +6,14 @@ export default {
   setup(props) {
     console.log("Prop classInfo in setup:", props.classInfo);
     return {
-      classInfoDays: props.classInfo['days'] || [],
     };
   },
   data() {
     return {
-      days: ["sun", "mon", "tue", "wen", "thu", "fri", "sat"],
-      selectedDays: this.classInfoDays || [],
+      days: ["Sun", "Mon", "Tue", "Wen", "Thu", "Fri", "Sat"],
+      schedules: [
+        { dayOfWeek: '', startTime: '', endTime: '' } // Default schedule
+      ],
     }
   },
   created() {
@@ -23,7 +24,7 @@ export default {
       // reset any previous validation state
       this.$refs.classDays.classList.remove('is-invalid');
       // validate the selected days
-      if (this.selectedDays.length === 0) {
+      if (this.schedules.length === 0) {
         // if no days are selected, apply the 'is-invalid' class
         this.$refs.classDays.classList.add('is-invalid');
         return;
@@ -44,7 +45,13 @@ export default {
             }
             console.log("PUT: class info has been requested. Response.status =", response.status);
           });
-    }
+    },
+    addSchedule() {
+      this.schedules.push({ dayOfWeek: '', startTime: '', endTime: '' });
+    },
+    removeSchedule(index) {
+      this.schedules.splice(index, 1);
+    },
   },
 };
 
@@ -89,24 +96,64 @@ export default {
         <!-- third row: class days selection -->
         <div class="row mb-3">
           <div class="col-12">
-            <label for="classDays" class="form-label">Select the days the class takes place<i>*</i></label>
-            <div ref="classDays" id="classDays" class="d-flex flex-wrap">
-              <div v-for="(day, index) in days" :key="index" class="form-check form-check-inline">
-                <input
-                    type="checkbox"
-                    :id="day"
-                    :name="day"
-                    :value="day"
-                    class="form-check-input"
-                    v-model="selectedDays"
+            <label for="classSchedules" class="form-label">
+              Select the schedules for the class<i>*</i>
+            </label>
+            <div ref="classSchedules" id="classSchedules" class="d-flex flex-column gap-2">
+              <div
+                  v-for="(schedule, index) in this.classInfo.schedules"
+                  :key="index"
+                  class="d-flex align-items-center gap-3"
+              >
+                <select
+                    v-model="schedule.dayOfWeek"
+                    class="form-select w-auto"
+                    :id="'schedule-day-' + index"
+                    required
                 >
-                <label class="form-check-label" :for="day" style="text-transform: capitalize;">
-                  {{ day }}
-                </label>
+                  <option value="" disabled>Select Day</option>
+                  <option v-for="day in days" :key="day" :value="day">
+                    {{ day }}
+                  </option>
+                </select>
+                <input
+                    type="time"
+                    v-model="schedule.startTime"
+                    class="form-control w-auto"
+                    :id="'schedule-start-' + index"
+                    required
+                />
+                <input
+                    type="time"
+                    v-model="schedule.endTime"
+                    class="form-control w-auto"
+                    :id="'schedule-end-' + index"
+                    required
+                />
+                <!-- Remove Schedule Button -->
+                <button
+                    type="button"
+                    class="btn btn-danger btn-sm"
+                    @click="removeSchedule(index)"
+                >
+                  Remove
+                </button>
+
               </div>
             </div>
-            <div v-if="selectedDays.length === 0" class="invalid-feedback">
-              Please select at least one day.
+
+            <!-- Add Schedule Button -->
+            <button
+                type="button"
+                class="btn btn-primary mt-2"
+                @click="addSchedule"
+            >
+              Add Schedule
+            </button>
+
+            <!-- Validation Feedback -->
+            <div v-if="schedules.length === 0" class="invalid-feedback">
+              Please add at least one schedule.
             </div>
           </div>
         </div>
