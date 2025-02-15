@@ -1,4 +1,4 @@
-package get.wordy.rest;
+package get.wordy.rest.error;
 
 import get.wordy.model.error.ValidationErrorResponse;
 import jakarta.validation.ConstraintViolation;

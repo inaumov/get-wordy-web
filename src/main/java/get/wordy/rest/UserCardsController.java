@@ -20,12 +20,12 @@ import java.util.*;
 @RestController
 @PreAuthorize("hasAuthority('P_MANAGE_OWN_VOCAB')")
 @RequestMapping(value = "/user/vocabularies")
-public class CardsController extends HttpServlet {
-    private static final Logger LOG = LoggerFactory.getLogger(CardsController.class);
+public class UserCardsController extends HttpServlet {
+    private static final Logger LOG = LoggerFactory.getLogger(UserCardsController.class);
 
     private final IUserCardsService userCardsService;
 
-    public CardsController(IUserCardsService userCardsService) {
+    public UserCardsController(IUserCardsService userCardsService) {
         this.userCardsService = userCardsService;
     }
 

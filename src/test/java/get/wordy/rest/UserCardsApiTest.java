@@ -10,11 +10,10 @@ import java.net.URISyntaxException;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
-import java.nio.file.Paths;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class CardsApiTest extends BaseApiTest {
+class UserCardsApiTest extends BaseApiTest {
 
     @Test
     public void getCards() throws URISyntaxException, IOException, InterruptedException {

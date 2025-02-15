@@ -14,7 +14,7 @@ import java.util.stream.IntStream;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class DictionariesApiTest extends BaseApiTest {
+class UserVocabulariesApiTest extends BaseApiTest {
 
     private static final String IMAGE_URL_PATTERN = "(http(s?):/)(/[^/]+)+\\.(?:jpg|jpeg|png)";
 

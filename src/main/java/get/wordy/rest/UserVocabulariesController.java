@@ -23,13 +23,13 @@ import java.util.List;
 @RestController
 @PreAuthorize("hasAuthority('P_MANAGE_OWN_VOCAB')")
 @RequestMapping(value = "/user/vocabularies")
-public class DictionariesController {
-    private static final Logger LOG = LoggerFactory.getLogger(DictionariesController.class);
+public class UserVocabulariesController {
+    private static final Logger LOG = LoggerFactory.getLogger(UserVocabulariesController.class);
 
     private final IVocabularyService vocabularyService;
 
     @Autowired
-    public DictionariesController(IVocabularyService vocabularyService) {
+    public UserVocabulariesController(IVocabularyService vocabularyService) {
         this.vocabularyService = vocabularyService;
     }
 
