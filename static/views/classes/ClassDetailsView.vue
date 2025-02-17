@@ -10,7 +10,9 @@ export default {
   components: {Materials, ClassInfo, Attendees},
   data() {
     return {
-      classInfo: {}
+      classInfo: {
+        attendees: []
+      }
     }
   },
   methods: {
@@ -109,7 +111,7 @@ export default {
           role="tabpanel"
           aria-labelledby="attendees-tab"
       >
-        <Attendees/>
+        <Attendees v-if="classInfo && classInfo.attendees" v-bind="{ classInfo }"/>
       </div>
     </div>
   </div>

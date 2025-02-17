@@ -1,5 +1,6 @@
 package get.wordy.rest;
 
+import get.wordy.core.api.IClassAccessService;
 import get.wordy.core.api.IClassService;
 import get.wordy.core.api.IVocabularyService;
 import get.wordy.core.api.bean.ClassInfo;
@@ -33,10 +34,12 @@ public class ClassController {
 
     private final IClassService classService;
     private final IVocabularyService vocabularyService;
+    private final IClassAccessService accessService;
 
-    public ClassController(IClassService classService, IVocabularyService vocabularyService) {
+    public ClassController(IClassService classService, IVocabularyService vocabularyService, IClassAccessService accessService) {
         this.classService = classService;
         this.vocabularyService = vocabularyService;
+        this.accessService = accessService;
     }
 
     @GetMapping
@@ -71,7 +74,7 @@ public class ClassController {
     }
 
     private ClassInfoResponse enrichWithAttendees(ClassInfoResponse response) {
-        return response.withAttendees(List.of("Test"));
+        return response.withAttendees(accessService.getAssignedAttendees(response.getClassId()));
     }
 
     @PostMapping

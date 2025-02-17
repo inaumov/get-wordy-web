@@ -1,12 +1,10 @@
 package get.wordy.config;
 
+import get.wordy.core.ClassAccessService;
 import get.wordy.core.ClassService;
 import get.wordy.core.GetWordyService;
 import get.wordy.core.WordsExplanationService;
-import get.wordy.core.api.IClassService;
-import get.wordy.core.api.IUserCardsService;
-import get.wordy.core.api.IVocabularyService;
-import get.wordy.core.api.IWordExplanationService;
+import get.wordy.core.api.*;
 import get.wordy.core.dao.impl.*;
 import get.wordy.core.db.LocalTxManager;
 import org.slf4j.Logger;
@@ -76,6 +74,16 @@ public class GetWordyConfiguration implements WebMvcConfigurer {
         LOG.info("Creating classes service for data source = {}", dataSource);
         return new ClassService(
                 new ClassesDao(jdbcTemplate),
+                txManager
+        );
+    }
+
+    @Bean
+    public IClassAccessService classAccessService(DataSource dataSource, NamedParameterJdbcTemplate jdbcTemplate) {
+        LocalTxManager txManager = LocalTxManager.withDataSource(dataSource);
+        LOG.info("Creating class access service for data source = {}", dataSource);
+        return new ClassAccessService(
+                new ClassAccessDao(jdbcTemplate),
                 txManager
         );
     }
