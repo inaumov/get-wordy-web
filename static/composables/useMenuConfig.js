@@ -2,10 +2,16 @@ export function useMenuConfig(accessType) {
     const menuConfig = {
         teacherAccess: [
             {
-                uri: '/Schedule',
-                label: 'Schedule & Classes',
+                uri: '/Materials',
+                label: 'Learning Materials',
                 icon: 'bi bi-book',
-                title: 'Manage and organize classes'
+                title: 'Manage and organize vocabularies'
+            },
+            {
+                uri: '/Attendees',
+                label: 'Class Attendees',
+                icon: 'bi bi-people',
+                title: 'Manage and invite people'
             },
             {
                 uri: '/Templates',
@@ -16,9 +22,15 @@ export function useMenuConfig(accessType) {
         ],
         sharedAccess: [
             {
-                uri: '/Classroom',
-                label: 'Classroom',
+                uri: '/MyClasses',
+                label: 'My Classes',
                 icon: 'bi bi-people',
+                title: 'Assigned classes'
+            },
+            {
+                uri: '/Classroom',
+                label: 'Learning Materials',
+                icon: 'bi bi-list',
                 title: 'Access classroom-shared materials'
             },
             {

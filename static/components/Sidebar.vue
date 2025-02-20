@@ -20,6 +20,10 @@ export default {
       type: String,
       default: 'Jaremy Clarkson',
     },
+    activeClass: {
+      type: Object,
+      required: false
+    }
   },
   setup() {
     const router = useRouter();
@@ -34,6 +38,13 @@ export default {
 
     return {navigate, isActive};
   },
+  methods: {
+    formatSchedule(schedule) {
+      const formattedStartTime = schedule.startTime?.substring(0, 5); // get hours and minutes (HH:mm)
+      const formattedEndTime = schedule.endTime?.substring(0, 5); // get hours and minutes (HH:mm)
+      return `${formattedStartTime} - ${formattedEndTime}`;
+    }
+  }
 };
 </script>
 
@@ -59,6 +70,22 @@ export default {
 
     <!-- Bottom Section -->
     <div class="footer text-center py-3">
+      <div v-if="activeClass" class="active-class-item">
+        <!-- Bell Icon centered with class name -->
+        <div class="active-class-header">
+          <h5 class="active-class-name">{{ activeClass.name }}</h5>
+          <span class="status-badge">
+            <i class="bi bi-bell animated-bell"></i>
+          </span>
+        </div>
+        <!-- Schedule Section -->
+        <div v-if="activeClass.schedules">
+          <span v-for="schedule in activeClass.schedules" :key="schedule.dayOfWeek" class="active-class-schedule">
+            <strong>{{ schedule.dayOfWeek }}</strong>: {{ formatSchedule(schedule) }}<br/>
+          </span>
+        </div>
+        <span class="active-class-schedule" v-else>No schedule assigned</span>
+      </div>
       <hr class="sidebar-divider"/>
       <img :src="schoolLogo" alt="School Logo" class="logo img-fluid mb-2"/>
       <p class="school-name mb-1">{{ schoolName }}</p>
@@ -103,5 +130,56 @@ export default {
 
 .teacher-name {
   font-size: 0.9rem;
+}
+
+.active-class-item {
+  background: #fff;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 12px;
+  margin-bottom: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.active-class-header {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+}
+
+.active-class-name {
+  font-size: 1.1rem;
+  font-weight: bold;
+  margin: 0; /* remove default margin to ensure it's centered */
+}
+
+.status-badge {
+  color: #ff9800;
+  font-weight: bold;
+  font-size: 1.3rem;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.active-class-schedule {
+  font-size: 0.9rem;
+  color: #444;
+}
+
+/* bell icon animation */
+.animated-bell {
+  color: #ff9800;
+  animation: ring 1.5s infinite ease-in-out;
+}
+
+@keyframes ring {
+  0%, 100% { transform: rotate(0); }
+  25% { transform: rotate(-10deg); }
+  50% { transform: rotate(10deg); }
+  75% { transform: rotate(-5deg); }
 }
 </style>

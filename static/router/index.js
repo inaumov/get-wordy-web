@@ -7,6 +7,7 @@ import ClassListView from "@/views/ClassListView.vue";
 import SharedMaterials from "@/views/shared/SharedMaterials.vue";
 import ScheduleView from "@/views/classes/ScheduleView.vue";
 import ClassDetailsView from "@/views/classes/ClassDetailsView.vue";
+import MyClasses from "@/views/shared/MyClasses.vue";
 
 const router = createRouter({
     history: createWebHistory(import.meta.env.BASE_URL),
@@ -27,6 +28,11 @@ const router = createRouter({
             component: ScheduleView
         },
         {
+            path: '/Attendees',
+            name: 'schedule',
+            component: ScheduleView
+        },
+        {
             path: '/Dictionaries',
             name: 'dictionaries',
             component: DictionariesView
@@ -35,6 +41,11 @@ const router = createRouter({
             path: '/Classroom',
             name: 'classroom',
             component: SharedMaterials
+        },
+        {
+            path: '/MyClasses',
+            name: 'my-classes',
+            component: MyClasses
         },
         {
             path: '/Schedule/:day',

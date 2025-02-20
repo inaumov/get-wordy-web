@@ -1,6 +1,7 @@
 <script>
 import Sidebar from '@/components/Sidebar.vue';
 import {useMenuConfig} from "@/composables/useMenuConfig.js";
+import {getUserClasses} from "@/js/classes-api.js";
 
 export default {
   name: 'DashboardPage',
@@ -20,6 +21,7 @@ export default {
   data() {
     return {
       permissions: [null],
+      assignedClasses: []
     };
   },
   computed: {
@@ -40,16 +42,24 @@ export default {
     showSidebar() {
       return this.isLoggedIn && (this.permissions.includes('P_MANAGE_CLASSES') || this.permissions.includes('P_SHARED_CLASS'));
     },
+    activeClass() {
+      // show the first active class, or nothing if none are active
+      return this.assignedClasses.find(classInfo => classInfo.isActive) || null;
+    }
   },
   mounted() {
     // Example: Simulate fetching user data (replace with real auth logic)
     this.fetchUserData();
+    this.fetchAttendeeClasses();
   },
   methods: {
     fetchUserData() {
-      this.permissions = ['P_MANAGE_OWN_VOCAB'];
-      this.permissions = ['P_SHARED_CLASS'];
+      this.permissions = ['P_MANAGE_OWN_VOCAB', 'P_SHARED_CLASS'];
       this.permissions = ['P_MANAGE_CLASSES'];
+    },
+    async fetchAttendeeClasses() {
+      const response = await getUserClasses();
+      this.assignedClasses = await response.json();
     },
   },
 };
@@ -58,7 +68,7 @@ export default {
 <template>
   <div class="app-layout">
     <!-- sidebar with menu items -->
-    <sidebar class="sidebar" v-if="showSidebar" :menuItems="menuItems"/>
+    <sidebar class="sidebar" v-if="showSidebar" :menuItems="menuItems" :activeClass="this.activeClass"/>
     <!-- main content area -->
     <main class="main-content">
       <router-view/>

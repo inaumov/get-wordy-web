@@ -1,5 +1,21 @@
 const classAPI = import.meta.env.VITE_BACKEND_API + "classes";
+const usersAPI = import.meta.env.VITE_USERS_API;
 const templatesAPI = import.meta.env.VITE_BACKEND_API + "templates";
+const vocabulariesAPI = import.meta.env.VITE_BACKEND_API + "vocabularies";
+
+export function getUserClasses() {
+    let headers = new Headers();
+    headers.append('Content-Type', 'application/json');
+
+    let initObject = {
+        headers: headers,
+    };
+
+    let getRequest = new Request(usersAPI + "/my-classes", initObject);
+
+    return fetch(getRequest)
+        .catch(err => console.error("Error fetching accessible classes:", err));
+}
 
 export function fetchClasses(dayOfWeek) {
     let headers = new Headers();
@@ -91,7 +107,7 @@ export function getVocabularies(classId) {
         headers: headers,
     };
 
-    let getRequest = new Request(classAPI + '/' + classId + '/vocabularies', initObject);
+    let getRequest = new Request(vocabulariesAPI, initObject);
 
     return fetch(getRequest)
         .catch(err => console.log("HTTP error: ", err));
@@ -105,7 +121,7 @@ export function getVocabulary(classId, vocabularyId) {
         method: 'GET', headers: headers,
     };
 
-    let getRequest = new Request(classAPI + '/' + classId + '/vocabularies/' + vocabularyId, initObject);
+    let getRequest = new Request(vocabulariesAPI + '/' + vocabularyId, initObject);
 
     return fetch(getRequest)
         .catch(err => console.log("HTTP error: ", err));
