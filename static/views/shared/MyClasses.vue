@@ -48,16 +48,15 @@ export default {
         <div v-for="classInfo in activeClasses" :key="classInfo.classId" class="class-item active">
           <div class="class-info">
             <h5 class="class-name">{{ classInfo.name }}</h5>
-            <p class="class-schedule" v-if="classInfo.schedules">
+            <div v-if="classInfo.isRepeatable" class="class-schedule">
               <span class="text-muted" v-for="schedule in classInfo.schedules">
                 <strong>{{ schedule.dayOfWeek }}: </strong>{{ formatSchedule(schedule) }}<br/>
               </span>
+            </div>
+            <p v-else class="text-muted">
+              One time activity<span v-if="classInfo.endDate">, at {{ dateHappened(classInfo.endDate) }}</span>
             </p>
-            <span v-else>No schedule assigned</span>
-            <p class="class-material">
-              <strong>Materials / References: </strong> {{ classInfo.material }}
-            </p>
-            <p class="class-material">
+            <p class="class-notes" v-if="classInfo.notes">
               <strong>Notes for student: </strong> {{ classInfo.notes }}
             </p>
           </div>
@@ -72,16 +71,13 @@ export default {
         <div v-for="classInfo in pastClasses" :key="classInfo.classId" class="class-item past">
           <div class="class-info">
             <h5 class="class-name">{{ classInfo.name }}</h5>
-            <p class="text-muted" v-if="classInfo.endDate">
-              One time activity, at {{ dateHappened(classInfo.endDate) }}
-            </p>
-            <p v-else class="text-muted">
+            <p v-if="classInfo.isRepeatable" class="text-muted">
               Repeatable classes (Archived)
             </p>
-            <p class="class-material">
-              <strong>Materials / References: </strong> {{ classInfo.material }}
+            <p v-else class="text-muted">
+              One time activity<span v-if="classInfo.endDate">, at {{ dateHappened(classInfo.endDate) }}</span>
             </p>
-            <p class="class-material">
+            <p class="class-notes" v-if="classInfo.notes">
               <strong>Notes for student: </strong> {{ classInfo.notes }}
             </p>
           </div>
@@ -134,11 +130,12 @@ export default {
   color: #444;
 }
 
-.class-material {
+.class-notes {
   color: #333;
 }
 
 .class-schedule {
   color: #555;
+  padding-bottom: 1rem;
 }
 </style>

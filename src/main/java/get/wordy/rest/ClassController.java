@@ -4,6 +4,7 @@ import get.wordy.core.api.IClassAccessService;
 import get.wordy.core.api.IClassService;
 import get.wordy.core.api.IVocabularyService;
 import get.wordy.core.api.bean.ClassInfo;
+import get.wordy.core.api.bean.ClassSchedule;
 import get.wordy.core.api.bean.Word;
 import get.wordy.core.api.bean.Vocabulary;
 import get.wordy.core.api.id.OwnerId;
@@ -61,7 +62,7 @@ public class ClassController {
         // group classes by day, while maintaining original order
         Map<String, List<ClassInfoResponse>> groupedClasses = new TreeMap<>();
         for (ClassInfoResponse classInfo : classes) {
-            for (ClassInfo.ClassSchedule schedule : classInfo.getSchedules()) {
+            for (ClassSchedule schedule : classInfo.getSchedules()) {
                 String day = schedule.getDayOfWeek().toLowerCase(); // ensure uniformity
                 if (dayOfWeekFilter.isEmpty() || day.equalsIgnoreCase(dayOfWeekFilter.get())) {
                     groupedClasses.computeIfAbsent(day, k -> new ArrayList<>())

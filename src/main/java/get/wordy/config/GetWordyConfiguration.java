@@ -84,7 +84,8 @@ public class GetWordyConfiguration implements WebMvcConfigurer {
         LOG.info("Creating class access service for data source = {}", dataSource);
         return new ClassAccessService(
                 new ClassAccessDao(jdbcTemplate),
-                txManager
+                txManager,
+                new ClassesDao(jdbcTemplate)
         );
     }
 
