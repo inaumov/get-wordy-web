@@ -103,10 +103,12 @@ export default {
           <div class="card-body">
             <div>
               <div class="class-details">
-                <span><strong>Name</strong> : {{ classItem['name'] }}</span>
+                <span><strong>{{ classItem['name'] }}</strong></span>
+              </div>
+              <div v-if="classItem['format']" class="class-details">
+                <span class="text-muted">{{ classItem['format'] }}</span>
               </div>
               <div class="class-details">
-                <span><strong>Time slots</strong> :</span>
                 <div v-if="classItem.timeSlots">
                   <span
                       v-for="(timeSlot, slotIndex) in classItem.timeSlots"
@@ -121,7 +123,9 @@ export default {
                 </div>
               </div>
               <div class="class-details">
-                <span><strong>Attendees</strong>:</span>
+                <span class="text-muted">
+                  <strong>Attendees:</strong>
+                </span>
                 <div v-if="classItem.hasAttendees">
                   <span
                       v-for="(attendee, attendeeIndex) in classItem['attendees']"
@@ -135,17 +139,10 @@ export default {
                   None
                 </div>
               </div>
-              <div v-if="classItem['format']" class="class-details">
-                <span><strong>Format</strong> : {{ classItem['format'] }}</span>
-              </div>
-              <div v-if="classItem['level']" class="class-details">
-                <span><strong>Level</strong> : {{ classItem['level'] }}</span>
-              </div>
-              <div v-if="classItem['material']" class="class-details">
-                <span><strong>Materials</strong> : {{ classItem['material'] }}</span>
-              </div>
-              <div v-if="classItem['notes']" class="class-details">
-                <span><strong>Notes</strong> : {{ classItem['notes'] }}</span>
+              <div v-if="classItem['drafts']" class="class-details">
+                <span class="text-muted">
+                  <strong>Draft vocabularies:</strong> {{ classItem['drafts'] }}
+                </span>
               </div>
             </div>
           </div>
@@ -176,20 +173,12 @@ export default {
   min-height: 178px;
 }
 
-.class-id {
-  color: grey;
-  font-size: 0.75rem;
-  right: 10px;
-  top: 10px;
-}
-
 .day-groups h3 {
   font-size: 1.5rem;
 }
 
 .badge {
   padding: 0.5rem;
-  margin: 0.25rem;
   color: DarkSlateGrey;
   font-weight: bold;
 }
