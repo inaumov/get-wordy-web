@@ -28,9 +28,7 @@ export default {
 
       let newItem = {
         name: formData.get('name'),
-        classFormat: formData.get('classFormat'),
-        classLevel: formData.get('classLevel'),
-        material: formData.get('material'),
+        format: formData.get('format'),
         notes: formData.get('notes')
       };
       createClass(newItem)
@@ -60,26 +58,13 @@ export default {
         <!-- first row: class name and class format -->
         <div class="row mb-3">
           <div class="col-6">
-            <label for="name" class="form-label">Class name (or time slot)<i>*</i></label>
+            <label for="name" class="form-label">Name<i>*</i></label>
             <input type="text" class="form-control" id="name" name="name" autocomplete="off" required>
           </div>
           <div class="col-6">
-            <label for="classFormat" class="form-label">Class format</label>
-            <input type="text" class="form-control" id="classFormat" name="classFormat" autocomplete="off">
+            <label for="format" class="form-label">Format</label>
+            <input type="text" class="form-control" id="format" name="format" autocomplete="off">
             <small class="form-text text-muted">e.g., Online, In-person, Hybrid, VIP</small>
-          </div>
-        </div>
-
-        <!-- second row: class level and material -->
-        <div class="row mb-3">
-          <div class="col-6">
-            <label for="classLevel" class="form-label">Class level</label>
-            <input type="text" class="form-control" id="classLevel" name="classLevel" autocomplete="off">
-            <small class="form-text text-muted">e.g., Beginner, Intermediate, Advanced</small>
-          </div>
-          <div class="col-6">
-            <label for="material" class="form-label">Material details</label>
-            <input type="text" class="form-control" id="material" name="material" autocomplete="off">
           </div>
         </div>
 

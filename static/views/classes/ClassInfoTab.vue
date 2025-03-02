@@ -19,27 +19,64 @@ export default {
   created() {
     console.log("Prop classInfo in created:", this.classInfo);
   },
+  computed: {
+    isRepeatableLocal: {
+      get() {
+        return this.classInfo.isRepeatable;
+      },
+      set(value) {
+        this.classInfo.isRepeatable = value;
+      }
+    },
+    endDateLocal: {
+      get() {
+        return this.classInfo.endDate;
+      },
+      set(value) {
+        this.classInfo.endDate = value;
+      }
+    }
+  },
   methods: {
     onSubmit: function () {
-      // reset any previous validation state
-      this.$refs.classDays.classList.remove('is-invalid');
-      // validate the selected days
-      if (this.schedules.length === 0) {
-        // if no days are selected, apply the 'is-invalid' class
-        this.$refs.classDays.classList.add('is-invalid');
-        return;
+      if (this.isRepeatableLocal === true) {
+        // reset any previous validation state
+        this.$refs.classSchedules.classList.remove('is-invalid');
+        // validate the selected days
+        if (this.classInfo.schedules.length === 0) {
+          // if no days are selected, apply the 'is-invalid' class
+          this.$refs.classSchedules.classList.add('is-invalid');
+          return;
+        }
       }
+      if (this.isRepeatableLocal === false) {
+        // reset any previous validation state
+        this.$refs.classOneTimeDate.classList.remove('is-invalid');
+        // validate class one time date
+        if (!this.endDateLocal) {
+          // if no end date selected, apply the 'is-invalid' class
+          this.$refs.classOneTimeDate.classList.add('is-invalid');
+          return;
+        }
+      }
+
       let form = document.getElementById('start-class-form');
       let formData = new FormData(form);
 
-      let newItem = {
+      let isRepeatable = this.isRepeatableLocal;
+      let requestData = {
         name: formData.get('name'),
-        classFormat: formData.get('classFormat'),
-        classLevel: formData.get('classLevel'),
-        material: formData.get('material'),
-        notes: formData.get('notes')
+        format: formData.get('format'),
+        notes: formData.get('notes'),
+        isRepeatable: isRepeatable,
       };
-      updateClassInfo(newItem)
+      if (isRepeatable === true) {
+        requestData['schedules'] = this.classInfo.schedules
+      }
+      if (isRepeatable === false) {
+        requestData['endDate'] = this.endDateLocal
+      }
+      updateClassInfo(requestData)
           .then(response => {
             if (response.ok) {
             }
@@ -47,10 +84,10 @@ export default {
           });
     },
     addSchedule() {
-      this.schedules.push({ dayOfWeek: '', startTime: '', endTime: '' });
+      this.classInfo.schedules.push({ dayOfWeek: '', startTime: '', endTime: '' });
     },
     removeSchedule(index) {
-      this.schedules.splice(index, 1);
+      this.classInfo.schedules.splice(index, 1);
     },
   },
 };
@@ -65,36 +102,31 @@ export default {
         <!-- first row: class name and class format -->
         <div class="row mb-3">
           <div class="col-6">
-            <label for="name" class="form-label">Class name (or time slot)<i>*</i></label>
+            <label for="name" class="form-label">Name<i>*</i></label>
             <input type="text" v-model="this.classInfo['name']" class="form-control" id="name" name="name"
                    autocomplete="off" required>
           </div>
           <div class="col-6">
-            <label for="classFormat" class="form-label">Class format</label>
-            <input type="text" v-model="this.classInfo['format']" class="form-control" id="classFormat"
-                   name="classFormat"
+            <label for="format" class="form-label">Format</label>
+            <input type="text" v-model="this.classInfo['format']" class="form-control" id="format"
+                   name="format"
                    autocomplete="off">
             <small class="form-text text-muted">e.g., Online, In-person, Hybrid, VIP</small>
           </div>
         </div>
 
-        <!-- second row: class level and material -->
         <div class="row mb-3">
           <div class="col-6">
-            <label for="classLevel" class="form-label">Class level</label>
-            <input type="text" v-model="this.classInfo['level']" class="form-control" id="classLevel" name="classLevel"
-                   autocomplete="off">
-            <small class="form-text text-muted">e.g., Beginner, Intermediate, Advanced</small>
-          </div>
-          <div class="col-6">
-            <label for="material" class="form-label">Material details</label>
-            <input type="text" v-model="this.classInfo['material']" class="form-control" id="material" name="material"
-                   autocomplete="off">
+            <label class="form-label">Class Type</label>
+            <select v-model="isRepeatableLocal" class="form-select">
+              <option :value="true">Repeatable (Scheduled)</option>
+              <option :value="false">One-time Class</option>
+            </select>
           </div>
         </div>
 
-        <!-- third row: class days selection -->
-        <div class="row mb-3">
+        <!-- schedule selection (visible only if repeatable) -->
+        <div class="row mb-3" v-if="this.isRepeatableLocal === true">
           <div class="col-12">
             <label for="classSchedules" class="form-label">
               Select the schedules for the class<i>*</i>
@@ -142,19 +174,32 @@ export default {
               </div>
             </div>
 
+            <!-- Validation Feedback -->
+            <div v-if="this.classInfo?.schedules?.length === 0" class="invalid-feedback">
+              Please add at least one schedule.
+            </div>
+
             <!-- Add Schedule Button -->
             <button
                 type="button"
                 class="btn btn-primary mt-2"
                 @click="addSchedule"
             >
-              Add Schedule
+              Add more slots
             </button>
 
-            <!-- Validation Feedback -->
-            <div v-if="schedules.length === 0" class="invalid-feedback">
-              Please add at least one schedule.
-            </div>
+          </div>
+        </div>
+
+        <!-- one-time end date selection -->
+        <div v-if="this.isRepeatableLocal === false" class="row mb-3">
+          <div ref="classOneTimeDate" id="classOneTimeDate" class="col-12">
+            <label class="form-label" for="endDate">Date scheduled<i>*</i></label>
+            <input type="date" id="endDate" v-model="this.endDateLocal" class="form-control">
+          </div>
+          <!-- Validation Feedback -->
+          <div v-if="!this.endDateLocal" class="invalid-feedback">
+            Please select the end date for this activity.
           </div>
         </div>
 
