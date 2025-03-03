@@ -54,7 +54,7 @@ export default {
             aria-controls="materials"
             aria-selected="true"
         >
-          Materials
+          Vocabularies
         </button>
       </li>
       <li class="nav-item" role="presentation">

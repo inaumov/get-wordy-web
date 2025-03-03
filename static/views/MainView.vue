@@ -31,10 +31,10 @@ export default {
     menuItems() {
       if (this.isLoggedIn) {
         if (this.permissions.includes('P_SHARED_CLASS')) {
-          return useMenuConfig('sharedAccess');
+          return useMenuConfig.sharedAccess(this.activeClass);
         }
         if (this.permissions.includes('P_MANAGE_CLASSES')) {
-          return useMenuConfig('teacherAccess');
+          return useMenuConfig.teacherAccess();
         }
       }
       return [];
@@ -50,7 +50,9 @@ export default {
   mounted() {
     // Example: Simulate fetching user data (replace with real auth logic)
     this.fetchUserData();
-    this.fetchAttendeeClasses();
+    if (this.permissions.some(p => p === 'P_SHARED_CLASS')) {
+      this.fetchAttendeeClasses();
+    }
   },
   methods: {
     fetchUserData() {

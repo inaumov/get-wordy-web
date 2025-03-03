@@ -1,5 +1,5 @@
 <script>
-import {getVocabularies} from '@/js/classes-api.js';
+import {getSharedVocabularies} from '@/js/classes-api.js';
 
 export default {
   name: 'SharedMaterialsView',
@@ -7,14 +7,13 @@ export default {
   props: ['classId'],
   data() {
     return {
-      classId: 'desna-4xRg7',
       name: '',
       vocabularies: [],
     }
   },
   methods: {
     async getData() {
-      const response = await getVocabularies(this.classId);
+      const response = await getSharedVocabularies(this.classId);
       this.vocabularies = await response.json();
     }
   },

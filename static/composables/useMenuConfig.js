@@ -1,6 +1,6 @@
-export function useMenuConfig(accessType) {
-    const menuConfig = {
-        teacherAccess: [
+export const useMenuConfig = {
+    teacherAccess() {
+        return [
             {
                 uri: '/Materials',
                 label: 'Learning Materials',
@@ -19,8 +19,22 @@ export function useMenuConfig(accessType) {
                 icon: 'bi bi-arrow-repeat',
                 title: 'Manage reusable vocabulary templates'
             },
-        ],
-        sharedAccess: [
+        ];
+    },
+
+    sharedAccess(activeClass) {
+        const defaultMenuItem = {
+            uri: '/Dictionaries',
+            label: 'My Space',
+            icon: 'bi bi-box',
+            title: 'Manage personal dictionaries and materials'
+        };
+
+        if (!activeClass) {
+            return [defaultMenuItem];
+        }
+
+        return [
             {
                 uri: '/MyClasses',
                 label: 'My Classes',
@@ -28,19 +42,12 @@ export function useMenuConfig(accessType) {
                 title: 'Assigned classes'
             },
             {
-                uri: '/Classroom',
-                label: 'Learning Materials',
+                uri: `/Classroom/${activeClass.classId}`,
+                label: 'Vocabularies',
                 icon: 'bi bi-list',
-                title: 'Access classroom-shared materials'
+                title: 'Access classroom-shared vocabularies'
             },
-            {
-                uri: '/Dictionaries',
-                label: 'My Space',
-                icon: 'bi bi-box',
-                title: 'Manage personal dictionaries and materials'
-            },
-        ],
-    };
-
-    return menuConfig[accessType] || [];
+            defaultMenuItem
+        ];
+    }
 }

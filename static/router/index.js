@@ -38,9 +38,14 @@ const router = createRouter({
             component: DictionariesView
         },
         {
-            path: '/Classroom',
+            path: '/Classroom/:classId',
             name: 'classroom',
-            component: SharedMaterials
+            component: SharedMaterials,
+            props: (route) => (
+                {
+                    classId: route.params.classId,
+                }
+            ),
         },
         {
             path: '/MyClasses',

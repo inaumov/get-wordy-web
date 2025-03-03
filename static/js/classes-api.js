@@ -1,5 +1,6 @@
 const classAPI = import.meta.env.VITE_BACKEND_API + "classes";
 const usersAPI = import.meta.env.VITE_USERS_API;
+const myClassesAPI = import.meta.env.VITE_BACKEND_API + "users/my-classes";
 const templatesAPI = import.meta.env.VITE_BACKEND_API + "templates";
 const vocabulariesAPI = import.meta.env.VITE_BACKEND_API + "vocabularies";
 
@@ -15,6 +16,21 @@ export function getUserClasses() {
 
     return fetch(getRequest)
         .catch(err => console.error("Error fetching accessible classes:", err));
+}
+
+export function getSharedVocabularies(classId) {
+    let headers = new Headers();
+    headers.append('Content-Type', 'application/json');
+
+    let initObject = {
+        method: 'GET',
+        headers: headers,
+    };
+
+    let getRequest = new Request(myClassesAPI + "/" + classId + "/vocabularies", initObject);
+
+    return fetch(getRequest)
+        .catch(err => console.log("HTTP error: ", err));
 }
 
 export function fetchClasses(dayOfWeek) {
