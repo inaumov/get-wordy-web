@@ -72,7 +72,7 @@ export default {
     <!-- sidebar with menu items -->
     <sidebar class="sidebar" v-if="showSidebar" :menuItems="menuItems" :activeClass="this.activeClass"/>
     <!-- main content area -->
-    <main class="main-content">
+    <main class="main-content" style="overflow-y: auto;">
       <router-view/>
     </main>
   </div>
