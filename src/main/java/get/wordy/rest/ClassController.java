@@ -148,15 +148,24 @@ public class ClassController {
 
         LOG.info("Getting a vocabulary for the class id = {}, and vocabulary id = {}", classId, vocabId);
 
+        Vocabulary vocabulary = vocabularyService.getVocabulary(createClassOwnerId(classId), vocabId);
+        if (vocabulary.getWordsTotal() == 0) {
+            Map<String, Object> empty = Map.of(
+                    "vocabId", vocabId,
+                    "wordsTotal", 0,
+                    "isShared", vocabulary.isShared(),
+                    "name", vocabulary.getName(),
+                    "words", Collections.emptyList()
+            );
+            return new ResponseEntity<>(empty, HttpStatus.OK);
+        }
         List<Word> vocabWords = vocabularyService.getWords(createClassOwnerId(classId), vocabId);
 
-        if (vocabWords.isEmpty()) {
-            LOG.info("No vocabulary found by id = {}", vocabId);
-            return new ResponseEntity<>(Collections.emptyMap(), HttpStatus.OK);
-        }
         Map<String, Object> vocabularyResponse = Map.of(
                 "vocabId", vocabId,
-                "name", "Test",
+                "wordsTotal", vocabulary.getWordsTotal(),
+                "isShared", vocabulary.isShared(),
+                "name", vocabulary.getName(),
                 "words", vocabWords
                         .stream()
                         .map(this::toWordResponse)

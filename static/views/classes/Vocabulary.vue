@@ -110,7 +110,7 @@ export default {
     <!-- submit -->
     <div class="d-flex justify-content-end p-4">
         <button type="button" class="btn btn-primary border btn-md" v-on:click="onReady">
-          {{this.isShared ? 'Publish' : 'Unpublish'}}
+          {{ this.isShared === false ? 'Publish' : 'Unpublish' }}
         </button>
     </div>
 
