@@ -1,5 +1,5 @@
 <script>
-import {getVocabulary} from "@/js/classes-api.js";
+import {getSharedVocabulary} from "@/js/shared-vocabs-api.js";
 
 export default {
   props: ['classId', 'vocabId'],
@@ -12,7 +12,7 @@ export default {
   },
   methods: {
     async getData() {
-      const response = await getVocabulary(this.classId, this.vocabId);
+      const response = await getSharedVocabulary(this.classId, this.vocabId);
       const vocabulary = await response.json();
       this.name = vocabulary['name'];
       this.words = vocabulary['words'] || [];

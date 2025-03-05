@@ -1,21 +1,5 @@
 const classAPI = import.meta.env.VITE_BACKEND_API + "/classes";
-const myClassesAPI = import.meta.env.VITE_BACKEND_API + "/user/my-classes";
 const templatesAPI = import.meta.env.VITE_BACKEND_API + "/templates";
-
-export function getSharedVocabularies(classId) {
-    let headers = new Headers();
-    headers.append('Content-Type', 'application/json');
-
-    let initObject = {
-        method: 'GET',
-        headers: headers,
-    };
-
-    let getRequest = new Request(myClassesAPI + "/" + classId + "/vocabularies", initObject);
-
-    return fetch(getRequest)
-        .catch(err => console.log("HTTP error: ", err));
-}
 
 export function fetchClasses(dayOfWeek) {
     let headers = new Headers();

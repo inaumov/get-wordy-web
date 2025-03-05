@@ -11,6 +11,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -47,11 +48,12 @@ public class SharedVocabulariesController {
 
         List<Map<String, Object>> vocabulariesResponse = vocabularyService.getVocabularies(createClassOwnerId(classId))
                 .stream()
+                .filter(Vocabulary::isShared) // !important
                 .map(this::toResponse)
                 .toList();
 
         if (vocabulariesResponse.isEmpty()) {
-            LOG.info("No vocabularies found for the class = {}", classId);
+            LOG.info("No available vocabularies found for the class = {}", classId);
             return new ResponseEntity<>(Collections.emptyList(), HttpStatus.OK);
         }
         return new ResponseEntity<>(vocabulariesResponse, HttpStatus.OK);
@@ -72,16 +74,25 @@ public class SharedVocabulariesController {
         LOG.info("Getting shared vocabulary = {} for the user = {}, and class id = {}", vocabId, user.getName(), classId);
 
         accessService.hasAccess(classId, user.getName());
+        Vocabulary vocabulary = vocabularyService.getVocabulary(createClassOwnerId(classId), vocabId);
+        if (!vocabulary.isShared()) {
+            throw new AccessDeniedException("Permission denied: no access to this vocabulary = " + vocabId);
+        }
+
+        if (vocabulary.getWordsTotal() == 0) {
+            Map<String, Object> empty = Map.of(
+                    "vocabId", vocabId,
+                    "name", vocabulary.getName(),
+                    "wordsTotal", 0,
+                    "words", Collections.emptyList());
+            return new ResponseEntity<>(empty, HttpStatus.OK);
+        }
 
         List<Word> vocabWords = vocabularyService.getWords(createClassOwnerId(classId), vocabId);
-
-        if (vocabWords.isEmpty()) {
-            LOG.info("No vocabulary found by id = {}", vocabId);
-            return new ResponseEntity<>(Collections.emptyMap(), HttpStatus.OK);
-        }
         Map<String, Object> vocabularyResponse = Map.of(
                 "vocabId", vocabId,
-                "name", "Test",
+                "name", vocabulary.getName(),
+                "wordsTotal", vocabulary.getWordsTotal(),
                 "words", vocabWords
                         .stream()
                         .map(this::toWordResponse)

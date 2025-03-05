@@ -1,5 +1,5 @@
 <script>
-import {getSharedVocabularies} from '@/js/classes-api.js';
+import {getSharedVocabularies} from '@/js/shared-vocabs-api.js';
 
 export default {
   name: 'SharedMaterialsView',
