@@ -13,7 +13,6 @@ public class ClassInfoRequest {
 
     private String name;
     private String format;
-    private String level;
-    private String material;
     private String notes;
+    private boolean isRepeatable;
 }

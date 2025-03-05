@@ -234,10 +234,10 @@ public class ClassController {
                 "desna-" + RandomStringUtils.secure().nextAlphanumeric(5),
                 request.getName(),
                 request.getFormat(),
-                request.getLevel(),
-                request.getMaterial(),
+                null,
+                null,
                 request.getNotes(),
-                null
+                request.isRepeatable()
         );
     }
 

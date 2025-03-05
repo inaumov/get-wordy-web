@@ -1,4 +1,4 @@
-const vocabulariesAPI = import.meta.env.VITE_BACKEND_API + "vocabularies";
+const vocabulariesAPI = import.meta.env.VITE_BACKEND_API + "/vocabularies";
 
 export function fetchExplanation(vocabId, wordId) {
     let headers = new Headers();

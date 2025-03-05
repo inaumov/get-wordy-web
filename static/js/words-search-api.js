@@ -1,4 +1,4 @@
-const searchAPI = import.meta.env.VITE_BACKEND_API + "words";
+const searchAPI = import.meta.env.VITE_BACKEND_API + "/words";
 
 export function searchWordData(value) {
 

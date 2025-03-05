@@ -24,7 +24,7 @@ import java.util.Map;
 
 @RestController
 @PreAuthorize("hasAuthority('P_SHARED_CLASS')")
-@RequestMapping(value = "/users/my-classes")
+@RequestMapping(value = "/user/my-classes")
 public class SharedVocabulariesController {
 
     private static final Logger LOG = LoggerFactory.getLogger(SharedVocabulariesController.class);

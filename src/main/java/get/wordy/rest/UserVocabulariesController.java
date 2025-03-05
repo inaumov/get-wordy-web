@@ -22,7 +22,7 @@ import java.util.List;
 
 @RestController
 @PreAuthorize("hasAuthority('P_MANAGE_OWN_VOCAB')")
-@RequestMapping(value = "/user/vocabularies")
+@RequestMapping(value = "/user/my-vocabularies")
 public class UserVocabulariesController {
     private static final Logger LOG = LoggerFactory.getLogger(UserVocabulariesController.class);
 

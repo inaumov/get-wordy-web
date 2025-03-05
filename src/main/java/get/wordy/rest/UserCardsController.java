@@ -19,7 +19,7 @@ import java.util.*;
 
 @RestController
 @PreAuthorize("hasAuthority('P_MANAGE_OWN_VOCAB')")
-@RequestMapping(value = "/user/vocabularies")
+@RequestMapping(value = "/user/my-vocabularies")
 public class UserCardsController extends HttpServlet {
     private static final Logger LOG = LoggerFactory.getLogger(UserCardsController.class);
 

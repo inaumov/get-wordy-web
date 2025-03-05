@@ -1,4 +1,4 @@
-const vocabsAPI = import.meta.env.VITE_BACKEND_API + "user/vocabularies";
+const vocabsAPI = import.meta.env.VITE_BACKEND_API + "/user/my-vocabularies";
 
 export function fetchDictionaries() {
     let headers = new Headers();

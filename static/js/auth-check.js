@@ -1,3 +1,5 @@
+const usersAPI = import.meta.env.VITE_USERS_API;
+
 import {ref, provide, inject} from 'vue';
 
 const isLoggedIn = ref(false);
@@ -5,7 +7,7 @@ const permissions = ref([]);
 
 export async function checkLoginStatus() {
     try {
-        const response = await fetch('/users/auth/status', {
+        const response = await fetch(usersAPI + '/auth/status', {
             method: 'GET',
             credentials: 'include', // include cookies in the request,
             headers: {
@@ -48,7 +50,7 @@ export async function logout() {
 
 async function loadPermissions() {
     try {
-        const response = await fetch('/users/permissions', {
+        const response = await fetch(usersAPI + '/permissions', {
             method: 'GET',
             credentials: 'include', // include cookies in the request,
             headers: {
@@ -63,6 +65,20 @@ async function loadPermissions() {
     } catch (error) {
         console.error('Error while getting user permissions:', error);
     }
+}
+
+export function getUserClasses() {
+    let headers = new Headers();
+    headers.append('Content-Type', 'application/json');
+
+    let initObject = {
+        headers: headers,
+    };
+
+    let getRequest = new Request(usersAPI + "/my-classes", initObject);
+
+    return fetch(getRequest)
+        .catch(err => console.error("Error fetching accessible classes:", err));
 }
 
 export function provideAuth() {

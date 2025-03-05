@@ -1,4 +1,4 @@
-const classAPI = import.meta.env.VITE_BACKEND_API + "classes";
+const classAPI = import.meta.env.VITE_BACKEND_API + "/classes";
 
 export function assignUser(classId, userIdentity) {
     let headers = new Headers();

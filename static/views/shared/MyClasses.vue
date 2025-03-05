@@ -1,5 +1,5 @@
 <script>
-import {getUserClasses} from '@/js/classes-api.js';
+import {getUserClasses} from '@/js/auth-check.js';
 
 export default {
   name: 'MyClasses',
