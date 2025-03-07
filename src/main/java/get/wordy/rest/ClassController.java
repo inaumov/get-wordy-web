@@ -4,7 +4,6 @@ import get.wordy.core.api.IClassAccessService;
 import get.wordy.core.api.IClassService;
 import get.wordy.core.api.IVocabularyService;
 import get.wordy.core.api.bean.ClassInfo;
-import get.wordy.core.api.bean.ClassSchedule;
 import get.wordy.core.api.bean.Word;
 import get.wordy.core.api.bean.Vocabulary;
 import get.wordy.core.api.id.OwnerId;
@@ -44,8 +43,8 @@ public class ClassController {
     }
 
     @GetMapping
-    public ResponseEntity<Map<String, List<ClassInfoResponse>>> getClassesInfo(Principal user,
-                                                                               @RequestParam(value = "filter", required = false) Optional<String> dayOfWeekFilter) {
+    public ResponseEntity<List<ClassInfoResponse>> getClassesInfo(Principal user,
+                                                                  @RequestParam(value = "filter", required = false) Optional<String> dayOfWeekFilter) {
         LOG.info("Getting {} classes info managed by the user = {}", dayOfWeekFilter.isEmpty() ? "all" : dayOfWeekFilter, user.getName());
 
         // fetch classes and filter by dayOfWeek at the data source level if a filter is provided
@@ -59,19 +58,7 @@ public class ClassController {
                                         .anyMatch(schedule -> schedule.getDayOfWeek().equalsIgnoreCase(dayOfWeekFilter.get())))
                 .toList();
 
-        // group classes by day, while maintaining original order
-        Map<String, List<ClassInfoResponse>> groupedClasses = new TreeMap<>();
-        for (ClassInfoResponse classInfo : classes) {
-            for (ClassSchedule schedule : classInfo.getSchedules()) {
-                String day = schedule.getDayOfWeek().toLowerCase(); // ensure uniformity
-                if (dayOfWeekFilter.isEmpty() || day.equalsIgnoreCase(dayOfWeekFilter.get())) {
-                    groupedClasses.computeIfAbsent(day, k -> new ArrayList<>())
-                            .add(classInfo);
-                }
-            }
-        }
-
-        return ResponseEntity.ok(groupedClasses);
+        return ResponseEntity.ok(classes);
     }
 
     private ClassInfoResponse enrichWithAttendees(ClassInfoResponse response) {
@@ -83,6 +70,17 @@ public class ClassController {
                                                           @Valid @RequestBody ClassInfoRequest classInfoRequest) {
 
         LOG.info("Add new class info = {} request for the user = {}", classInfoRequest.getName(), user.getName());
+
+        var savedClass = classService.saveClassInfo(createUserOwnerId(user), copyClassInfo(classInfoRequest));
+        return ResponseEntity.created(URI.create("/" + savedClass.getClassId()))
+                .body(new ClassInfoResponse(savedClass));
+    }
+
+    @PutMapping
+    public ResponseEntity<ClassInfoResponse> editClassInfo(Principal user,
+                                                           @Valid @RequestBody ClassInfoEditRequest classInfoRequest) {
+
+        LOG.info("Update class info = {} request for the user = {}", classInfoRequest.getName(), user.getName());
 
         var savedClass = classService.saveClassInfo(createUserOwnerId(user), copyClassInfo(classInfoRequest));
         return ResponseEntity.created(URI.create("/" + savedClass.getClassId()))
@@ -239,8 +237,14 @@ public class ClassController {
     }
 
     public ClassInfo copyClassInfo(ClassInfoRequest request) {
+        String classId;
+        if (request instanceof ClassInfoEditRequest editRequest) {
+            classId = editRequest.getClassId();
+        } else {
+            classId = "desna-" + RandomStringUtils.secure().nextAlphanumeric(5);
+        }
         return new ClassInfo(
-                "desna-" + RandomStringUtils.secure().nextAlphanumeric(5),
+                classId,
                 request.getName(),
                 request.getFormat(),
                 null,

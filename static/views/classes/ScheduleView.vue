@@ -16,7 +16,11 @@ export default {
     navigateToClasses(day) {
       // navigate to the page showing classes for the selected day
       this.$router.push({name: 'day-classes', params: {day}});
-      console.log(`Navigate to classes for ${day}`);
+    },
+    addNewClass() {
+      this.$router.push({
+        name: 'add-new-class'
+      });
     },
   },
 
@@ -25,8 +29,9 @@ export default {
 
 <template>
   <div class="container p-4">
-    <div class="row justify-content-center text-center">
-      <div
+    <div class="row justify-content-center">
+      <p class="lead text-center">See a day tied vocabulary streamlines</p>
+      <div class="text-center"
           v-for="(day, index) in days"
           :key="index"
           :class="['col-2 col-sm-1', 'mb-4', 'day-button-container', { 'today': isToday(day) }]"
@@ -37,6 +42,24 @@ export default {
         >
           <span class="day-text">{{ day }}</span>
         </button>
+      </div>
+    </div>
+    <div class="d-flex mt-5 justify-content-center align-items-center">
+      <div class="text-center w-50">
+        <p class="lead">Start a new vocabulary streamline, or one time activity.</p>
+        <div class="d-flex justify-content-center mt-3">
+          <div class="card text-center w-100"
+               @click="addNewClass()"
+               data-bs-toggle="tooltip"
+               data-bs-placement="right"
+               title="Start a new class"
+               style="cursor: pointer;"
+          >
+            <div class="card-body d-flex justify-content-center align-items-center">
+              <i class="bi bi-plus" style="font-size: 2rem;"></i>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   </div>

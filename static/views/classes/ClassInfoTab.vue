@@ -117,7 +117,7 @@ export default {
 
         <div class="row mb-3">
           <div class="col-6">
-            <label class="form-label">Class Type</label>
+            <label class="form-label">Class Type<i>*</i></label>
             <select v-model="isRepeatableLocal" class="form-select">
               <option :value="true">Repeatable (Scheduled)</option>
               <option :value="false">One-time Class</option>
@@ -129,7 +129,7 @@ export default {
         <div class="row mb-3" v-if="this.isRepeatableLocal === true">
           <div class="col-12">
             <label for="classSchedules" class="form-label">
-              Select the schedules for the class<i>*</i>
+              Select the schedules for the class
             </label>
             <div ref="classSchedules" id="classSchedules" class="d-flex flex-column gap-2">
               <div
@@ -194,7 +194,7 @@ export default {
         <!-- one-time end date selection -->
         <div v-if="this.isRepeatableLocal === false" class="row mb-3">
           <div ref="classOneTimeDate" id="classOneTimeDate" class="col-12">
-            <label class="form-label" for="endDate">Date scheduled<i>*</i></label>
+            <label class="form-label" for="endDate">Date scheduled</label>
             <input type="date" id="endDate" v-model="this.endDateLocal" class="form-control">
           </div>
           <!-- Validation Feedback -->
@@ -206,7 +206,7 @@ export default {
         <!-- last row: notes (textarea) -->
         <div class="row mb-3">
           <div class="col-12">
-            <label for="notes" class="form-label">Any additional notes</label>
+            <label for="notes" class="form-label">Any additional notes for student</label>
             <textarea class="form-control" id="notes" name="notes" rows="5" maxlength="500"
                       v-model="this.classInfo['notes']"
                       autocomplete="off"></textarea>

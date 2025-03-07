@@ -20,7 +20,11 @@ export default {
     async getData() {
       const response = await fetchClasses(this.day);
       let dayClasses = await response.json();
-      this.classList = dayClasses.hasOwnProperty(this.day) ? dayClasses[this.day].map(item => {
+      this.classList = dayClasses
+          .filter(item =>
+              item.schedules?.some(schedule => schedule?.dayOfWeek.toLowerCase() === this.day)
+          )
+          .map(item => {
         // add the 'hasAttendees' property based on the condition
         return {
           ...item, // spread the existing properties
@@ -29,7 +33,7 @@ export default {
             return this.formatTimeSlot(x)
           })
         };
-      }) : [];
+      });
     },
     navigateToClassDetails(classItem) {
       this.router.push({
@@ -147,10 +151,11 @@ export default {
             </div>
           </div>
         </div>
-        <div v-if="false" class="col-md-4 card" @click="addNewClass()"
+        <div class="col-md-4 card" @click="addNewClass()"
              data-bs-toggle="tooltip"
              data-bs-placement="right"
              title="Start a new class"
+             style="cursor: pointer;"
         >
           <div class="card-body d-flex justify-content-center align-items-center">
             <div>
@@ -162,8 +167,23 @@ export default {
       </div>
     </div>
   </div>
-  <div v-else class="d-flex justify-content-center p-5">
-    <p class="lead">No classes registered yet, please create.</p>
+  <div v-else class="d-flex justify-content-center align-items-center vh-100">
+    <div class="text-center w-50">
+      <p class="lead">No classes registered yet, please create.</p>
+      <div class="d-flex justify-content-center mt-3">
+        <div class="card text-center w-100"
+             @click="addNewClass()"
+             data-bs-toggle="tooltip"
+             data-bs-placement="right"
+             title="Start a new class"
+             style="cursor: pointer;"
+        >
+          <div class="card-body d-flex justify-content-center align-items-center">
+            <i class="bi bi-plus" style="font-size: 2rem;"></i>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
