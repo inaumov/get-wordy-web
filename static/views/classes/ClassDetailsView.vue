@@ -1,13 +1,12 @@
 <script>
 import ClassInfo from "./ClassInfoTab.vue";
-import Materials from "./MaterialsTab.vue";
 import Attendees from "./AttendeesTab.vue";
 import {getClass} from "@/js/classes-api.js";
 
 export default {
   props: ['classId'],
   name: "ClassDetails",
-  components: {Materials, ClassInfo, Attendees},
+  components: {ClassInfo, Attendees},
   data() {
     return {
       classInfo: {
@@ -46,27 +45,13 @@ export default {
       <li class="nav-item" role="presentation">
         <button
             class="nav-link active"
-            id="materials-tab"
-            data-bs-toggle="tab"
-            data-bs-target="#materials"
-            type="button"
-            role="tab"
-            aria-controls="materials"
-            aria-selected="true"
-        >
-          Vocabularies
-        </button>
-      </li>
-      <li class="nav-item" role="presentation">
-        <button
-            class="nav-link"
             id="class-info-tab"
             data-bs-toggle="tab"
             data-bs-target="#class-info"
             type="button"
             role="tab"
             aria-controls="class-info"
-            aria-selected="false"
+            aria-selected="true"
         >
           Class Info
         </button>
@@ -91,14 +76,6 @@ export default {
     <div class="tab-content mt-3" id="classDetailsTabContent">
       <div
           class="tab-pane fade show active"
-          id="materials"
-          role="tabpanel"
-          aria-labelledby="materials-tab"
-      >
-        <Materials v-bind="{classId: this.classId}"/>
-      </div>
-      <div
-          class="tab-pane fade"
           id="class-info"
           role="tabpanel"
           aria-labelledby="class-info-tab"

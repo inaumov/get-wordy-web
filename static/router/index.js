@@ -1,7 +1,7 @@
 import {createRouter, createWebHistory} from 'vue-router'
 import LandingPage from "@/pages/LandingPage.vue";
 import MainView from "@/views/MainView.vue";
-import ClassVocabularies from "@/views/classes/ClassVocabularies.vue";
+import MaterialsTab from "@/views/classes/MaterialsTab.vue";
 import DictionariesView from "@/views/DictionariesView.vue";
 import ClassListView from "@/views/ClassListView.vue";
 import SharedMaterials from "@/views/shared/SharedMaterials.vue";
@@ -131,9 +131,9 @@ const router = createRouter({
             component: () => import('@/views/classes/ManageClassView.vue')
         },
         {
-            path: '/Classes/:classId/Vocabularies',
+            path: '/Streamline/:classId/Vocabularies',
             name: 'class-vocabularies',
-            component: ClassVocabularies,
+            component: MaterialsTab,
             props: (route) => (
                 {
                     classId: route.params.classId

@@ -26,9 +26,9 @@ export default {
             };
           });
     },
-    navigateToClassDetails(classItem) {
+    navigateToVocabularies(classItem) {
       this.router.push({
-        name: 'class-details',
+        name: 'class-vocabularies',
         params: {
           classId: classItem['classId']
         }
@@ -71,7 +71,7 @@ export default {
     <div class="row mx-1" v-for="classItem in streamline">
       <div class="card my-2"
            :key="classItem['classId']"
-           @click="navigateToClassDetails(classItem)">
+           @click="navigateToVocabularies(classItem)">
         <div class="card-body">
           <div>
             <div class="class-details">
