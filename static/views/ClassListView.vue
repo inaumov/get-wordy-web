@@ -42,7 +42,6 @@ export default {
               classId: classItem['classId']
             }
           });
-      console.log("Selected class: id = ", classItem['classId'], ", name = ", classItem['name'])
     },
     addNewClass() {
       this.router.push({
@@ -143,11 +142,6 @@ export default {
                   None
                 </div>
               </div>
-              <div v-if="classItem['drafts']" class="class-details">
-                <span class="text-muted">
-                  <strong>Draft vocabularies:</strong> {{ classItem['drafts'] }}
-                </span>
-              </div>
             </div>
           </div>
         </div>
@@ -202,18 +196,5 @@ export default {
   color: DarkSlateGrey;
   font-weight: bold;
 }
-
-.pastel-blue { background-color: rgba(124, 185, 232, 0.9); }
-.pastel-pink { background-color: rgba(247, 168, 184, 0.9); }
-.pastel-yellow { background-color: rgba(255, 178, 48, 1); }  /* darker yellow */
-.pastel-green { background-color: rgba(168, 213, 186, 0.9); }
-.pastel-lavender { background-color: rgba(185, 168, 217, 0.9); }
-.pastel-peach { background-color: rgba(255, 124, 85, 1); }   /* darker peach/orange */
-.pastel-mint { background-color: rgba(141, 228, 161, 0.9); }
-.pastel-coral { background-color: rgba(255, 111, 97, 0.9); }
-.pastel-lilac { background-color: rgba(216, 167, 208, 0.9); }
-.pastel-lemon { background-color: rgba(255, 228, 87, 1); }  /* slightly darker yellow */
-.pastel-sky { background-color: rgba(163, 201, 255, 0.9); }
-.pastel-beige { background-color: rgba(244, 209, 176, 0.9); }
 
 </style>

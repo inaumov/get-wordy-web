@@ -8,6 +8,7 @@ import SharedMaterials from "@/views/shared/SharedMaterials.vue";
 import ScheduleView from "@/views/classes/ScheduleView.vue";
 import ClassDetailsView from "@/views/classes/ClassDetailsView.vue";
 import MyClasses from "@/views/shared/MyClasses.vue";
+import StreamlineView from "@/views/StreamlineView.vue";
 
 const router = createRouter({
     history: createWebHistory(import.meta.env.BASE_URL),
@@ -28,9 +29,10 @@ const router = createRouter({
             component: ScheduleView
         },
         {
-            path: '/Attendees',
-            name: 'schedule',
-            component: ScheduleView
+            path: '/Streamline',
+            name: 'streamline',
+            component: StreamlineView,
+            props: true,
         },
         {
             path: '/Dictionaries',
@@ -53,7 +55,7 @@ const router = createRouter({
             component: MyClasses
         },
         {
-            path: '/Schedule/:day',
+            path: '/Classes/:day',
             name: 'day-classes',
             component: ClassListView,
             props: true,
