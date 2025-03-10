@@ -3,15 +3,14 @@
 export default {
   data() {
     return {
-      days: ["sun", "mon", "tue", "wed", "thu", "fri", "sat"],
+      days: ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"],
     };
   },
   methods: {
     isToday(day) {
       const today = new Date();
-      const dayNames = ["sun", "mon", "tue", "wed", "thu", "fri", "sat"];
       const todayIndex = today.getDay(); // get day index (0-6)
-      return dayNames[todayIndex] === day;
+      return this.days[todayIndex] === day;
     },
     navigateToClasses(day) {
       // navigate to the page showing classes for the selected day
@@ -30,7 +29,7 @@ export default {
 <template>
   <div class="container p-4">
     <div class="row justify-content-center">
-      <p class="lead text-center">See a day tied vocabulary streamlines</p>
+      <p class="lead text-center">View and manage vocabulary streamlining groups and their assignees.</p>
       <div class="text-center"
           v-for="(day, index) in days"
           :key="index"
@@ -46,7 +45,7 @@ export default {
     </div>
     <div class="d-flex mt-5 justify-content-center align-items-center">
       <div class="text-center w-50">
-        <p class="lead">Start a new vocabulary streamline, or one time activity.</p>
+        <p class="lead">Start a new group to streamline vocabulary learning.</p>
         <div class="d-flex justify-content-center mt-3">
           <div class="card text-center w-100"
                @click="addNewClass()"

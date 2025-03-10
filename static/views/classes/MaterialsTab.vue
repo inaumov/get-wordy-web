@@ -13,7 +13,6 @@ export default {
   </div>
 
   <div class="p-3">
-    <div class="pt-3">
       <div class="d-flex flex-column align-items-end">
         <button class="btn btn-md" v-on:click="" title="Add printable materials">
           <i class="bi bi-file-earmark-pdf"></i>
@@ -28,7 +27,6 @@ export default {
           Add resources
         </button>
       </div>
-    </div>
     <ClassVocabularies v-bind="{classId: this.classId}"/>
   </div>
 

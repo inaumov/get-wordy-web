@@ -22,7 +22,7 @@ export default {
       let dayClasses = await response.json();
       this.classList = dayClasses
           .filter(item =>
-              item.schedules?.some(schedule => schedule?.dayOfWeek.toLowerCase() === this.day)
+              item.schedules?.some(schedule => schedule?.dayOfWeek.toLowerCase() === this.day.toLowerCase())
           )
           .map(item => {
         // add the 'hasAttendees' property based on the condition
@@ -39,7 +39,8 @@ export default {
       this.router.push({
             name: 'class-details',
             params: {
-              classId: classItem['classId']
+              classId: classItem['classId'],
+              day: this.day
             }
           });
     },

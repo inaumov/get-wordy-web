@@ -61,11 +61,12 @@ const router = createRouter({
             props: true,
         },
         {
-            path: '/Classes/:classId',
+            path: '/Classes/:day/:classId',
             name: 'class-details',
             component: ClassDetailsView,
             props: (route) => (
                 {
+                    day: route.params.day,
                     classId: route.params.classId,
                 }
             ),

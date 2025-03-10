@@ -4,7 +4,7 @@ import Attendees from "./AttendeesTab.vue";
 import {getClass} from "@/js/classes-api.js";
 
 export default {
-  props: ['classId'],
+  props: ['classId', 'day'],
   name: "ClassDetails",
   components: {ClassInfo, Attendees},
   data() {
@@ -34,7 +34,7 @@ export default {
 
 <template>
   <div class="p-4 d-flex flex-column align-items-start">
-    <router-link :to="{name: 'schedule'}" class="btn btn-secondary" title="Back">Back</router-link>
+    <router-link :to="{name: 'day-classes', params: {day: this.day}}" class="btn btn-secondary" title="Back">Back</router-link>
   </div>
 
   <div class="p-4">

@@ -27,23 +27,21 @@ export default {
 
 <template>
 
-  <div v-if="hasTemplates" class="p-4" id="templates">
-    <h4 class="pb-4">Prepared vocabularies</h4>
+  <div class="p-3" id="templates">
+    <h4 class="p-2">Prepared vocabularies</h4>
 
-      <div class="pb-3">
         <div class="d-flex flex-column align-items-end">
-          <button class="btn btn-md" v-on:click="" title="Add template vocabulary">
+          <button class="btn" v-on:click="" title="Add template vocabulary">
             <i class="bi bi-file-plus"></i>
             Add template
           </button>
         </div>
-      </div>
 
-  <div class="container">
+  <div class="container" v-if="hasTemplates">
     <div
         v-for="template in vocabularies"
         :key="template['templateId']"
-        class="mb-4 bg-light bg-opacity-10 border border-danger-subtle rounded">
+        class="my-2 bg-light bg-opacity-10 border border-danger-subtle rounded">
 
       <!-- make the whole element as clickable-->
       <router-link :to="{ name: 'template-preview', params: { templateId : template['templateId']}, query: { name: template['name'] }}"
@@ -62,10 +60,11 @@ export default {
 
     </div>
   </div>
-  </div>
 
-  <div v-else class="d-flex justify-content-center p-5">
-    <p class="lead">Loading vocabulary templates...</p>
+    <div v-else class="d-flex justify-content-center p-5">
+      <p class="lead">No vocabulary templates prepared so far. Please create.</p>
+    </div>
+
   </div>
 
 </template>
