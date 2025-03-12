@@ -33,6 +33,9 @@ export default {
 </script>
 
 <template>
+  <div class="p-4 d-flex flex-column align-items-start">
+    <router-link :to="{name: 'classroom', params: { classId: this.classId}}" class="btn btn-secondary" title="Back">Back</router-link>
+  </div>
   <div class="p-4">
     <div v-if="words" class="word-list">
       <h4 class="pb-4" style="vertical-align: middle;">{{this.name}}</h4>
@@ -49,21 +52,21 @@ export default {
 
       <div v-for="item in words" class="word-card">
         <div class="word-info">
-          <p><strong>Word:</strong> {{ item.word.value }} ({{ item.word.partOfSpeech }})</p>
-          <p><strong>Transcription:</strong> {{ item.word.transcription }}</p>
-          <p><strong>Meaning:</strong> {{ item.word.meaning }}</p>
-          <div v-if="item.sentences && item.sentences.length > 0" class="sentences">
+          <p><strong>Word:</strong> {{ item.value }} ({{ item.explanation.partOfSpeech }})</p>
+          <p><strong>Transcription:</strong> {{ item.transcription }}</p>
+          <p><strong>Meaning:</strong> {{ item.explanation.meaning }}</p>
+          <div v-if="item.explanation?.inContext" class="sentences">
             <strong>In Context:</strong>
             <ul>
-              <li v-for="(sentence, index) in item.sentences" :key="index">
+              <li v-for="(sentence, index) in item.explanation.inContext" :key="index">
                 {{ sentence }}
               </li>
             </ul>
           </div>
-          <div v-if="item.collocations && item.collocations.length > 0" class="collocations">
+          <div v-if="item.explanation?.collocations" class="collocations">
             <strong>Collocations:</strong>
             <ul>
-              <li v-for="(collocation, index) in item.collocations" :key="index">
+              <li v-for="(collocation, index) in item.explanation.collocations" :key="index">
                 {{ collocation }}
               </li>
             </ul>

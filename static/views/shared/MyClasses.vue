@@ -121,7 +121,6 @@ export default {
   padding: 14px;
   border-radius: 6px;
   transition: background 0.2s ease;
-  cursor: pointer;
 }
 
 .class-name {

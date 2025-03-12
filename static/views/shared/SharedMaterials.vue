@@ -55,9 +55,10 @@ export default {
 
     </div>
   </div>
-
-  <div v-else class="d-flex justify-content-center p-5">
-    <p class="lead">Loading shared vocabularies for the class...</p>
+  <div v-else class="d-flex justify-content-center align-items-center vh-100">
+    <div class="text-center w-50">
+      <p class="lead">No shared vocabularies assigned so far...</p>
+    </div>
   </div>
 
 </template>

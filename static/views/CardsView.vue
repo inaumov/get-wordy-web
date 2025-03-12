@@ -27,7 +27,10 @@ export default {
 </script>
 
 <template>
-  <h4>{{this.dictionaryName}}</h4>
+  <div class="p-4 d-flex flex-column align-items-start">
+    <router-link :to="{name: 'dictionaries'}" class="btn btn-secondary" title="Back">Back</router-link>
+  </div>
+  <h4 class="p-4">{{ this.dictionaryName }}</h4>
   <action-buttons/>
   <cards-table v-bind="{dictionaryId: this.dictionaryId, cards: this.cards}"/>
 
