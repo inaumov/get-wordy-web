@@ -61,8 +61,10 @@ export default {
     </div>
   </div>
 
-    <div v-else class="d-flex justify-content-center p-5">
-      <p class="lead">No vocabulary templates prepared so far. Please create.</p>
+    <div v-else class="d-flex justify-content-center align-items-center">
+      <div class="text-center w-50">
+        <p class="lead">No vocabulary template has been prepared so far. Please create one.</p>
+      </div>
     </div>
 
   </div>

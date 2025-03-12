@@ -94,7 +94,7 @@ export default {
   </div>
   <div v-else class="d-flex justify-content-center align-items-center vh-100">
     <div class="text-center w-50">
-      <p class="lead">No classes registered yet, please create.</p>
+      <p class="lead">No vocabulary streamlining group has been registered yet. Please create one.</p>
     </div>
   </div>
 </template>

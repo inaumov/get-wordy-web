@@ -72,7 +72,7 @@ export default {
     <!-- sidebar with menu items -->
     <sidebar class="sidebar" v-if="showSidebar" :menuItems="menuItems" :activeClass="this.activeClass"/>
     <!-- main content area -->
-    <main class="main-content" style="overflow-y: auto;">
+    <main class="main-content vh-100" style="overflow-y: auto;">
       <router-view/>
     </main>
   </div>
@@ -93,7 +93,7 @@ export default {
 
 .main-content {
   flex-grow: 1;
-  padding: 20px;
+  padding: 0 20px;
   background: #ffffff;
 }
 </style>
