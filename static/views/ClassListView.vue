@@ -33,6 +33,7 @@ export default {
           // .filter(item =>
           //     item.schedules?.some(schedule => schedule?.dayOfWeek.toLowerCase() === this.day.toLowerCase())
           // )
+          .sort((cls1, cls2) => cls2.isActive - cls1.isActive)
           .map(item => {
         // add dynamic properties based on the condition
         return {
@@ -182,15 +183,19 @@ export default {
         <div class="col-md-3 card" v-for="classItem in filteredClasses"
              :key="classItem['classId']"
              @click="navigateToClassDetails(classItem)">
-          <div class="card-body">
+          <div class="py-2">
             <div>
-              <div class="class-details">
+              <div class="d-flex align-items-center justify-content-between">
                 <span><strong>{{ classItem['name'] }}</strong></span>
+                <span v-if="classItem['isActive']" class="active d-flex align-items-center">
+                  <i class="bi bi-dot"></i>&nbsp;Active</span>
+                <span v-else-if="!classItem['isActive']" class="disabled d-flex align-items-center">
+                  <i class="bi bi-dot"></i>&nbsp;Disabled</span>
               </div>
-              <div v-if="classItem['format']" class="class-details">
+              <div v-if="classItem['format']" class="">
                 <span class="text-muted">{{ classItem['format'] }}</span>
               </div>
-              <div class="class-details">
+              <div class="">
                 <div v-if="classItem.timeSlots">
                   <span
                       v-for="(timeSlot, slotIndex) in classItem.timeSlots"
@@ -204,7 +209,7 @@ export default {
                   None
                 </div>
               </div>
-              <div class="class-details">
+              <div class="">
                 <span class="text-muted">
                   <strong>Attendees:</strong>
                 </span>
@@ -248,6 +253,16 @@ export default {
   padding: 0.5rem;
   color: DarkSlateGrey;
   font-weight: bold;
+}
+
+.disabled {
+  color: grey;
+  font-size: 13px;
+}
+
+.active {
+  color: green;
+  font-size: 13px;
 }
 
 </style>
