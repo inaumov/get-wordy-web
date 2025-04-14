@@ -20,6 +20,7 @@ export default {
       classList: [],
       selectedFormat: "",
       day: null,
+      searchTerm: "",
       showActiveOnly: false,
       hasDraftsOnly: false
     }
@@ -87,6 +88,9 @@ export default {
       const formattedEndTime = timeSlot.endTime?.substring(0, 5); // get hours and minutes (HH:mm)
       return `${formattedStartTime} - ${formattedEndTime}`;
     },
+    clearSearch() {
+      this.searchTerm = "";
+    }
   },
   computed: {
     hasClasses() {
@@ -98,6 +102,12 @@ export default {
     },
     filteredClasses() {
       return this.classList
+          // filter by search term (by class name)
+          .filter(cls => {
+            if (!this.searchTerm) return true;
+            const term = this.searchTerm.toLowerCase();
+            return cls.name.toLowerCase().includes(term);
+          })
           // filter by format
           .filter(cls => {
             return this.selectedFormat === '' || cls.format === this.selectedFormat;
@@ -125,16 +135,6 @@ export default {
     <h4>Groups</h4>
   </div>
   <div class="p-4 d-flex justify-content-end" style="gap: 20px">
-    <div class="input-group" style="max-width: 240px">
-      <input id="group-search-input" type="text" class="form-control" name="groups-name" placeholder="Search for a group"
-             autocomplete="off"
-             required>
-      <span class="input-group-btn">
-                <button type="submit" class="btn btn-md btn-default border">
-                  <i class="bi bi-search"></i>
-                </button>
-      </span>
-    </div>
     <router-link :to="{name: 'add-new-class'}" class="btn btn-light" title="Create group">Create group</router-link>
   </div>
   <div class="px-4 d-flex justify-content-start" style="gap: 40px">
@@ -151,6 +151,26 @@ export default {
           {{ format }}
         </option>
       </select>
+    </div>
+    <!-- search -->
+    <div class="group-search-input d-flex align-items-center position-relative mb-3" style="max-width: 300px;">
+      <input
+          class="form-control px-3 py-1"
+          type="text"
+          v-model="searchTerm"
+          placeholder="Search by name..."
+          autocomplete="off"
+          style="padding: 6px 12px; line-height: 1.5;"
+      />
+      <button
+          v-if="searchTerm"
+          @click="clearSearch"
+          class="btn btn-sm position-absolute top-50 end-0 translate-middle-y me-2 px-1 py-0 text-muted"
+          style="z-index: 2; background: none; border: none;"
+          aria-label="Clear search"
+      >
+        &times;
+      </button>
     </div>
     <!-- active groups checkbox filter -->
     <div class="form-check py-1">
@@ -187,7 +207,7 @@ export default {
           <div class="group px-3 py-2">
             <div>
               <div class="d-flex align-items-center justify-content-between">
-                <span class="ellipsis d-inline-block" style="max-width: 185px;">
+                <span class="ellipsis d-inline-block" style="max-width: 190px;">
                   <strong>{{ classItem['name'] }}</strong>
                 </span>
                 <span v-if="classItem['isActive']" class="active d-flex align-items-center">
