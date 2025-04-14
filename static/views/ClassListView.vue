@@ -75,6 +75,13 @@ export default {
       // return the class based on the shuffled color order for the class
       return classItem.colorOrder[index % classItem.colorOrder.length];
     },
+    // get the badge class randomly
+    pickBadgeColorClass(count) {
+      const colors = this.shuffleColors();
+      const colorCount = colors.length;
+      const index = colorCount % count;
+      return colors[index];
+    },
     formatTimeSlot(timeSlot) {
       const formattedStartTime = timeSlot.startTime?.substring(0, 5); // get hours and minutes (HH:mm)
       const formattedEndTime = timeSlot.endTime?.substring(0, 5); // get hours and minutes (HH:mm)
@@ -91,17 +98,17 @@ export default {
     },
     filteredClasses() {
       return this.classList
+          // filter by format
           .filter(cls => {
-            // filter by format
             return this.selectedFormat === '' || cls.format === this.selectedFormat;
           })
+          // filter by active status
           .filter(cls => {
-            // filter by active status
             if (!this.showActiveOnly) return true;
             return cls.isActive;
           })
+          // filter by drafts presence
           .filter(cls => {
-            // filter by drafts presence
             if (!this.hasDraftsOnly) return true;
             return cls.hasDrafts;
           });
@@ -173,22 +180,36 @@ export default {
 
   <div v-if="hasClasses" class="container p-4">
     <div class="day-groups">
-      <div class="row mx-1">
-        <div class="col-md-3 card" v-for="classItem in filteredClasses"
+      <div class="row g-3">
+        <div class="col-md-3" v-for="classItem in filteredClasses"
              :key="classItem['classId']"
              @click="navigateToClassDetails(classItem)">
-          <div class="py-2">
+          <div class="group px-3 py-2">
             <div>
               <div class="d-flex align-items-center justify-content-between">
-                <span><strong>{{ classItem['name'] }}</strong></span>
+                <span class="ellipsis d-inline-block" style="max-width: 185px;">
+                  <strong>{{ classItem['name'] }}</strong>
+                </span>
                 <span v-if="classItem['isActive']" class="active d-flex align-items-center">
-                  <i class="bi bi-dot"></i>&nbsp;Active</span>
+                  <i class="bi bi-dot"></i>Active
+                </span>
                 <span v-else-if="!classItem['isActive']" class="disabled d-flex align-items-center">
-                  <i class="bi bi-dot"></i>&nbsp;Disabled</span>
+                  <i class="bi bi-dot"></i>Disabled
+                </span>
               </div>
               <div v-if="classItem['format']" class="">
                 <span class="text-muted">{{ classItem['format'] }}</span>
               </div>
+              <span v-if="classItem.hasDrafts" class="text-muted text-end">
+                <span :class="pickBadgeColorClass(classItem.drafts)">
+                  <strong>Drafts</strong>: {{ classItem['drafts'] }}
+                </span>
+              </span>
+              <span v-else class="text-muted text-end">
+                <span>
+                  <strong>Last shared material:</strong> 01/01/2025
+                </span>
+              </span>
               <div class="py-1">
                 <div v-if="classItem.schedules">
                   <span v-for="timeSlot in classItem.schedules" :key="timeSlot.dayOfWeek" class="class-schedule">
@@ -201,12 +222,13 @@ export default {
                 <span class="text-muted">
                   <strong>Participants</strong>: {{ classItem['attendees'].length }}
                 </span>
-                <div v-if="classItem.hasAttendees">
+                <div v-if="classItem.hasAttendees" class="badge-container">
                   <span
                       v-for="(attendee, attendeeIndex) in classItem['attendees']"
                       :key="attendeeIndex"
                       :class="getBadgeClass(classItem, attendeeIndex)"
-                      class="badge">
+                      class="badge"
+                  >
                     {{ attendee }}
                   </span>
                 </div>
@@ -225,9 +247,17 @@ export default {
 </template>
 
 <style scoped>
-.card {
+.group {
   cursor: pointer;
-  min-height: 178px;
+  min-height: 198px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+}
+
+.ellipsis {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .day-groups h3 {
@@ -253,6 +283,12 @@ export default {
 .class-schedule {
   font-size: 0.9rem;
   color: #444;
+}
+
+.badge-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
 }
 
 </style>
