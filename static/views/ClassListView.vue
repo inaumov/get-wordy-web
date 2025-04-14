@@ -39,9 +39,6 @@ export default {
         return {
           ...item, // spread the existing properties
           hasAttendees: item['attendees'] && item['attendees'].length >= 1,
-          timeSlots: item['schedules']?.map(x => {
-            return this.formatTimeSlot(x)
-          }),
           hasDrafts: item['drafts'] && item['drafts'] >= 0,
         };
       });
@@ -79,12 +76,9 @@ export default {
       return classItem.colorOrder[index % classItem.colorOrder.length];
     },
     formatTimeSlot(timeSlot) {
-      const formatTime = (time) =>
-          new Date(`1970-01-01T${time}`).toLocaleTimeString([], {
-            hour: '2-digit',
-            minute: '2-digit',
-          });
-      return `${timeSlot['dayOfWeek']} : ${formatTime(timeSlot.startTime)} - ${formatTime(timeSlot.endTime)}`;
+      const formattedStartTime = timeSlot.startTime?.substring(0, 5); // get hours and minutes (HH:mm)
+      const formattedEndTime = timeSlot.endTime?.substring(0, 5); // get hours and minutes (HH:mm)
+      return `${formattedStartTime} - ${formattedEndTime}`;
     },
   },
   computed: {
@@ -195,23 +189,17 @@ export default {
               <div v-if="classItem['format']" class="">
                 <span class="text-muted">{{ classItem['format'] }}</span>
               </div>
-              <div class="">
-                <div v-if="classItem.timeSlots">
-                  <span
-                      v-for="(timeSlot, slotIndex) in classItem.timeSlots"
-                      :key="slotIndex"
-                      :class="getBadgeClass(classItem, slotIndex)"
-                      class="badge">
-                        {{ timeSlot }}
+              <div class="py-1">
+                <div v-if="classItem.schedules">
+                  <span v-for="timeSlot in classItem.schedules" :key="timeSlot.dayOfWeek" class="class-schedule">
+                    <strong>{{ timeSlot.dayOfWeek }}</strong>: {{ formatTimeSlot(timeSlot) }}<br/>
                   </span>
                 </div>
-                <div v-else>
-                  None
-                </div>
+                <span class="class-schedule" v-else>No schedule assigned</span>
               </div>
               <div class="">
                 <span class="text-muted">
-                  <strong>Attendees:</strong>
+                  <strong>Participants</strong>: {{ classItem['attendees'].length }}
                 </span>
                 <div v-if="classItem.hasAttendees">
                   <span
@@ -221,9 +209,6 @@ export default {
                       class="badge">
                     {{ attendee }}
                   </span>
-                </div>
-                <div v-else>
-                  None
                 </div>
               </div>
             </div>
@@ -263,6 +248,11 @@ export default {
 .active {
   color: green;
   font-size: 13px;
+}
+
+.class-schedule {
+  font-size: 0.9rem;
+  color: #444;
 }
 
 </style>
