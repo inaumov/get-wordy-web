@@ -4,7 +4,12 @@ import {getFullDayName} from '@/js/utils.js'
 import {useRouter} from "vue-router";
 
 export default {
-  props: ['day'],
+  props: {
+    classList: {
+      type: Array,
+      required: true
+    }
+  },
   name: 'ClassListView',
   setup() {
     let router = useRouter();
@@ -13,6 +18,10 @@ export default {
   data() {
     return {
       classList: [],
+      selectedFormat: "",
+      day: null,
+      showActiveOnly: false,
+      hasDraftsOnly: false
     }
   },
   methods: {
@@ -21,17 +30,18 @@ export default {
       const response = await fetchClasses(this.day);
       let dayClasses = await response.json();
       this.classList = dayClasses
-          .filter(item =>
-              item.schedules?.some(schedule => schedule?.dayOfWeek.toLowerCase() === this.day.toLowerCase())
-          )
+          // .filter(item =>
+          //     item.schedules?.some(schedule => schedule?.dayOfWeek.toLowerCase() === this.day.toLowerCase())
+          // )
           .map(item => {
-        // add the 'hasAttendees' property based on the condition
+        // add dynamic properties based on the condition
         return {
           ...item, // spread the existing properties
           hasAttendees: item['attendees'] && item['attendees'].length >= 1,
-          timeSlots: item['schedules'].map(x => {
+          timeSlots: item['schedules']?.map(x => {
             return this.formatTimeSlot(x)
-          })
+          }),
+          hasDrafts: item['drafts'] && item['drafts'] >= 0,
         };
       });
     },
@@ -43,11 +53,6 @@ export default {
               day: this.day
             }
           });
-    },
-    addNewClass() {
-      this.router.push({
-        name: 'add-new-class'
-      });
     },
     // method to shuffle colors randomly
     shuffleColors() {
@@ -84,6 +89,27 @@ export default {
   computed: {
     hasClasses() {
       return this.classList && this.classList.length > 0;
+    },
+    uniqueFormats() {
+      const formats = this.classList.map(c => c.format);
+      return [...new Set(formats)];
+    },
+    filteredClasses() {
+      return this.classList
+          .filter(cls => {
+            // filter by format
+            return this.selectedFormat === '' || cls.format === this.selectedFormat;
+          })
+          .filter(cls => {
+            // filter by active status
+            if (!this.showActiveOnly) return true;
+            return cls.isActive;
+          })
+          .filter(cls => {
+            // filter by drafts presence
+            if (!this.hasDraftsOnly) return true;
+            return cls.hasDrafts;
+          });
     }
   },
   mounted() {
@@ -93,15 +119,67 @@ export default {
 </script>
 
 <template>
-  <div class="p-4 d-flex flex-column align-items-start">
-    <router-link :to="{name: 'schedule'}" class="btn btn-secondary" title="Back">Back</router-link>
+  <div class="p-4 d-flex justify-content-start">
+    <h4>Groups</h4>
+  </div>
+  <div class="p-4 d-flex justify-content-end" style="gap: 20px">
+    <div class="input-group" style="max-width: 240px">
+      <input id="group-search-input" type="text" class="form-control" name="groups-name" placeholder="Search for a group"
+             autocomplete="off"
+             required>
+      <span class="input-group-btn">
+                <button type="submit" class="btn btn-md btn-default border">
+                  <i class="bi bi-search"></i>
+                </button>
+      </span>
+    </div>
+    <router-link :to="{name: 'add-new-class'}" class="btn btn-light" title="Create group">Create group</router-link>
+  </div>
+  <div class="px-4 d-flex justify-content-start" style="gap: 40px">
+    <!-- format filter -->
+    <div>
+      <select
+          v-model="selectedFormat"
+          class="form-select px-3 py-1"
+          id="formatFilter"
+          style="border-radius: 1rem; width: auto; min-width: 180px; padding: 6px 12px; line-height: 1.5;"
+      >
+        <option value="">All formats</option>
+        <option v-for="format in uniqueFormats" :key="format" :value="format">
+          {{ format }}
+        </option>
+      </select>
+    </div>
+    <!-- active groups checkbox filter -->
+    <div class="form-check py-1">
+      <input
+          class="form-check-input"
+          type="checkbox"
+          id="activeGroupsOnly"
+          v-model="showActiveOnly"
+      />
+      <label class="form-check-label" for="activeGroupsOnly">
+        Show active groups only
+      </label>
+    </div>
+    <!-- has drafts checkbox filter -->
+    <div class="form-check py-1">
+      <input
+          class="form-check-input"
+          type="checkbox"
+          id="hasDraftsOnly"
+          v-model="hasDraftsOnly"
+      />
+      <label class="form-check-label" for="hasDraftsOnly">
+        Has drafts
+      </label>
+    </div>
   </div>
 
   <div v-if="hasClasses" class="container p-4">
-    <h4 class="pb-4">{{ getFullDayName(day) }}</h4>
     <div class="day-groups">
       <div class="row mx-1">
-        <div class="col-md-4 card" v-for="classItem in classList"
+        <div class="col-md-3 card" v-for="classItem in filteredClasses"
              :key="classItem['classId']"
              @click="navigateToClassDetails(classItem)">
           <div class="card-body">
@@ -146,38 +224,12 @@ export default {
             </div>
           </div>
         </div>
-        <div class="col-md-4 card" @click="addNewClass()"
-             data-bs-toggle="tooltip"
-             data-bs-placement="right"
-             title="Start a new class"
-             style="cursor: pointer;"
-        >
-          <div class="card-body d-flex justify-content-center align-items-center">
-            <div>
-              <!-- plus icon centered within the card -->
-              <i class="bi bi-plus" style="font-size: 2rem;"></i>
-            </div>
-          </div>
-        </div>
       </div>
     </div>
   </div>
   <div v-else class="d-flex justify-content-center align-items-center">
     <div class="text-center w-50">
       <p class="lead">No vocabulary streamlining group has been registered yet. Please create one.</p>
-      <div class="d-flex justify-content-center mt-3">
-        <div class="card text-center w-100"
-             @click="addNewClass()"
-             data-bs-toggle="tooltip"
-             data-bs-placement="right"
-             title="Start a new class"
-             style="cursor: pointer;"
-        >
-          <div class="card-body d-flex justify-content-center align-items-center">
-            <i class="bi bi-plus" style="font-size: 2rem;"></i>
-          </div>
-        </div>
-      </div>
     </div>
   </div>
 </template>
