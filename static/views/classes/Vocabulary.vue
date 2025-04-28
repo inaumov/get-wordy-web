@@ -3,7 +3,7 @@ import WordsheetTable from "@/components/classes/WordsheetTable.vue";
 import SearchInput from "@/components/search/SearchInput.vue";
 import SearchResultsPreview from "@/components/search/SearchResultsPreview.vue";
 
-import {getVocabulary, publish, updateVocabularyName, addToVocabulary} from '@/js/classes-api.js';
+import {getVocabulary, publish, updateVocabularyName, addToVocabulary, removeFromVocabulary} from '@/js/classes-api.js';
 
 export default {
   components: {SearchResultsPreview, WordsheetTable, SearchInput},
@@ -50,9 +50,9 @@ export default {
       publish(this.classId, this.vocabId, true)
           .then(response => {
             if (response.ok) {
-              console.log('Property [isShared] has been changed to:', true, ', for vocabulary id =', this.vocabId);
+              // todo success notification
             }
-            console.log("PATCH vocabularies has been requested. Response.status =", response.status);
+            // todo failure notification
           });
     },
     handleAddToVocabulary(wordExplanation) {
@@ -70,6 +70,15 @@ export default {
       } else {
         alert('This word is already added.');
       }
+    },
+    handleRemoveItemAction(wordId) {
+      removeFromVocabulary(this.classId, this.vocabId, wordId)
+          .then(response => {
+            if (response.ok) {
+              const index = this.wordsList.findIndex(obj => obj['wordId'] === wordId)
+              this.wordsList.splice(index, 1)
+            }
+          });
     },
     vocabularyContains(wordExplanation) {
       return this.wordsList.some((item) => {
@@ -105,7 +114,25 @@ export default {
 
     <search-results-preview @add-to-vocabulary="handleAddToVocabulary" v-bind="{previewData: this.foundExplanations}"/>
 
-    <wordsheet-table v-bind="{classId: this.classId, vocabId: this.vocabId, items: this.wordsList}"/>
+    <wordsheet-table v-bind="{items: this.wordsList}">
+      <template #actions="{ row }">
+        <router-link
+            :to="{ name: 'edit-explanation', params: { vocabId: vocabId, wordId: row?.wordId } }"
+            class="btn btn-lg"
+            title="Edit word explanation"
+        >
+          <i class="bi bi-pencil-square"></i>
+        </router-link>
+
+        <button
+            class="btn btn-lg"
+            @click="handleRemoveItemAction(row?.wordId)"
+            title="Delete"
+        >
+          <i class="bi bi-x-lg"></i>
+        </button>
+      </template>
+    </wordsheet-table>
 
     <!-- submit -->
     <div class="d-flex justify-content-end p-4">

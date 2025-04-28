@@ -71,17 +71,6 @@ const router = createRouter({
             ),
         },
         {
-            path: '/Templates/:templateId/Words/:wordId',
-            name: 'edit-explanation',
-            component: () => import('@/views/EditCardView.vue'),
-            props: (route) => (
-                {
-                    vocabId: route.params.templateId,
-                    wordId: route.params.wordId
-                }
-            ),
-        },
-        {
             path: '/Dictionaries/:dictionaryId/Cards',
             name: 'all-cards',
             component: () => import('@/views/CardsView.vue'),

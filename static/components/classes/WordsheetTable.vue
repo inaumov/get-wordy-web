@@ -1,25 +1,13 @@
 <script>
-import {removeFromVocabulary} from "@/js/classes-api.js";
 
 export default {
-  props: ['classId', 'vocabId', 'items'],
+  props: ['items'],
   data() {
     return {
       // items: []
     }
   },
   methods: {
-    removeWord(word) {
-      const wordId = word['wordId'];
-      removeFromVocabulary(this.classId, this.vocabId, wordId)
-          .then(response => {
-            if (response.ok) {
-              const index = this.items.findIndex(obj => obj['wordId'] === wordId)
-              this.items.splice(index, 1)
-            }
-            console.log("DELETE a word has been requested. Response.status =", response.status);
-          });
-    },
   }
 }
 
@@ -52,13 +40,7 @@ export default {
         </td>
         <td style="text-align: right">
           <div id="actions">
-            <router-link :to="{name: 'edit-explanation', params: {vocabId: this.vocabId, wordId: item['wordId']}}"
-                         class="btn btn-lg" title="Edit word explanation">
-              <i class="bi bi-pencil-square"></i>
-            </router-link>
-            <button class="btn btn-lg" @click="removeWord(item)" title="Delete">
-              <i class="bi bi-x-lg"></i>
-            </button>
+            <slot name="actions" :row="item"></slot>
           </div>
         </td>
       </tr>
@@ -67,7 +49,7 @@ export default {
   </div>
 </template>
 
-<style scoped>
+<style>
 
 table #actions {
   position: relative;
