@@ -87,7 +87,7 @@ export default {
 
 <template>
   <div class="d-flex justify-content-start p-4">
-    <router-link :to="{name: 'class-vocabularies', params: {classId:this.classId}}" class="btn btn-secondary" title="Back">Back</router-link>
+    <router-link :to="{name: 'class-details', params: {classId:this.classId}}" class="btn btn-secondary" title="Back">Back</router-link>
   </div>
 
   <div class="container">

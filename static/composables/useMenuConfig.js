@@ -2,22 +2,16 @@ export const useMenuConfig = {
     teacherAccess() {
         return [
             {
-                uri: '/Schedule',
-                label: 'Organization',
+                uri: '/Classes',
+                label: 'Classes',
                 icon: 'bi bi-people',
-                title: 'Manage classes and assignees'
-            },
-            {
-                uri: '/Streamline',
-                label: 'Streamline',
-                icon: 'bi bi-book',
-                title: 'Manage and organize vocabularies'
+                title: 'Manage classes, participants, and organize vocabularies'
             },
             {
                 uri: '/Templates',
                 label: 'Templates',
                 icon: 'bi bi-arrow-repeat',
-                title: 'Manage reusable vocabulary templates'
+                title: 'Manage reusable vocabulary templates and search by themes'
             },
         ];
     },

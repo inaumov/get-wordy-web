@@ -1,14 +1,11 @@
 import {createRouter, createWebHistory} from 'vue-router'
 import LandingPage from "@/pages/LandingPage.vue";
 import MainView from "@/views/MainView.vue";
-import MaterialsTab from "@/views/classes/MaterialsTab.vue";
 import DictionariesView from "@/views/DictionariesView.vue";
 import ClassListView from "@/views/ClassListView.vue";
 import SharedMaterials from "@/views/shared/SharedMaterials.vue";
-import ScheduleView from "@/views/classes/ScheduleView.vue";
 import ClassDetailsView from "@/views/classes/ClassDetailsView.vue";
 import MyClasses from "@/views/shared/MyClasses.vue";
-import StreamlineView from "@/views/StreamlineView.vue";
 
 const router = createRouter({
     history: createWebHistory(import.meta.env.BASE_URL),
@@ -23,17 +20,6 @@ const router = createRouter({
             component: MainView,
             children: [
         // components rendered inside Dashboard
-        {
-            path: '/Schedule',
-            name: 'schedule',
-            component: ScheduleView
-        },
-        {
-            path: '/Streamline',
-            name: 'streamline',
-            component: StreamlineView,
-            props: true,
-        },
         {
             path: '/Dictionaries',
             name: 'dictionaries',
@@ -55,18 +41,16 @@ const router = createRouter({
             component: MyClasses
         },
         {
-            path: '/Classes/:day',
+            path: '/Classes',
             name: 'day-classes',
-            component: ClassListView,
-            props: true,
+            component: ClassListView
         },
         {
-            path: '/Classes/:day/:classId',
+            path: '/Classes/:classId',
             name: 'class-details',
             component: ClassDetailsView,
             props: (route) => (
                 {
-                    day: route.params.day,
                     classId: route.params.classId,
                 }
             ),
@@ -79,10 +63,10 @@ const router = createRouter({
         {
             path: '/Templates/:templateId',
             name: 'template-preview',
-            component: () => import('@/views/shared/WordsPreview.vue'),
+            component: () => import('@/views/classes/Template.vue'),
             props: (route) => (
                 {
-                    vocabId: route.params.templateId
+                    templateId: route.params.templateId
                 }
             ),
         },
@@ -127,19 +111,9 @@ const router = createRouter({
             props: true
         },
         {
-            path: '/Class',
+            path: '/Classes',
             name: 'add-new-class',
             component: () => import('@/views/classes/ManageClassView.vue')
-        },
-        {
-            path: '/Streamline/:classId/Vocabularies',
-            name: 'class-vocabularies',
-            component: MaterialsTab,
-            props: (route) => (
-                {
-                    classId: route.params.classId
-                }
-            ),
         },
         {
             path: '/Classes/:classId/Vocabularies/:vocabId',

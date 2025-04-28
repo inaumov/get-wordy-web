@@ -8,9 +8,6 @@ export default {
 </script>
 
 <template>
-  <div class="p-4 d-flex flex-column align-items-start">
-    <router-link :to="{name: 'streamline'}" class="btn btn-secondary" title="Back">Back</router-link>
-  </div>
 
   <div class="p-3">
       <div class="d-flex flex-column align-items-end">
