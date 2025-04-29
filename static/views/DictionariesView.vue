@@ -5,52 +5,58 @@ export default {
   name: 'DictionariesView',
   data() {
     return {
-      dictionaries: [],
-      favoriteWords: {
-        "dictionaryId": 5,
-        "name": "Favorite words",
-        "picture": "https://cdn-icons-png.flaticon.com/512/4208/4208408.png",
-        "cardsTotal": 6
-      },
+      vocabularies: [],
+      favorites: [],
     }
   },
   methods: {
     async getData() {
       const response = await fetchDictionaries();
-      this.dictionaries = await response.json();
+      const all = await response.json();
+      const [favorites, vocabularies] = all.reduce(
+          ([fav, nonFav], item) => {
+            item['isFavorite'] ? fav.push(item) : nonFav.push(item);
+            return [fav, nonFav];
+          },
+          [[], []]
+      );
+      this.vocabularies = vocabularies;
+      this.favorites = favorites;
     }
   },
   mounted() {
     this.getData()
   },
   computed: {
-    hasDictionaries() {
-      return this.dictionaries && this.dictionaries.length > 0;
+    hasVocabularies() {
+      return this.vocabularies && this.vocabularies.length > 0;
     },
-    hasFavoriteWords() {
-      return true;
+    hasFavorites() {
+      return this.favorites && this.favorites.length > 0;
     }
   }
 };
 </script>
 
 <template>
-  <div v-if="hasFavoriteWords" class="container p-4" id="active-vocabulary">
-    <div id="favorite_words" class="card text-center">
-      <img v-bind:src="favoriteWords['picture']" class="card-img-top mx-auto d-block"
-           v-bind:alt="favoriteWords['name']">
+  <div v-if="hasFavorites" class="container p-4" id="active-vocabulary">
+    <h4 class="pb-4">Favorite words</h4>
+
+    <div id="favorite_words" class="card text-center" v-for="favorite in favorites">
+      <img v-bind:src="favorite['picture']" class="card-img-top mx-auto d-block"
+           v-bind:alt="favorite['name']">
       <div class="card-body">
-        <h5 class="card-title">{{ favoriteWords['name'] }}</h5>
+        <h5 class="card-title">{{ favorite['name'] }}</h5>
         <router-link class="btn btn-primary"
-                     :to="{ name: 'all-cards', params: { dictionaryId : favoriteWords['dictionaryId']}, query: { dictionaryName: favoriteWords['name'] }}">
-          {{ favoriteWords['cardsTotal'] }}
+                     :to="{ name: 'all-cards', params: { dictionaryId : favorite['dictionaryId']}, query: { dictionaryName: favorite['name'] }}">
+          {{ favorite['wordsTotal'] }}
         </router-link>
       </div>
     </div>
   </div>
 
-  <div v-if="hasDictionaries" class="container p-4" id="content">
-    <h4 class="pb-4">My dictionaries</h4>
+  <div v-if="hasVocabularies" class="container p-4" id="content">
+    <h4 class="pb-4">Own vocabularies</h4>
 
     <div class="row">
       <div class="col" id="settings">
@@ -64,19 +70,19 @@ export default {
       </div>
     </div>
 
-    <div id="dictionary" class="card text-center" v-for="dictionary in dictionaries">
-      <img v-bind:src="dictionary['picture']" class="card-img-top mx-auto d-block" v-bind:alt="dictionary['name']">
+    <div id="dictionary" class="card text-center" v-for="vcb in vocabularies">
+      <img v-bind:src="vcb['picture']" class="card-img-top mx-auto d-block" v-bind:alt="vcb['name']">
       <div class="card-body">
-        <h5 class="card-title">{{ dictionary['name'] }}</h5>
+        <h5 class="card-title">{{ vcb['name'] }}</h5>
         <router-link class="btn btn-primary"
-                     :to="{ name: 'all-cards', params: { dictionaryId : dictionary['dictionaryId']}, query: { dictionaryName: dictionary['name'] }}">
-          {{ dictionary['cardsTotal'] }}
+                     :to="{ name: 'all-cards', params: { dictionaryId : vcb['dictionaryId']}, query: { dictionaryName: vcb['name'] }}">
+          {{ vcb['wordsTotal'] }}
         </router-link>
       </div>
     </div>
   </div>
   <div v-else class="d-flex justify-content-center p-5">
-    <p class="lead">Loading dictionaries...</p>
+    <p class="lead">No vocabularies has been created so far...</p>
   </div>
 </template>
 
