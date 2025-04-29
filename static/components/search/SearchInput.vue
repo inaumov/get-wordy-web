@@ -25,16 +25,13 @@ export default {
   <form id="search-words-form" action="" method="get" class="form-inline" v-on:submit.prevent="onSearch">
     <div class="form-group">
       <div class="input-group">
-        <input id="ai-search-input" type="text" class="form-control" name="words" placeholder="Search for..."
-               autocomplete="off"
-               required>
+        <input id="ai-search-input" type="text" class="form-control" name="words" autocomplete="off" required>
         <span class="input-group-btn">
                 <button type="submit" class="btn btn-md btn-default border">
                   <i class="bi bi-search"></i>
                 </button>
               </span>
       </div>
-      <small class="form-text text-muted">Enter a word or phrase and click Search.</small>
     </div>
   </form>
 </template>

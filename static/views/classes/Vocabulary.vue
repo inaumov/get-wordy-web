@@ -38,7 +38,7 @@ export default {
             });
         return;
       }
-      console.log('No changes detected in property [name] for vocabularies id =', this.vocabId);
+      console.log('No changes detected in property [name] for vocabulary id =', this.vocabId);
     },
     onSearch(searchResult) {
       this.foundExplanations = searchResult;
@@ -101,20 +101,21 @@ export default {
 
   <div class="container">
 
-    <div class="d-flex justify-content-center py-2">
+    <div class="d-flex justify-content-left p-2">
       <span contenteditable="true" class="h4 p-1" v-text="name" v-on:blur="onNameEdit">
       </span>
     </div>
 
-    <div class="d-flex justify-content-center p-4">
+    <div class="d-flex justify-content-center p-2">
       <div style="padding-top:7px;" class="col-md-4 form-group pull-right">
         <search-input @wordsheet-search-submit="onSearch" v-bind="{onSearchEventName: 'wordsheet-search-submit'}"/>
+        <small class="text-muted">Enter a word or phrase and click search</small>
       </div>
     </div>
 
     <search-results-preview @add-to-vocabulary="handleAddToVocabulary" v-bind="{previewData: this.foundExplanations}"/>
 
-    <wordsheet-table v-bind="{items: this.wordsList}">
+    <wordsheet-table class="p-2" v-bind="{items: this.wordsList}">
       <template #actions="{ row }">
         <router-link
             :to="{ name: 'edit-explanation', params: { vocabId: vocabId, wordId: row?.wordId } }"
@@ -135,9 +136,9 @@ export default {
     </wordsheet-table>
 
     <!-- submit -->
-    <div class="d-flex justify-content-end p-4">
+    <div class="d-flex justify-content-end p-2">
         <button type="button" class="btn btn-primary border btn-md" v-on:click="onReady">
-          {{ this.isShared === false ? 'Publish' : 'Unpublish' }}
+          {{ this.isShared === false ? 'Share' : 'Stop sharing' }}
         </button>
     </div>
 

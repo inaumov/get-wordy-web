@@ -14,8 +14,7 @@ export default {
 </script>
 
 <template>
-  <div class="p-4">
-
+  <div class="">
     <table class="table">
       <thead>
       <tr>
