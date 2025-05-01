@@ -1,18 +1,9 @@
 <script>
-import {updateClassInfo} from '@/js/classes-api.js';
-
 export default {
   props: ['classInfo'],
-  setup(props) {
-    console.log("Prop classInfo in setup:", props.classInfo);
-    return {};
-  },
   data() {
     return {
-      days: ["Sun", "Mon", "Tue", "Wen", "Thu", "Fri", "Sat"],
-      schedules: [
-        { dayOfWeek: '', startTime: '', endTime: '' } // Default schedule
-      ],
+      days: ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"],
       SCHEDULE_TYPES: {
         NONE: 'NONE',
         REPEATABLE: 'REPEATABLE',
@@ -61,12 +52,8 @@ export default {
       if (scheduleType === this.SCHEDULE_TYPES.ONE_TIME) {
         requestData['endDate'] = this.classInfo.endDate;
       }
-      updateClassInfo(requestData)
-          .then(response => {
-            if (response.ok) {
-            }
-            console.log("PUT: class info has been requested. Response.status =", response.status);
-          });
+      // emit the structured requestData to parent
+      this.$emit('classInfoSubmit', requestData);
     },
     addSchedule() {
       this.classInfo.schedules.push({ dayOfWeek: '', startTime: '', endTime: '' });
