@@ -5,8 +5,7 @@ export default {
   props: ['classInfo'],
   setup(props) {
     console.log("Prop classInfo in setup:", props.classInfo);
-    return {
-    };
+    return {};
   },
   data() {
     return {
@@ -14,32 +13,18 @@ export default {
       schedules: [
         { dayOfWeek: '', startTime: '', endTime: '' } // Default schedule
       ],
-    }
-  },
-  created() {
-    console.log("Prop classInfo in created:", this.classInfo);
-  },
-  computed: {
-    isRepeatableLocal: {
-      get() {
-        return this.classInfo.isRepeatable;
+      SCHEDULE_TYPES: {
+        NONE: 'NONE',
+        REPEATABLE: 'REPEATABLE',
+        ONE_TIME: 'ONE_TIME'
       },
-      set(value) {
-        this.classInfo.isRepeatable = value;
-      }
-    },
-    endDateLocal: {
-      get() {
-        return this.classInfo.endDate;
-      },
-      set(value) {
-        this.classInfo.endDate = value;
-      }
     }
   },
   methods: {
     onSubmit: function () {
-      if (this.isRepeatableLocal === true) {
+      const scheduleType = this.classInfo.scheduleType;
+
+      if (scheduleType === this.SCHEDULE_TYPES.REPEATABLE) {
         // reset any previous validation state
         this.$refs.classSchedules.classList.remove('is-invalid');
         // validate the selected days
@@ -49,11 +34,12 @@ export default {
           return;
         }
       }
-      if (this.isRepeatableLocal === false) {
+
+      if (scheduleType === this.SCHEDULE_TYPES.ONE_TIME) {
         // reset any previous validation state
         this.$refs.classOneTimeDate.classList.remove('is-invalid');
         // validate class one time date
-        if (!this.endDateLocal) {
+        if (!this.classInfo.endDate) {
           // if no end date selected, apply the 'is-invalid' class
           this.$refs.classOneTimeDate.classList.add('is-invalid');
           return;
@@ -63,18 +49,17 @@ export default {
       let form = document.getElementById('start-class-form');
       let formData = new FormData(form);
 
-      let isRepeatable = this.isRepeatableLocal;
       let requestData = {
         name: formData.get('name'),
         format: formData.get('format'),
         notes: formData.get('notes'),
-        isRepeatable: isRepeatable,
+        scheduleType: scheduleType,
       };
-      if (isRepeatable === true) {
-        requestData['schedules'] = this.classInfo.schedules
+      if (scheduleType === this.SCHEDULE_TYPES.REPEATABLE) {
+        requestData['schedules'] = this.classInfo.schedules;
       }
-      if (isRepeatable === false) {
-        requestData['endDate'] = this.endDateLocal
+      if (scheduleType === this.SCHEDULE_TYPES.ONE_TIME) {
+        requestData['endDate'] = this.classInfo.endDate;
       }
       updateClassInfo(requestData)
           .then(response => {
@@ -103,12 +88,12 @@ export default {
         <div class="row mb-3">
           <div class="col-6">
             <label for="name" class="form-label">Name<i>*</i></label>
-            <input type="text" v-model="this.classInfo['name']" class="form-control" id="name" name="name"
+            <input type="text" v-model="classInfo['name']" class="form-control" id="name" name="name"
                    autocomplete="off" required>
           </div>
           <div class="col-6">
             <label for="format" class="form-label">Format</label>
-            <input type="text" v-model="this.classInfo['format']" class="form-control" id="format"
+            <input type="text" v-model="classInfo['format']" class="form-control" id="format"
                    name="format"
                    autocomplete="off">
             <small class="form-text text-muted">e.g., Online, In-person, Hybrid, VIP</small>
@@ -117,19 +102,20 @@ export default {
 
         <div class="row mb-3">
           <div class="col-6">
-            <label class="form-label">Class Type<i>*</i></label>
-            <select v-model="isRepeatableLocal" class="form-select">
-              <option :value="true">Repeatable (Scheduled)</option>
-              <option :value="false">One-time Class</option>
+            <label class="form-label">Schedule Type</label>
+            <select v-model="classInfo.scheduleType" class="form-select">
+              <option :value="SCHEDULE_TYPES.NONE">None</option>
+              <option :value="SCHEDULE_TYPES.REPEATABLE">Repeatable</option>
+              <option :value="SCHEDULE_TYPES.ONE_TIME">One-Time</option>
             </select>
           </div>
         </div>
 
         <!-- schedule selection (visible only if repeatable) -->
-        <div class="row mb-3" v-if="this.isRepeatableLocal === true">
+        <div v-if="classInfo.scheduleType === SCHEDULE_TYPES.REPEATABLE" class="row mb-3">
           <div class="col-12">
             <label for="classSchedules" class="form-label">
-              Select the schedules for the class
+              Select the schedules for the class<i>*</i>
             </label>
             <div ref="classSchedules" id="classSchedules" class="d-flex flex-column gap-2">
               <div
@@ -176,7 +162,7 @@ export default {
 
             <!-- Validation Feedback -->
             <div v-if="this.classInfo?.schedules?.length === 0" class="invalid-feedback">
-              Please add at least one schedule.
+              At least one slot required.
             </div>
 
             <!-- Add Schedule Button -->
@@ -192,13 +178,13 @@ export default {
         </div>
 
         <!-- one-time end date selection -->
-        <div v-if="this.isRepeatableLocal === false" class="row mb-3">
+        <div v-if="classInfo.scheduleType === SCHEDULE_TYPES.ONE_TIME" class="row mb-3">
           <div ref="classOneTimeDate" id="classOneTimeDate" class="col-12">
-            <label class="form-label" for="endDate">Date scheduled</label>
-            <input type="date" id="endDate" v-model="this.endDateLocal" class="form-control">
+            <label class="form-label" for="endDate">Date scheduled<i>*</i></label>
+            <input type="date" id="endDate" v-model="this.classInfo.endDate" class="form-control">
           </div>
           <!-- Validation Feedback -->
-          <div v-if="!this.endDateLocal" class="invalid-feedback">
+          <div v-if="!this.classInfo.endDate" class="invalid-feedback">
             Please select the end date for this activity.
           </div>
         </div>
@@ -217,7 +203,7 @@ export default {
         <!-- submit / back Buttons -->
         <div class="row py-4">
           <div class="d-flex flex-column align-items-end">
-            <button type="submit" class="btn btn-primary">Save</button>
+            <button type="submit" class="btn btn-secondary">Update</button>
           </div>
         </div>
       </form>
