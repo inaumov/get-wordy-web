@@ -1,7 +1,7 @@
 <script>
 import {useRouter} from "vue-router";
 import {createClass} from '@/js/classes-api.js';
-import ClassInfoForm from "@/views/classes/ClassInfoTab.vue";
+import ClassInfoForm from "@/components/classes/ClassInfoForm.vue";
 
 export default {
   components: {ClassInfoForm},

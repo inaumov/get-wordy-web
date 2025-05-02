@@ -1,5 +1,5 @@
 <script>
-import ClassInfo from "./ClassInfoTab.vue";
+import EditClass from "./EditClass.vue";
 import Materials from "./MaterialsTab.vue";
 import Attendees from "./AttendeesTab.vue";
 import {getClass} from "@/js/classes-api.js";
@@ -7,7 +7,7 @@ import {getClass} from "@/js/classes-api.js";
 export default {
   props: ['classId', 'day'],
   name: "ClassDetails",
-  components: {Materials, ClassInfo, Attendees},
+  components: {Materials, EditClass, Attendees},
   data() {
     return {
       classInfo: {
@@ -103,7 +103,7 @@ export default {
           role="tabpanel"
           aria-labelledby="class-info-tab"
       >
-        <ClassInfo v-bind="{classInfo: this.classInfo}"/>
+        <EditClass v-bind="{classInfo: this.classInfo}"/>
       </div>
       <div
           class="tab-pane fade"

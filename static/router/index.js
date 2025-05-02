@@ -4,7 +4,7 @@ import MainView from "@/views/MainView.vue";
 import DictionariesView from "@/views/DictionariesView.vue";
 import ClassListView from "@/views/ClassListView.vue";
 import SharedMaterials from "@/views/shared/SharedMaterials.vue";
-import ClassDetailsView from "@/views/classes/ClassDetailsView.vue";
+import ClassDashboard from "@/views/classes/ClassDashboard.vue";
 import MyClasses from "@/views/shared/MyClasses.vue";
 
 const router = createRouter({
@@ -47,8 +47,8 @@ const router = createRouter({
         },
         {
             path: '/Classes/:classId',
-            name: 'class-details',
-            component: ClassDetailsView,
+            name: 'class-dashboard',
+            component: ClassDashboard,
             props: (route) => (
                 {
                     classId: route.params.classId,
@@ -102,7 +102,7 @@ const router = createRouter({
         {
             path: '/Classes',
             name: 'add-new-class',
-            component: () => import('@/views/classes/ManageClassView.vue')
+            component: () => import('@/views/classes/AddClass.vue')
         },
         {
             path: '/Classes/:classId/Vocabularies/:vocabId',
