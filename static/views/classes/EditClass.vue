@@ -17,12 +17,13 @@ export default {
           .then(response => {
             if (response.ok) {
               console.log('Class info updated');
+              this.$emit('success'); // bubble up to top-level
             }
           })
           .catch(error => console.error('Error updating class info:', error));
     }
   },
-  emits: ['classInfoSubmit']
+  emits: ['classInfoSubmit', 'success']
 };
 </script>
 
