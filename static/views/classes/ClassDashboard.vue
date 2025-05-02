@@ -1,5 +1,5 @@
 <script>
-import ClassInfo from "./ClassInfoTab.vue";
+import EditClass from "./EditClass.vue";
 import Materials from "./MaterialsTab.vue";
 import Attendees from "./AttendeesTab.vue";
 import {getClass} from "@/js/classes-api.js";
@@ -7,9 +7,10 @@ import {getClass} from "@/js/classes-api.js";
 export default {
   props: ['classId', 'day'],
   name: "ClassDetails",
-  components: {Materials, ClassInfo, Attendees},
+  components: {Materials, EditClass, Attendees},
   data() {
     return {
+      isEditMode: false,
       classInfo: {
         attendees: []
       }
@@ -20,6 +21,12 @@ export default {
       const response = await getClass(this.classId);
       this.classInfo = await response.json();
     },
+    showEditForm() {
+      this.isEditMode = true;
+    },
+    hideEditForm() {
+      this.isEditMode = false;
+    }
   },
   mounted() {
     this.getData()
@@ -34,11 +41,18 @@ export default {
 </script>
 
 <template>
-  <div class="p-4 d-flex flex-column align-items-start">
-    <router-link :to="{name: 'day-classes', params: {day: this.day}}" class="btn btn-secondary" title="Back">Back</router-link>
+  <div v-if="!this.isEditMode" class="p-4 d-flex flex-column align-items-start">
+    <router-link :to="{name: 'day-classes', params: {day: this.day}}" class="btn btn-secondary" title="Back">Back
+    </router-link>
+  </div>
+  <div v-if="!this.isEditMode" class="p-4 d-flex flex-column align-items-end" style="gap: 20px">
+    <button @click="showEditForm" class="btn btn-light">Edit class info</button>
+  </div>
+  <div v-else class="p-4 d-flex flex-column align-items-start">
+    <button @click="hideEditForm" class="btn btn-secondary" title="Back">Back</button>
   </div>
 
-  <div class="p-4">
+  <div v-if="!this.isEditMode" class="p-4">
     <h4 class="">{{ className }}</h4>
 
     <!-- Tabs Navigation -->
@@ -55,20 +69,6 @@ export default {
             aria-selected="true"
         >
           Vocabularies
-        </button>
-      </li>
-      <li class="nav-item" role="presentation">
-        <button
-            class="nav-link"
-            id="class-info-tab"
-            data-bs-toggle="tab"
-            data-bs-target="#class-info"
-            type="button"
-            role="tab"
-            aria-controls="class-info"
-            aria-selected="false"
-        >
-          Class Info
         </button>
       </li>
       <li class="nav-item" role="presentation">
@@ -99,14 +99,6 @@ export default {
       </div>
       <div
           class="tab-pane fade"
-          id="class-info"
-          role="tabpanel"
-          aria-labelledby="class-info-tab"
-      >
-        <ClassInfo v-bind="{classInfo: this.classInfo}"/>
-      </div>
-      <div
-          class="tab-pane fade"
           id="attendees"
           role="tabpanel"
           aria-labelledby="attendees-tab"
@@ -115,6 +107,10 @@ export default {
       </div>
     </div>
   </div>
+  <EditClass v-if="this.isEditMode"
+             v-bind="{classInfo: this.classInfo}"
+             @success="isEditMode = false"
+  />
 </template>
 
 <style scoped>
