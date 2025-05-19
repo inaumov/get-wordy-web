@@ -42,8 +42,8 @@ export default {
 <template>
   <div class="class-access-container">
     <!-- assign new user (top & centered) -->
-    <h5 class="pb-2">Participants</h5>
-    <form class="d-flex align-items-center gap-2 mb-3" @submit.prevent="handleAssignUser">
+    <h5 class="pb-2 border-bottom">Participants</h5>
+    <form class="d-flex align-items-center gap-2 pt-2 mb-3" @submit.prevent="handleAssignUser">
       <input
           v-model="newUserIdentity"
           type="text"

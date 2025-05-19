@@ -28,21 +28,21 @@ export default {
 
 <template>
   <div>
-    <h5 class="pb-2">Vocabularies</h5>
-    <ul v-if="hasVocabs" class="list-group" id="vocabularies">
+    <h5 class="pb-2 border-bottom">Vocabularies</h5>
+    <ul v-if="hasVocabs" class="pt-2 list-unstyled spaced-items" id="vocabularies">
 
       <li
           v-for="vocabulary in vocabularies"
           :key="vocabulary['vocabId']"
-          class="py-2 list-group-item border rounded">
+          class="vocab-item border rounded px-3 py-1">
 
         <div class="d-flex justify-content-between align-items-center">
           <router-link
               :to="{ name: 'vocabulary', params: { classId: this.classId, vocabId : vocabulary['vocabId']}}"
               class="py-2 text-decoration-none text-dark">
-        <span class="">
-          {{ vocabulary['name'] }}
-        </span>
+          <span class="">
+            {{ vocabulary['name'] }}
+          </span>
           </router-link>
           <!-- displaying total count as a badge -->
           <div class="">
@@ -73,5 +73,8 @@ export default {
 #vocabularies > a:hover {
   background-color: #f8f9fa;
   cursor: pointer;
+}
+.spaced-items .vocab-item + .vocab-item {
+  margin-top: 0.75rem;
 }
 </style>

@@ -4,11 +4,12 @@ import Actions from "./NewVocabularyActions.vue";
 import Participants from "./Participants.vue";
 import Vocabularies from "@/views/classes/ClassVocabularies.vue";
 import {getClass} from "@/js/classes-api.js";
+import ClassInfoCard from "@/views/classes/ClassInfoCard.vue";
 
 export default {
   props: ['classId', 'day'],
   name: "ClassDetails",
-  components: {Vocabularies, Actions, EditClass, Participants},
+  components: {ClassInfoCard, Vocabularies, Actions, EditClass, Participants},
   data() {
     return {
       isEditMode: false,
@@ -27,6 +28,12 @@ export default {
     },
     hideEditForm() {
       this.isEditMode = false;
+    },
+    onDeactivate() {
+
+    },
+    onDelete() {
+
     }
   },
   mounted() {
@@ -43,21 +50,23 @@ export default {
 
 <template>
   <div v-if="!this.isEditMode" class="p-4 d-flex flex-column align-items-start">
-    <router-link :to="{name: 'day-classes', params: {day: this.day}}" class="btn btn-secondary" title="Back">Back
+    <router-link :to="{name: 'day-classes', params: {day: this.day}}" class="btn btn-secondary" title="Back">
+      Back
     </router-link>
   </div>
-  <div v-if="!this.isEditMode" class="p-4 d-flex flex-column align-items-end" style="gap: 20px">
-    <button @click="showEditForm" class="btn btn-light">Edit class info</button>
-  </div>
-  <div v-else class="p-4 d-flex flex-column align-items-start">
+  <div v-else class="px-4 d-flex flex-column align-items-start">
     <button @click="hideEditForm" class="btn btn-secondary" title="Back">Back</button>
   </div>
+  <ClassInfoCard v-if="!isEditMode" :class-info="this.classInfo" class="px-4"
+      @edit="showEditForm"
+      @deactivate="onDeactivate"
+      @delete="onDelete"
+  />
 
   <div v-if="!this.isEditMode" class="p-4">
-    <h4 class="">{{ className }}</h4>
     <!-- Page Content -->
     <Actions class="pb-5" v-bind="{classId: this.classId}"/>
-    <div class="d-flex gap-3">
+    <div class="d-flex gap-5">
       <!-- Left column: 70% -->
       <Vocabularies class="flex-grow-1" style="flex-basis: 70%;" v-bind="{classId: this.classId}"/>
       <!-- Right column: 30% -->
