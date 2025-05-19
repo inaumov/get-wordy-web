@@ -3,11 +3,12 @@ import EditClass from "./EditClass.vue";
 import Materials from "./MaterialsTab.vue";
 import Attendees from "./AttendeesTab.vue";
 import {getClass} from "@/js/classes-api.js";
+import ClassVocabularies from "@/views/classes/ClassVocabularies.vue";
 
 export default {
   props: ['classId', 'day'],
   name: "ClassDetails",
-  components: {Materials, EditClass, Attendees},
+  components: {ClassVocabularies, Materials, EditClass, Attendees},
   data() {
     return {
       isEditMode: false,
@@ -54,57 +55,13 @@ export default {
 
   <div v-if="!this.isEditMode" class="p-4">
     <h4 class="">{{ className }}</h4>
-
-    <!-- Tabs Navigation -->
-    <ul class="nav nav-tabs" id="classDetailsTabs" role="tablist">
-      <li class="nav-item" role="presentation">
-        <button
-            class="nav-link active"
-            id="materials-tab"
-            data-bs-toggle="tab"
-            data-bs-target="#materials"
-            type="button"
-            role="tab"
-            aria-controls="materials"
-            aria-selected="true"
-        >
-          Vocabularies
-        </button>
-      </li>
-      <li class="nav-item" role="presentation">
-        <button
-            class="nav-link"
-            id="attendees-tab"
-            data-bs-toggle="tab"
-            data-bs-target="#attendees"
-            type="button"
-            role="tab"
-            aria-controls="attendees"
-            aria-selected="false"
-        >
-          Attendees
-        </button>
-      </li>
-    </ul>
-
-    <!-- Tab Content -->
-    <div class="tab-content mt-3" id="classDetailsTabContent">
-      <div
-          class="tab-pane fade show active"
-          id="materials"
-          role="tabpanel"
-          aria-labelledby="materials-tab"
-      >
-        <Materials v-bind="{classId: this.classId}"/>
-      </div>
-      <div
-          class="tab-pane fade"
-          id="attendees"
-          role="tabpanel"
-          aria-labelledby="attendees-tab"
-      >
-        <Attendees v-if="classInfo && classInfo.attendees" v-bind="{ classInfo }"/>
-      </div>
+    <!-- Page Content -->
+    <Materials class="pb-5" v-bind="{classId: this.classId}"/>
+    <div class="d-flex gap-3">
+      <!-- Left column: 70% -->
+      <ClassVocabularies class="flex-grow-1" style="flex-basis: 70%;" v-bind="{classId: this.classId}"/>
+      <!-- Right column: 30% -->
+      <Attendees style="flex-basis: 30%; max-width: 30%;" v-if="classInfo && classInfo.attendees" v-bind="{ classInfo }"/>
     </div>
   </div>
   <EditClass v-if="this.isEditMode"

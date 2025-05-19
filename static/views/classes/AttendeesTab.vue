@@ -40,9 +40,9 @@ export default {
 </script>
 
 <template>
-  <div class="class-access-container p-3">
+  <div class="class-access-container">
     <!-- assign new user (top & centered) -->
-    <h5 class="pb-3">Participants</h5>
+    <h5 class="pb-2">Participants</h5>
     <form class="d-flex align-items-center gap-2 mb-3" @submit.prevent="handleAssignUser">
       <input
           v-model="newUserIdentity"
@@ -55,7 +55,7 @@ export default {
       </button>
     </form>
     <!-- users list (below) -->
-    <h5 class="pt-3">{{ this.classInfo.attendees?.length }} participant(s)</h5>
+    <h6 class="pt-3">{{ this.classInfo.attendees?.length }} participant(s)</h6>
     <ul v-if="this.classInfo.attendees.length > 0" class="access-list">
       <li class="py-2 d-flex align-items-center" v-for="user in this.classInfo.attendees" :key="user">
         <span class="px-2 me-auto">{{ user }}</span>
@@ -67,10 +67,6 @@ export default {
 </template>
 
 <style scoped>
-.class-access-container {
-  max-width: 330px;
-  margin: 0 auto; /* center the whole block */
-}
 
 .btn-equals {
   min-width: 68px

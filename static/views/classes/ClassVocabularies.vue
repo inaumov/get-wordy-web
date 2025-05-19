@@ -27,51 +27,46 @@ export default {
 </script>
 
 <template>
+  <div>
+    <h5 class="pb-2">Vocabularies</h5>
+    <ul v-if="hasVocabs" class="list-group" id="vocabularies">
 
-  <div v-if="hasVocabs" class="container" id="vocabularies">
-    <h4 class="">Vocabularies</h4>
+      <li
+          v-for="vocabulary in vocabularies"
+          :key="vocabulary['vocabId']"
+          class="py-2 list-group-item border rounded">
 
-    <div
-        v-for="vocabulary in vocabularies"
-        :key="vocabulary['vocabId']"
-        class="mb-4 bg-light bg-opacity-10 border border-danger-subtle rounded">
-
-      <!-- make the whole element as clickable-->
-      <router-link
-          :to="{ name: 'vocabulary', params: { classId: this.classId, vocabId : vocabulary['vocabId']}}"
-          class="row p-3 text-decoration-none text-dark">
-
-        <span class="col-8">
+        <div class="d-flex justify-content-between align-items-center">
+          <router-link
+              :to="{ name: 'vocabulary', params: { classId: this.classId, vocabId : vocabulary['vocabId']}}"
+              class="py-2 text-decoration-none text-dark">
+        <span class="">
           {{ vocabulary['name'] }}
         </span>
-
-        <!-- displaying total count as a badge in a separate column -->
-        <div class="col-3 text-end">
-          <span class="badge bg-info rounded-pill">{{ vocabulary['wordsTotal'] }} words</span>
-        </div>
-
-        <!-- displaying whether the item is shared or not (optional property) -->
-        <div class="col-1 text-end">
+          </router-link>
+          <!-- displaying total count as a badge -->
+          <div class="">
+            <span class="badge bg-info rounded-pill">{{ vocabulary['wordsTotal'] }} words</span>
+          </div>
+          <!-- displaying whether the item is shared or not (optional property) -->
+          <div class="">
           <span
               v-if="vocabulary['isShared']"
-              class="badge bg-success text-white"
-              data-bs-toggle="tooltip"
-              title="This vocabulary is available now for associated student">
+              class="badge bg-success">
             Shared
           </span>
-          <span v-else class="badge bg-secondary text-white">
+            <span v-else class="badge bg-secondary">
             Not shared
           </span>
+          </div>
         </div>
-      </router-link>
+      </li>
+    </ul>
 
+    <div v-else class="d-flex justify-content-center p-5">
+      <p class="lead">Loading vocabularies for the class...</p>
     </div>
   </div>
-
-  <div v-else class="d-flex justify-content-center p-5">
-    <p class="lead">Loading vocabularies for the class...</p>
-  </div>
-
 </template>
 
 <style>
