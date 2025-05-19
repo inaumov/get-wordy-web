@@ -1,14 +1,14 @@
 <script>
 import EditClass from "./EditClass.vue";
-import Materials from "./MaterialsTab.vue";
-import Attendees from "./AttendeesTab.vue";
+import Actions from "./NewVocabularyActions.vue";
+import Participants from "./Participants.vue";
+import Vocabularies from "@/views/classes/ClassVocabularies.vue";
 import {getClass} from "@/js/classes-api.js";
-import ClassVocabularies from "@/views/classes/ClassVocabularies.vue";
 
 export default {
   props: ['classId', 'day'],
   name: "ClassDetails",
-  components: {ClassVocabularies, Materials, EditClass, Attendees},
+  components: {Vocabularies, Actions, EditClass, Participants},
   data() {
     return {
       isEditMode: false,
@@ -56,12 +56,12 @@ export default {
   <div v-if="!this.isEditMode" class="p-4">
     <h4 class="">{{ className }}</h4>
     <!-- Page Content -->
-    <Materials class="pb-5" v-bind="{classId: this.classId}"/>
+    <Actions class="pb-5" v-bind="{classId: this.classId}"/>
     <div class="d-flex gap-3">
       <!-- Left column: 70% -->
-      <ClassVocabularies class="flex-grow-1" style="flex-basis: 70%;" v-bind="{classId: this.classId}"/>
+      <Vocabularies class="flex-grow-1" style="flex-basis: 70%;" v-bind="{classId: this.classId}"/>
       <!-- Right column: 30% -->
-      <Attendees style="flex-basis: 30%; max-width: 30%;" v-if="classInfo && classInfo.attendees" v-bind="{ classInfo }"/>
+      <Participants style="flex-basis: 30%; max-width: 30%;" v-if="classInfo && classInfo.attendees" v-bind="{ classInfo }"/>
     </div>
   </div>
   <EditClass v-if="this.isEditMode"
