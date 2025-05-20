@@ -42,8 +42,8 @@ public class UserController {
     }
 
     @GetMapping("/my-classes")
-    public ResponseEntity<List<ClassViewerInfo>> getAttendeeClasses(Principal user) {
-        List<ClassViewerInfo> classes = classAccessService.getAttendeeClasses(user.getName());
+    public ResponseEntity<List<ClassViewerInfo>> getParticipantClasses(Principal user) {
+        List<ClassViewerInfo> classes = classAccessService.getParticipantClasses(user.getName());
         return ResponseEntity.ok(classes);
     }
 

@@ -1,6 +1,6 @@
 <script>
 import {fetchClasses} from '@/js/classes-api.js';
-import {getFullDayName} from '@/js/utils.js'
+import {formatTimeSlot, getFullDayName} from '@/js/utils.js'
 import {useRouter} from "vue-router";
 
 export default {
@@ -19,7 +19,6 @@ export default {
     return {
       classList: [],
       selectedFormat: "",
-      day: null,
       searchTerm: "",
       showActiveOnly: false,
       hasDraftsOnly: false
@@ -28,28 +27,24 @@ export default {
   methods: {
     getFullDayName,
     async getData() {
-      const response = await fetchClasses(this.day);
+      const response = await fetchClasses();
       let dayClasses = await response.json();
       this.classList = dayClasses
-          // .filter(item =>
-          //     item.schedules?.some(schedule => schedule?.dayOfWeek.toLowerCase() === this.day.toLowerCase())
-          // )
           .sort((cls1, cls2) => cls2.isActive - cls1.isActive)
           .map(item => {
         // add dynamic properties based on the condition
         return {
           ...item, // spread the existing properties
-          hasAttendees: item['attendees'] && item['attendees'].length >= 1,
+          hasParticipants: item['participants'] && item['participants'].length >= 1,
           hasDrafts: item['drafts'] && item['drafts'] >= 0,
         };
       });
     },
     navigateToClassDetails(classItem) {
       this.router.push({
-            name: 'class-details',
+            name: 'class-dashboard',
             params: {
-              classId: classItem['classId'],
-              day: this.day
+              classId: classItem['classId']
             }
           });
     },
@@ -67,7 +62,7 @@ export default {
       }
       return pastelColors;
     },
-    // get the badge class for a specific attendee in a specific class
+    // get the badge class for a specific participant in a specific class
     getBadgeClass(classItem, index) {
       // if colorOrder is not defined, shuffle colors for this class
       if (!classItem.colorOrder) {
@@ -83,11 +78,7 @@ export default {
       const index = colorCount % count;
       return colors[index];
     },
-    formatTimeSlot(timeSlot) {
-      const formattedStartTime = timeSlot.startTime?.substring(0, 5); // get hours and minutes (HH:mm)
-      const formattedEndTime = timeSlot.endTime?.substring(0, 5); // get hours and minutes (HH:mm)
-      return `${formattedStartTime} - ${formattedEndTime}`;
-    },
+    formatTimeSlot,
     clearSearch() {
       this.searchTerm = "";
     }
@@ -231,25 +222,25 @@ export default {
                 </span>
               </span>
               <div class="py-1">
-                <div v-if="classItem.schedules">
-                  <span v-for="timeSlot in classItem.schedules" :key="timeSlot.dayOfWeek" class="class-schedule">
+                <div v-if="classItem.timeSlots">
+                  <span v-for="timeSlot in classItem.timeSlots" :key="timeSlot.dayOfWeek" class="class-schedule">
                     <strong>{{ timeSlot.dayOfWeek }}</strong>: {{ formatTimeSlot(timeSlot) }}<br/>
                   </span>
                 </div>
-                <span class="class-schedule" v-else>No schedule assigned</span>
+                <span class="class-schedule" v-else>No time slot assigned</span>
               </div>
               <div class="">
                 <span class="text-muted">
-                  <strong>Participants</strong>: {{ classItem['attendees'].length }}
+                  <strong>Participants</strong>: {{ classItem['participants'].length }}
                 </span>
-                <div v-if="classItem.hasAttendees" class="badge-container">
+                <div v-if="classItem.hasParticipants" class="badge-container">
                   <span
-                      v-for="(attendee, attendeeIndex) in classItem['attendees']"
+                      v-for="(user, attendeeIndex) in classItem['participants']"
                       :key="attendeeIndex"
                       :class="getBadgeClass(classItem, attendeeIndex)"
                       class="badge"
                   >
-                    {{ attendee }}
+                    {{ user }}
                   </span>
                 </div>
               </div>

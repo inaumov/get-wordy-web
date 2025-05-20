@@ -1,4 +1,9 @@
 package get.wordy.model;
 
-public record Attendee(String userIdentity) {
+import jakarta.validation.constraints.NotBlank;
+
+public record Attendee(
+        @NotBlank
+        String userIdentity
+) {
 }

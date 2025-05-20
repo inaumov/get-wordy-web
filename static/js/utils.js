@@ -22,3 +22,13 @@ export function getFullDayName(day) {
 
     return dayNames[day.toLowerCase()] || day; // In case of an invalid input, return the original value
 }
+
+export function formatTimeSlot(timeSlot) {
+    const formattedStartTime = timeSlot.startTime?.substring(0, 5); // get hours and minutes (HH:mm)
+    const formattedEndTime = timeSlot.endTime?.substring(0, 5); // get hours and minutes (HH:mm)
+    return `${formattedStartTime} - ${formattedEndTime}`;
+}
+
+export function dateHappened(endDate) {
+    return endDate;
+}

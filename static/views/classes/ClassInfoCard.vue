@@ -1,4 +1,6 @@
 <script>
+import {dateHappened, formatTimeSlot} from "@/js/utils.js";
+
 export default {
   props: {
     classInfo: {
@@ -7,20 +9,17 @@ export default {
     },
   },
   methods: {
-    formatSlot(timeSlot) {
-      const formattedStartTime = timeSlot.startTime?.substring(0, 5); // get hours and minutes (HH:mm)
-      const formattedEndTime = timeSlot.endTime?.substring(0, 5); // get hours and minutes (HH:mm)
-      return `${formattedStartTime} - ${formattedEndTime}`;
-    },
+    formatTimeSlot,
+    dateHappened,
     editClass() {
       this.$emit('edit', this.classInfo);
     },
-    toggleState() {
+    updateActivation() {
       this.$emit('activation', this.classInfo);
     },
     deleteClass() {
       this.$emit('delete', this.classInfo);
-    },
+    }
   },
 };
 </script>
@@ -34,17 +33,25 @@ export default {
         <span v-if="classInfo['isActive']" class="text-success">
           <i class="bi bi-dot"></i>Active
         </span>
-        <span v-else-if="!classInfo['isActive']" class="text-danger">
+        <span v-else class="text-danger">
           <i class="bi bi-dot"></i>Inactive
         </span>
       </div>
-      <div v-if="classInfo.isRepeatable">
-        <span class="text-muted" v-for="(timeSlot, index) in classInfo.schedules" :key="index">
-          <strong>{{ timeSlot.dayOfWeek }}: </strong>{{ formatSlot(timeSlot) }}
-          <i v-if="index < classInfo.schedules.length - 1" class="bi bi-dot"></i>
+      <span class="text-muted">{{ classInfo.format }}</span>
+      <div v-if="this.classInfo.scheduleType === 'REPEATABLE'">
+        <span class="text-muted" v-for="(timeSlot, index) in this.classInfo.timeSlots" :key="index">
+          <strong>{{ timeSlot.dayOfWeek }}: </strong>{{ formatTimeSlot(timeSlot) }}
+          <i v-if="index < this.classInfo.timeSlots.length - 1" class="bi bi-dot"></i>
         </span>
       </div>
-      <span class="text-muted">{{ classInfo.format }}</span>
+      <div v-if="this.classInfo.scheduleType === 'ONE_TIME'">
+        <span class="text-muted">
+          One time activity<span>, at {{ dateHappened(this.classInfo.endDate) }}</span>
+        </span>
+      </div>
+      <p class="class-notes" v-if="this.classInfo.notes">
+        <strong>Notes for student: </strong> {{ this.classInfo.notes }}
+      </p>
     </div>
     <!-- status and actions -->
     <div class="ms-auto">
@@ -58,7 +65,7 @@ export default {
           </a>
         </li>
         <li>
-          <a class="dropdown-item" href="#" @click="toggleState">
+          <a class="dropdown-item" href="#" @click="updateActivation">
             {{ classInfo.isActive ? 'Disable' : 'Enable' }}
           </a>
         </li>

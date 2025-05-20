@@ -17,11 +17,11 @@ export default {
 
       if (scheduleType === this.SCHEDULE_TYPES.REPEATABLE) {
         // reset any previous validation state
-        this.$refs.classSchedules.classList.remove('is-invalid');
+        this.$refs.timeSlots.classList.remove('is-invalid');
         // validate the selected days
-        if (this.classInfo.schedules.length === 0) {
+        if (this.classInfo.timeSlots.length === 0) {
           // if no days are selected, apply the 'is-invalid' class
-          this.$refs.classSchedules.classList.add('is-invalid');
+          this.$refs.timeSlots.classList.add('is-invalid');
           return;
         }
       }
@@ -47,7 +47,7 @@ export default {
         scheduleType: scheduleType,
       };
       if (scheduleType === this.SCHEDULE_TYPES.REPEATABLE) {
-        requestData['schedules'] = this.classInfo.schedules;
+        requestData['timeSlots'] = this.classInfo.timeSlots;
       }
       if (scheduleType === this.SCHEDULE_TYPES.ONE_TIME) {
         requestData['endDate'] = this.classInfo.endDate;
@@ -55,11 +55,11 @@ export default {
       // emit the structured requestData to parent
       this.$emit('classInfoSubmit', requestData);
     },
-    addSchedule() {
-      this.classInfo.schedules.push({ dayOfWeek: '', startTime: '', endTime: '' });
+    addTimeSlot() {
+      this.classInfo.timeSlots.push({ dayOfWeek: '', startTime: '', endTime: '' });
     },
-    removeSchedule(index) {
-      this.classInfo.schedules.splice(index, 1);
+    removeTimeSlot(index) {
+      this.classInfo.timeSlots.splice(index, 1);
     },
   },
 };
@@ -98,22 +98,22 @@ export default {
           </div>
         </div>
 
-        <!-- schedule selection (visible only if repeatable) -->
+        <!-- time slots selection (visible only if repeatable) -->
         <div v-if="classInfo.scheduleType === SCHEDULE_TYPES.REPEATABLE" class="row mb-3">
           <div class="col-12">
-            <label for="classSchedules" class="form-label">
-              Select the schedules for the class<i>*</i>
+            <label for="timeSlots" class="form-label">
+              Select the time slots for the class<i>*</i>
             </label>
-            <div ref="classSchedules" id="classSchedules" class="d-flex flex-column gap-2">
+            <div ref="timeSlots" id="timeSlots" class="d-flex flex-column gap-2">
               <div
-                  v-for="(schedule, index) in this.classInfo.schedules"
+                  v-for="(timeSlot, index) in this.classInfo.timeSlots"
                   :key="index"
                   class="d-flex align-items-center gap-3"
               >
                 <select
-                    v-model="schedule.dayOfWeek"
+                    v-model="timeSlot.dayOfWeek"
                     class="form-select w-auto"
-                    :id="'schedule-day-' + index"
+                    :id="'timeslot-day-' + index"
                     required
                 >
                   <option value="" disabled>Select Day</option>
@@ -123,23 +123,23 @@ export default {
                 </select>
                 <input
                     type="time"
-                    v-model="schedule.startTime"
+                    v-model="timeSlot.startTime"
                     class="form-control w-auto"
-                    :id="'schedule-start-' + index"
+                    :id="'timeslot-start-' + index"
                     required
                 />
                 <input
                     type="time"
-                    v-model="schedule.endTime"
+                    v-model="timeSlot.endTime"
                     class="form-control w-auto"
-                    :id="'schedule-end-' + index"
+                    :id="'timeslot-end-' + index"
                     required
                 />
-                <!-- Remove Schedule Button -->
+                <!-- remove time slots button -->
                 <button
                     type="button"
                     class="btn btn-danger btn-sm"
-                    @click="removeSchedule(index)"
+                    @click="removeTimeSlot(index)"
                 >
                   Remove
                 </button>
@@ -148,15 +148,15 @@ export default {
             </div>
 
             <!-- Validation Feedback -->
-            <div v-if="this.classInfo?.schedules?.length === 0" class="invalid-feedback">
+            <div v-if="this.classInfo?.timeSlots?.length === 0" class="invalid-feedback">
               At least one slot required.
             </div>
 
-            <!-- Add Schedule Button -->
+            <!-- add time slots button -->
             <button
                 type="button"
                 class="btn btn-primary mt-2"
-                @click="addSchedule"
+                @click="addTimeSlot"
             >
               Add more slots
             </button>
@@ -190,7 +190,7 @@ export default {
         <!-- submit / back Buttons -->
         <div class="row py-4">
           <div class="d-flex flex-column align-items-end">
-            <button type="submit" class="btn btn-secondary">Update</button>
+            <button type="submit" class="btn btn-secondary">Submit</button>
           </div>
         </div>
       </form>

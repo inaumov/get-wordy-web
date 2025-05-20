@@ -1,5 +1,5 @@
 <script>
-import {assignUser, revokeUser} from "@/js/attendees-api";
+import {assignUser, revokeUser} from "@/js/participants-api.js";
 
 export default {
   props: ['classInfo'],
@@ -18,7 +18,7 @@ export default {
       this.inputError = "";
       try {
         await assignUser(this.classInfo?.classId, this.newUserIdentity);
-        this.classInfo.attendees.push(this.newUserIdentity);
+        this.classInfo.participants.push(this.newUserIdentity);
         this.newUserIdentity = "";
       } catch (error) {
         console.error("Error assigning user:", error);
@@ -27,9 +27,9 @@ export default {
     async handleRevokeUser(userIdentity) {
       try {
         await revokeUser(this.classInfo?.classId, userIdentity);
-        const index = this.classInfo.attendees.indexOf(userIdentity);
+        const index = this.classInfo.participants.indexOf(userIdentity);
         if (index !== -1) {
-          this.classInfo.attendees.splice(index, 1);
+          this.classInfo.participants.splice(index, 1);
         }
       } catch (error) {
         console.error("Error revoking user:", error);
@@ -55,9 +55,9 @@ export default {
       </button>
     </form>
     <!-- users list (below) -->
-    <h6 class="pt-3">{{ this.classInfo.attendees?.length }} participant(s)</h6>
-    <ul v-if="this.classInfo.attendees.length > 0" class="access-list">
-      <li class="py-2 d-flex align-items-center" v-for="user in this.classInfo.attendees" :key="user">
+    <h6 class="pt-3">{{ this.classInfo.participants?.length }} participant(s)</h6>
+    <ul v-if="this.classInfo.participants.length > 0" class="access-list">
+      <li class="py-2 d-flex align-items-center" v-for="user in this.classInfo.participants" :key="user">
         <span class="px-2 me-auto">{{ user }}</span>
         <button class="btn btn-outline-danger btn-sm btn-equals" @click="handleRevokeUser(user)">Revoke</button>
       </li>

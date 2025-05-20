@@ -13,7 +13,10 @@ export default {
   },
   methods: {
     onUpdate(updatedClassInfo) {
-      updateClassInfo(updatedClassInfo)
+      updateClassInfo({
+        classId: this.classInfo.classId,
+        ...updatedClassInfo
+      })
           .then(response => {
             if (response.ok) {
               console.log('Class info updated');

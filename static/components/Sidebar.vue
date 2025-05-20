@@ -1,5 +1,6 @@
 <script>
 import {useRouter} from 'vue-router';
+import {formatTimeSlot} from "@/js/utils.js";
 
 export default {
   props: {
@@ -39,11 +40,7 @@ export default {
     return {navigate, isActive};
   },
   methods: {
-    formatSchedule(schedule) {
-      const formattedStartTime = schedule.startTime?.substring(0, 5); // get hours and minutes (HH:mm)
-      const formattedEndTime = schedule.endTime?.substring(0, 5); // get hours and minutes (HH:mm)
-      return `${formattedStartTime} - ${formattedEndTime}`;
-    }
+    formatTimeSlot,
   }
 };
 </script>
@@ -78,13 +75,13 @@ export default {
             <i class="bi bi-bell animated-bell"></i>
           </span>
         </div>
-        <!-- Schedule Section -->
-        <div v-if="activeClass.schedules">
-          <span v-for="schedule in activeClass.schedules" :key="schedule.dayOfWeek" class="active-class-schedule">
-            <strong>{{ schedule.dayOfWeek }}</strong>: {{ formatSchedule(schedule) }}<br/>
+        <!-- time slots section -->
+        <div v-if="activeClass?.timeSlots">
+          <span v-for="timeSlot in activeClass.timeSlots" :key="timeSlot.dayOfWeek" class="active-class-schedule">
+            <strong>{{ timeSlot.dayOfWeek }}</strong>: {{ formatTimeSlot(timeSlot) }}<br/>
           </span>
         </div>
-        <span class="active-class-schedule" v-else>No schedule assigned</span>
+        <span class="active-class-schedule" v-else>No time slots assigned</span>
       </div>
       <hr class="sidebar-divider"/>
       <img :src="schoolLogo" alt="School Logo" class="logo img-fluid mb-2"/>

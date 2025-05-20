@@ -15,7 +15,7 @@ export default {
         name: '',
         format: '',
         scheduleType: 'NONE',
-        schedules: [],
+        timeSlots: [],
         endDate: '',
         notes: ''
       }

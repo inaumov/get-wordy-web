@@ -4,6 +4,7 @@ import get.wordy.core.api.IClassAccessService;
 import get.wordy.core.api.IClassService;
 import get.wordy.core.api.IVocabularyService;
 import get.wordy.core.api.bean.ClassInfo;
+import get.wordy.core.api.bean.ClassSchedule;
 import get.wordy.core.api.bean.Word;
 import get.wordy.core.api.bean.Vocabulary;
 import get.wordy.core.api.id.OwnerId;
@@ -50,19 +51,19 @@ public class ClassController {
         // fetch classes and filter by dayOfWeek at the data source level if a filter is provided
         List<ClassInfoResponse> classes = classService.getClassesInfo(createUserOwnerId(user))
                 .stream()
-                .map(ClassInfoResponse::new)
-                .map(this::enrichWithAttendees)
                 .filter(classInfo ->
                         dayOfWeekFilter.isEmpty() ||
-                                classInfo.getSchedules().stream()
-                                        .anyMatch(schedule -> schedule.getDayOfWeek().equalsIgnoreCase(dayOfWeekFilter.get())))
+                                classInfo.getTimeSlots().stream()
+                                        .anyMatch(timeSlot -> timeSlot.getDayOfWeek().equalsIgnoreCase(dayOfWeekFilter.get())))
+                .map(ClassInfoResponse::new)
+                .map(this::enrichWithParticipants)
                 .toList();
 
         return ResponseEntity.ok(classes);
     }
 
-    private ClassInfoResponse enrichWithAttendees(ClassInfoResponse response) {
-        return response.withAttendees(accessService.getAssignedAttendees(response.getClassId()));
+    private ClassInfoResponse enrichWithParticipants(ClassInfoResponse response) {
+        return response.withParticipants(accessService.getAssignedParticipants(response.getClassId()));
     }
 
     @PostMapping
@@ -82,8 +83,8 @@ public class ClassController {
 
         LOG.info("Update class info = {} request for the user = {}", classInfoRequest.getName(), user.getName());
 
-        var savedClass = classService.saveClassInfo(createUserOwnerId(user), copyClassInfo(classInfoRequest));
-        return ResponseEntity.created(URI.create("/" + savedClass.getClassId()))
+        var savedClass = classService.editClassInfo(createUserOwnerId(user), copyClassInfo(classInfoRequest));
+        return ResponseEntity.accepted()
                 .body(new ClassInfoResponse(savedClass));
     }
 
@@ -94,16 +95,32 @@ public class ClassController {
 
         Optional<ClassInfoResponse> response = Optional.of(classService.findClassInfo(createUserOwnerId(user), classId))
                 .map(ClassInfoResponse::new)
-                .map(this::enrichWithAttendees);
+                .map(this::enrichWithParticipants);
 
         return ResponseEntity.ok(response.orElseThrow());
     }
 
     @DeleteMapping(value = "/{classId}")
-    public ResponseEntity<ClassInfo> deleteClassInfo(Principal user, @PathVariable("classId") String classId) {
-        LOG.info("Deleting a class info for the user = {}, class id = {}", user.getName(), classId);
+    public ResponseEntity<ClassInfo> deleteClass(Principal user, @PathVariable("classId") String classId) {
+        LOG.info("Deleting a class by the user = {}, class id = {}", user.getName(), classId);
 
         classService.deleteClassInfo(createUserOwnerId(user), classId);
+
+        return ResponseEntity
+                .noContent()
+                .build();
+    }
+
+    @PatchMapping(value = "/{classId}")
+    public ResponseEntity<ClassInfo> classActivation(Principal user, @PathVariable("classId") String classId,
+                                                     @RequestBody ClassActivation activationRequest) {
+        LOG.info("Class activation request by the user = {}, class id = {}, set = {}", user.getName(), classId, activationRequest.isActive());
+
+        if (activationRequest.isActive()) {
+            accessService.activate(createUserOwnerId(user), classId);
+        } else {
+            accessService.deactivate(createUserOwnerId(user), classId);
+        }
 
         return ResponseEntity
                 .noContent()
@@ -199,7 +216,7 @@ public class ClassController {
                                                         @PathVariable("vocabId") int vocabId,
                                                         @Valid @RequestBody WordIdRequest wordId, UriComponentsBuilder ucBuilder) {
 
-        LOG.info("Receiving a new word to add request to vocabulary id = {}. User = {}, class id = {}", vocabId, user.getName(), classId);
+        LOG.info("Adding new word to vocabulary id = {}. User = {}, class id = {}", vocabId, user.getName(), classId);
 
         Word addedToVocabulary = vocabularyService.addToVocabulary(createClassOwnerId(classId), vocabId, wordId.wordId());
 
@@ -243,15 +260,29 @@ public class ClassController {
         } else {
             classId = "desna-" + RandomStringUtils.secure().nextAlphanumeric(5);
         }
-        return new ClassInfo(
+        ClassInfo classInfo = new ClassInfo(
                 classId,
                 request.getName(),
                 request.getFormat(),
                 null,
                 null,
                 request.getNotes(),
-                request.isRepeatable()
+                request.getScheduleType() == ScheduleType.REPEATABLE
         );
+        if (request.getScheduleType() == ScheduleType.NONE) {
+            return classInfo;
+        }
+        if (request.getScheduleType() == ScheduleType.ONE_TIME) {
+            classInfo.setEndDate(request.getEndDate());
+        }
+        if (request.getScheduleType() == ScheduleType.REPEATABLE) {
+            List<ClassSchedule> timeSlots = request.getTimeSlots()
+                    .stream()
+                    .map(timeSlot -> new ClassSchedule(timeSlot.dayOfWeek(), timeSlot.startTime(), timeSlot.endTime()))
+                    .toList();
+            classInfo.setTimeSlots(timeSlots);
+        }
+        return classInfo;
     }
 
     private WordResponse toWordResponse(Word word) {

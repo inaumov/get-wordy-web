@@ -14,13 +14,13 @@ import java.security.Principal;
 @RestController
 @RequestMapping("/classes")
 @PreAuthorize("hasAuthority('P_MANAGE_CLASSES')")
-public class AttendeesController {
+public class ParticipantsController {
 
-    private static final Logger LOG = LoggerFactory.getLogger(AttendeesController.class);
+    private static final Logger LOG = LoggerFactory.getLogger(ParticipantsController.class);
 
     private final IClassAccessService classService;
 
-    public AttendeesController(IClassAccessService classAccessService) {
+    public ParticipantsController(IClassAccessService classAccessService) {
         this.classService = classAccessService;
     }
 

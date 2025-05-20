@@ -19,7 +19,7 @@ export default {
     return {
       isEditMode: false,
       classInfo: {
-        attendees: []
+        participants: []
       }
     }
   },
@@ -96,7 +96,7 @@ export default {
       <!-- Left column: 70% -->
       <Vocabularies class="flex-grow-1" style="flex-basis: 70%;" v-bind="{classId: this.classId}"/>
       <!-- Right column: 30% -->
-      <Participants style="flex-basis: 30%; max-width: 30%;" v-if="classInfo && classInfo.attendees"
+      <Participants style="flex-basis: 30%; max-width: 30%;" v-if="classInfo && classInfo.participants"
                     v-bind="{ classInfo }"/>
     </div>
   </div>

@@ -1,5 +1,6 @@
 <script>
 import {getUserClasses} from '@/js/auth-check.js';
+import {dateHappened, formatTimeSlot} from "@/js/utils.js";
 
 export default {
   name: 'MyClasses',
@@ -15,14 +16,8 @@ export default {
       const response = await getUserClasses();
       this.assignedClasses = await response.json();
     },
-    formatSchedule(schedule) {
-      const formattedStartTime = schedule.startTime?.substring(0, 5); // get hours and minutes (HH:mm)
-      const formattedEndTime = schedule.endTime?.substring(0, 5); // get hours and minutes (HH:mm)
-      return `${formattedStartTime} - ${formattedEndTime}`;
-    },
-    dateHappened(endDate) {
-      return endDate;
-    }
+    formatTimeSlot,
+    dateHappened,
   },
   mounted() {
     this.fetchAttendeeClasses();
@@ -48,9 +43,9 @@ export default {
         <div v-for="classInfo in activeClasses" :key="classInfo.classId" class="class-item active">
           <div class="class-info">
             <h5 class="class-name">{{ classInfo.name }}</h5>
-            <div v-if="classInfo.isRepeatable" class="class-schedule">
-              <span class="text-muted" v-for="schedule in classInfo.schedules">
-                <strong>{{ schedule.dayOfWeek }}: </strong>{{ formatSchedule(schedule) }}<br/>
+            <div v-if="classInfo.timeSlots" class="class-schedule">
+              <span class="text-muted" v-for="timeSlot in classInfo.timeSlots">
+                <strong>{{ timeSlot.dayOfWeek }}: </strong>{{ formatTimeSlot(timeSlot) }}<br/>
               </span>
             </div>
             <p v-else class="text-muted">
@@ -71,8 +66,8 @@ export default {
         <div v-for="classInfo in pastClasses" :key="classInfo.classId" class="class-item past">
           <div class="class-info">
             <h5 class="class-name">{{ classInfo.name }}</h5>
-            <p v-if="classInfo.isRepeatable" class="text-muted">
-              Repeatable classes (Archived)
+            <p v-if="!classInfo.isActive" class="text-muted">
+              Archived
             </p>
             <p v-else class="text-muted">
               One time activity<span v-if="classInfo.endDate">, at {{ dateHappened(classInfo.endDate) }}</span>

@@ -56,8 +56,8 @@ class ClassesApiTest extends BaseApiTest {
             assertTrue(firstClass.has("level"));
             assertTrue(firstClass.get("notes").isEmpty());
             // meta
-            assertTrue(firstClass.get("attendees").isArray());
-            assertEquals("Test", firstClass.get("attendees").get(0).asText());
+            assertTrue(firstClass.get("participants").isArray());
+            assertEquals("Test", firstClass.get("participants").get(0).asText());
         }
     }
 
