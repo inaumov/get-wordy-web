@@ -16,7 +16,7 @@ export default {
       this.$emit('edit', this.classInfo);
     },
     toggleState() {
-      this.$emit('deactivate', this.classInfo);
+      this.$emit('activation', this.classInfo);
     },
     deleteClass() {
       this.$emit('delete', this.classInfo);

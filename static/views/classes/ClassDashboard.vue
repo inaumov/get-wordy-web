@@ -3,13 +3,18 @@ import EditClass from "./EditClass.vue";
 import Actions from "./NewVocabularyActions.vue";
 import Participants from "./Participants.vue";
 import Vocabularies from "@/views/classes/ClassVocabularies.vue";
-import {getClass} from "@/js/classes-api.js";
+import {classActivation, deleteClass, getClass} from "@/js/classes-api.js";
 import ClassInfoCard from "@/views/classes/ClassInfoCard.vue";
+import {useRouter} from "vue-router";
 
 export default {
   props: ['classId', 'day'],
   name: "ClassDetails",
   components: {ClassInfoCard, Vocabularies, Actions, EditClass, Participants},
+  setup() {
+    let router = useRouter();
+    return {router}
+  },
   data() {
     return {
       isEditMode: false,
@@ -29,12 +34,33 @@ export default {
     hideEditForm() {
       this.isEditMode = false;
     },
-    onDeactivate() {
-
+    async onActivation() {
+      let active = !this.classInfo.isActive;
+      const response = await classActivation(this.classId, active);
+      if (response.ok) {
+        await this.getData() // reload because of schedule reset
+      }
+      if (!response.ok) {
+        const err = await response.json();
+        console.log("Failed to send class activation request", err)
+      }
     },
-    onDelete() {
-
-    }
+    async onDelete() {
+      const response = await deleteClass(this.classId);
+      if (response.ok) {
+        this.navigateToClasses();
+      }
+      if (!response.ok) {
+        const err = await response.json();
+        console.log("Failed to delete a class", err)
+      }
+    },
+    navigateToClasses() {
+      this.router.push({
+        name: 'day-classes',
+        params: {day: this.day}
+      });
+    },
   },
   mounted() {
     this.getData()
@@ -59,7 +85,7 @@ export default {
   </div>
   <ClassInfoCard v-if="!isEditMode" :class-info="this.classInfo" class="px-4"
       @edit="showEditForm"
-      @deactivate="onDeactivate"
+      @activation="onActivation"
       @delete="onDelete"
   />
 
@@ -70,7 +96,8 @@ export default {
       <!-- Left column: 70% -->
       <Vocabularies class="flex-grow-1" style="flex-basis: 70%;" v-bind="{classId: this.classId}"/>
       <!-- Right column: 30% -->
-      <Participants style="flex-basis: 30%; max-width: 30%;" v-if="classInfo && classInfo.attendees" v-bind="{ classInfo }"/>
+      <Participants style="flex-basis: 30%; max-width: 30%;" v-if="classInfo && classInfo.attendees"
+                    v-bind="{ classInfo }"/>
     </div>
   </div>
   <EditClass v-if="this.isEditMode"

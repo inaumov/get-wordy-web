@@ -32,7 +32,6 @@ export function createClass(classInfo) {
     let createRequest = new Request(classAPI, initObject);
     return fetch(createRequest)
         .catch(err => console.log("HTTP error: ", err));
-
 }
 
 export function updateClassInfo(classInfo) {
@@ -50,7 +49,6 @@ export function updateClassInfo(classInfo) {
     let createRequest = new Request(classAPI, initObject);
     return fetch(createRequest)
         .catch(err => console.log("HTTP error: ", err));
-
 }
 
 export function getClass(classId) {
@@ -79,6 +77,23 @@ export function deleteClass(classId) {
     let deleteRequest = new Request(classAPI + "/" + classId, initObject);
 
     return fetch(deleteRequest)
+        .catch(err => console.log("HTTP error: ", err));
+}
+
+export function classActivation(classId, isActive) {
+    let headers = new Headers();
+
+    let request = {
+        isActive: isActive
+    }
+    let initObject = {
+        method: 'PATCH',
+        headers: headers,
+        body: JSON.stringify(request),
+    };
+
+    let patchRequest = new Request(classAPI + "/" + classId, initObject);
+    return fetch(patchRequest)
         .catch(err => console.log("HTTP error: ", err));
 }
 

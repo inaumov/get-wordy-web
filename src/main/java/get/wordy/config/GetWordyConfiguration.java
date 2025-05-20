@@ -79,13 +79,14 @@ public class GetWordyConfiguration implements WebMvcConfigurer {
     }
 
     @Bean
-    public IClassAccessService classAccessService(DataSource dataSource, NamedParameterJdbcTemplate jdbcTemplate) {
+    public IClassAccessService classAccessService(DataSource dataSource, NamedParameterJdbcTemplate jdbcTemplate,
+                                                  IClassService classService) {
         LocalTxManager txManager = LocalTxManager.withDataSource(dataSource);
         LOG.info("Creating class access service for data source = {}", dataSource);
         return new ClassAccessService(
                 new ClassAccessDao(jdbcTemplate),
                 txManager,
-                new ClassesDao(jdbcTemplate)
+                classService
         );
     }
 
