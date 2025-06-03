@@ -7,7 +7,9 @@ import get.wordy.core.api.bean.ClassInfo;
 import get.wordy.core.api.bean.ClassSchedule;
 import get.wordy.core.api.bean.Word;
 import get.wordy.core.api.bean.Vocabulary;
+import get.wordy.core.api.bean.wrapper.VocabularySummary;
 import get.wordy.core.api.id.OwnerId;
+import get.wordy.core.api.id.OwnersId;
 import get.wordy.model.*;
 import get.wordy.model.WordResponse;
 import jakarta.validation.Valid;
@@ -25,6 +27,8 @@ import org.springframework.web.util.UriComponentsBuilder;
 import java.net.URI;
 import java.security.Principal;
 import java.util.*;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/classes")
@@ -45,20 +49,50 @@ public class ClassController {
     @GetMapping
     public ResponseEntity<List<ClassInfoResponse>> getClassesInfo(Principal user,
                                                                   @RequestParam(value = "filter", required = false) Optional<String> dayOfWeekFilter) {
-        LOG.info("Getting {} classes info managed by the user = {}", dayOfWeekFilter.isEmpty() ? "all" : dayOfWeekFilter, user.getName());
+        LOG.info("Getting {} classes info managed by the user = {}",
+                dayOfWeekFilter.map(String::toUpperCase).orElse("ALL"),
+                user.getName());
 
-        // fetch classes and filter by dayOfWeek at the data source level if a filter is provided
-        List<ClassInfoResponse> classes = classService.getClassesInfo(createUserOwnerId(user))
-                .stream()
-                .filter(classInfo ->
-                        dayOfWeekFilter.isEmpty() ||
-                                classInfo.getTimeSlots().stream()
-                                        .anyMatch(timeSlot -> timeSlot.getDayOfWeek().equalsIgnoreCase(dayOfWeekFilter.get())))
+        // Step 1: Fetch classes
+        List<ClassInfo> classInfos = classService.getClassesInfo(createUserOwnerId(user));
+
+        // Step 2: Apply dayOfWeek filter early (if provided)
+        if (dayOfWeekFilter.isPresent()) {
+            String filter = dayOfWeekFilter.get().toUpperCase();
+            classInfos = classInfos.stream()
+                    .filter(c -> c.getTimeSlots().stream()
+                            .anyMatch(slot -> slot.getDayOfWeek().equalsIgnoreCase(filter)))
+                    .toList();
+        }
+
+        // Step 3: Convert to response DTOs and enrich with participants
+        List<ClassInfoResponse> classResponses = classInfos.stream()
                 .map(ClassInfoResponse::new)
                 .map(this::enrichWithParticipants)
                 .toList();
 
-        return ResponseEntity.ok(classes);
+        // Step 4: Collect class IDs
+        Set<String> classIds = classResponses.stream()
+                .map(ClassInfoResponse::getClassId)
+                .collect(Collectors.toSet());
+
+        // Step 5: Fetch vocabulary summaries
+        Map<String, VocabularySummary> summaryMap = vocabularyService
+                .findVocabularySummaries(new OwnersId(classIds, "class"))
+                .stream()
+                .collect(Collectors.toMap(VocabularySummary::ownerId, Function.identity()));
+
+        // Step 6: Enrich responses with vocab summary
+        List<ClassInfoResponse> result = classResponses.stream()
+                .map(classInfo -> {
+                    VocabularySummary summary = summaryMap.get(classInfo.getClassId());
+                    return summary != null
+                            ? classInfo.withSharedSummary(summary.notSharedCount(), summary.lastUpdatedAt())
+                            : classInfo;
+                })
+                .toList();
+
+        return ResponseEntity.ok(result);
     }
 
     private ClassInfoResponse enrichWithParticipants(ClassInfoResponse response) {

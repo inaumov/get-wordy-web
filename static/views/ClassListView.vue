@@ -80,6 +80,9 @@ export default {
     },
     formatTimeSlot,
     dateHappened,
+    formatDateTime(dateTime) {
+      return new Date(dateTime).toLocaleString();
+    },
     clearSearch() {
       this.searchTerm = "";
     }

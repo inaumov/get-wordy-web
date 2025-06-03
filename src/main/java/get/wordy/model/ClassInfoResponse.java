@@ -5,6 +5,7 @@ import get.wordy.core.api.bean.ClassInfo;
 import lombok.Getter;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -20,6 +21,8 @@ public class ClassInfoResponse {
     private final String notes;
     @JsonProperty("isActive")
     private final boolean isActive;
+    private int draftsCount;
+    private LocalDateTime lastUpdatedAt;
 
     @Getter
     @JsonProperty("participants")
@@ -41,6 +44,12 @@ public class ClassInfoResponse {
 
     public ClassInfoResponse withParticipants(List<String> participants) {
         this.participants.addAll(participants);
+        return this;
+    }
+
+    public ClassInfoResponse withSharedSummary(int draftsCount, LocalDateTime lastUpdatedAt) {
+        this.draftsCount = draftsCount;
+        this.lastUpdatedAt = lastUpdatedAt;
         return this;
     }
 
