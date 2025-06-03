@@ -11,7 +11,6 @@ import get.wordy.core.api.id.OwnerId;
 import get.wordy.model.*;
 import get.wordy.model.WordResponse;
 import jakarta.validation.Valid;
-import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -202,8 +201,8 @@ public class ClassController {
             vocabularyService.renameVocabulary(createClassOwnerId(classId), vocabId, partialUpdate.name());
         }
         // handle availability change
-        if (BooleanUtils.isTrue(partialUpdate.isShared())) {
-            vocabularyService.makeVocabularyIsShared(createClassOwnerId(classId), vocabId, true);
+        if (Objects.nonNull(partialUpdate.isShared())) {
+            vocabularyService.updateSharing(createClassOwnerId(classId), vocabId, partialUpdate.isShared());
         }
         return ResponseEntity
                 .noContent()
@@ -304,7 +303,8 @@ public class ClassController {
                 vocabHeader.getVocabId(),
                 vocabHeader.getName(),
                 vocabHeader.getWordsTotal(),
-                vocabHeader.isShared()
+                vocabHeader.isShared(),
+                vocabHeader.getUpdateTime()
         );
     }
 

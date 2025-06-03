@@ -1,5 +1,5 @@
 <script>
-import {dateHappened, formatTimeSlot} from "@/js/utils.js";
+import {dateHappened, formatTimeSlot, getFullDayName} from "@/js/utils.js";
 
 export default {
   props: {
@@ -9,6 +9,7 @@ export default {
     },
   },
   methods: {
+    getFullDayName,
     formatTimeSlot,
     dateHappened,
     editClass() {
@@ -37,19 +38,21 @@ export default {
           <i class="bi bi-dot"></i>Inactive
         </span>
       </div>
-      <span class="text-muted">{{ classInfo.format }}</span>
+      <div v-if="classInfo['format']" class="my-1">
+        <span class="text-primary-emphasis">{{ classInfo['format'] }}</span>
+      </div>
       <div v-if="this.classInfo.scheduleType === 'REPEATABLE'">
         <span class="text-muted" v-for="(timeSlot, index) in this.classInfo.timeSlots" :key="index">
-          <strong>{{ timeSlot.dayOfWeek }}: </strong>{{ formatTimeSlot(timeSlot) }}
+          <strong>{{ getFullDayName(timeSlot.dayOfWeek) }}: </strong>{{ formatTimeSlot(timeSlot) }}
           <i v-if="index < this.classInfo.timeSlots.length - 1" class="bi bi-dot"></i>
         </span>
       </div>
       <div v-if="this.classInfo.scheduleType === 'ONE_TIME'">
         <span class="text-muted">
-          One time activity<span>, at {{ dateHappened(this.classInfo.endDate) }}</span>
+          <strong>One time activity</strong>: {{ dateHappened(this.classInfo.endDate) }}
         </span>
       </div>
-      <p class="class-notes" v-if="this.classInfo.notes">
+      <p class="class-notes text-muted" v-if="this.classInfo.notes">
         <strong>Notes for student: </strong> {{ this.classInfo.notes }}
       </p>
     </div>

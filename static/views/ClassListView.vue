@@ -1,6 +1,6 @@
 <script>
 import {fetchClasses} from '@/js/classes-api.js';
-import {formatTimeSlot, getFullDayName} from '@/js/utils.js'
+import {dateHappened, formatTimeSlot, getFullDayName} from '@/js/utils.js'
 import {useRouter} from "vue-router";
 
 export default {
@@ -36,7 +36,7 @@ export default {
         return {
           ...item, // spread the existing properties
           hasParticipants: item['participants'] && item['participants'].length >= 1,
-          hasDrafts: item['drafts'] && item['drafts'] >= 0,
+          hasDrafts: item['draftsCount'] && item['draftsCount'] >= 0,
         };
       });
     },
@@ -79,6 +79,7 @@ export default {
       return colors[index];
     },
     formatTimeSlot,
+    dateHappened,
     clearSearch() {
       this.searchTerm = "";
     }
@@ -198,7 +199,7 @@ export default {
           <div class="group px-3 py-2">
             <div>
               <div class="d-flex align-items-center justify-content-between">
-                <span class="ellipsis d-inline-block" style="max-width: 190px;">
+                <span class="ellipsis d-inline-block text-dark" style="max-width: 190px;">
                   <strong>{{ classItem['name'] }}</strong>
                 </span>
                 <span v-if="classItem['isActive']" class="active d-flex align-items-center">
@@ -208,26 +209,28 @@ export default {
                   <i class="bi bi-dot"></i>Disabled
                 </span>
               </div>
-              <div v-if="classItem['format']" class="">
-                <span class="text-muted">{{ classItem['format'] }}</span>
+              <div v-if="classItem['format']" class="my-1">
+                <span class="text-primary-emphasis">{{ classItem['format'] }}</span>
               </div>
-              <span v-if="classItem.hasDrafts" class="text-muted text-end">
-                <span :class="pickBadgeColorClass(classItem.drafts)">
-                  <strong>Drafts</strong>: {{ classItem['drafts'] }}
-                </span>
+              <span v-if="classItem.hasDrafts" class="text-muted" :class="pickBadgeColorClass(classItem.drafts)">
+                  <strong>Drafts</strong>: {{ classItem['draftsCount'] }}
+              </span>
+              <span v-else-if="classItem['lastUpdatedAt']" class="text-muted">
+                  <strong>Last vocabulary update</strong>: {{ formatDateTime(classItem['lastUpdatedAt']) }}
               </span>
               <span v-else class="text-muted text-end">
-                <span>
-                  <strong>Last shared material:</strong> 01/01/2025
-                </span>
+                  No vocabularies added yet
               </span>
               <div class="py-1">
                 <div v-if="classItem.timeSlots">
-                  <span v-for="timeSlot in classItem.timeSlots" :key="timeSlot.dayOfWeek" class="class-schedule">
+                  <span v-for="timeSlot in classItem.timeSlots" :key="timeSlot.dayOfWeek" class="text-muted">
                     <strong>{{ timeSlot.dayOfWeek }}</strong>: {{ formatTimeSlot(timeSlot) }}<br/>
                   </span>
                 </div>
-                <span class="class-schedule" v-else>No time slot assigned</span>
+                <span v-else-if="classItem.endDate" class="text-muted">
+                  <strong>One time activity</strong>: {{ dateHappened(classItem.endDate) }}
+                </span>
+                <span class="text-muted" v-else>No time slot assigned</span>
               </div>
               <div class="">
                 <span class="text-muted">

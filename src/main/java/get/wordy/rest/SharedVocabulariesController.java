@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.security.Principal;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -63,6 +64,7 @@ public class SharedVocabulariesController {
         return Map.of(
                 "vocabId", vocabulary.getVocabId(),
                 "name", vocabulary.getName(),
+                "updateTime", vocabulary.getUpdateTime(),
                 "wordsTotal", vocabulary.getWordsTotal());
     }
 
@@ -79,25 +81,23 @@ public class SharedVocabulariesController {
             throw new AccessDeniedException("Permission denied: no access to this vocabulary = " + vocabId);
         }
 
+        Map<String, Object> vocabularyResponse = new HashMap<>();
+        vocabularyResponse.put("vocabId", vocabId);
+        vocabularyResponse.put("name", vocabulary.getName());
+        vocabularyResponse.put("updateTime", vocabulary.getUpdateTime());
+
         if (vocabulary.getWordsTotal() == 0) {
-            Map<String, Object> empty = Map.of(
-                    "vocabId", vocabId,
-                    "name", vocabulary.getName(),
-                    "wordsTotal", 0,
-                    "words", Collections.emptyList());
-            return new ResponseEntity<>(empty, HttpStatus.OK);
+            vocabularyResponse.put("wordsTotal", 0);
+            vocabularyResponse.put("words", Collections.emptyList());
+            return new ResponseEntity<>(vocabularyResponse, HttpStatus.OK);
         }
 
-        List<Word> vocabWords = vocabularyService.getWords(createClassOwnerId(classId), vocabId);
-        Map<String, Object> vocabularyResponse = Map.of(
-                "vocabId", vocabId,
-                "name", vocabulary.getName(),
-                "wordsTotal", vocabulary.getWordsTotal(),
-                "words", vocabWords
-                        .stream()
-                        .map(this::toWordResponse)
-                        .toList()
-        );
+        List<WordResponse> vocabWords = vocabularyService.getWords(createClassOwnerId(classId), vocabId)
+                .stream()
+                .map(this::toWordResponse)
+                .toList();
+        vocabularyResponse.put("wordsTotal", vocabulary.getWordsTotal());
+        vocabularyResponse.put("words", vocabWords);
 
         return new ResponseEntity<>(vocabularyResponse, HttpStatus.OK);
     }

@@ -48,8 +48,8 @@ export default {
                 <strong>{{ timeSlot.dayOfWeek }}: </strong>{{ formatTimeSlot(timeSlot) }}<br/>
               </span>
             </div>
-            <p v-else class="text-muted">
-              One time activity<span v-if="classInfo.endDate">, at {{ dateHappened(classInfo.endDate) }}</span>
+            <p v-if="classInfo.endDate" class="text-muted">
+              <strong>One time activity</strong><span>: {{ dateHappened(classInfo.endDate) }}</span>
             </p>
             <p class="class-notes" v-if="classInfo.notes">
               <strong>Notes for student: </strong> {{ classInfo.notes }}
@@ -70,7 +70,7 @@ export default {
               Archived
             </p>
             <p v-else class="text-muted">
-              One time activity<span v-if="classInfo.endDate">, at {{ dateHappened(classInfo.endDate) }}</span>
+              <strong>One time activity</strong><span>: {{ dateHappened(classInfo.endDate) }}</span>
             </p>
             <p class="class-notes" v-if="classInfo.notes">
               <strong>Notes for student: </strong> {{ classInfo.notes }}

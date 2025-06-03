@@ -54,7 +54,7 @@ export default {
           <!-- displaying whether the item is shared or not (optional property) -->
           <div class="col text-end">
             <span v-if="vocabulary.isShared" class="text-success">
-              Shared on: {{ formatDateTime(vocabulary.sharedAt) }}
+              Last update: {{ formatDateTime(vocabulary['updateTime']) }}
             </span>
             <span v-else class="text-secondary">
               Not shared
