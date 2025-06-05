@@ -1,5 +1,6 @@
 <script>
 import {getVocabularies} from '@/js/classes-api.js';
+import {formatDateTime} from "@/js/utils.js";
 
 export default {
   name: 'ClassVocabularies',
@@ -14,9 +15,7 @@ export default {
       const response = await getVocabularies(this.classId);
       this.vocabularies = await response.json();
     },
-    formatDateTime(dateTime) {
-      return new Date(dateTime).toLocaleString();
-    }
+    formatDateTime
   },
   mounted() {
     this.getData()

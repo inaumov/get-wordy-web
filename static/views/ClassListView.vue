@@ -1,6 +1,6 @@
 <script>
 import {fetchClasses} from '@/js/classes-api.js';
-import {dateHappened, formatTimeSlot, getFullDayName} from '@/js/utils.js'
+import {dateHappened, formatDateTime, formatTimeSlot, getFullDayName} from '@/js/utils.js'
 import {useRouter} from "vue-router";
 
 export default {
@@ -80,9 +80,7 @@ export default {
     },
     formatTimeSlot,
     dateHappened,
-    formatDateTime(dateTime) {
-      return new Date(dateTime).toLocaleString();
-    },
+    formatDateTime,
     clearSearch() {
       this.searchTerm = "";
     }

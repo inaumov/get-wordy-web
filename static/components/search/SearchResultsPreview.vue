@@ -17,7 +17,7 @@ export default {
 </script>
 
 <template>
-  <div class="p-3">
+  <div>
     <div v-if="previewData?.value" class="text-center">
       <p>Choose one of the following explanations:</p>
     </div>

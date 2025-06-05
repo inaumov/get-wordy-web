@@ -3,7 +3,14 @@ import WordsheetTable from "@/components/classes/WordsheetTable.vue";
 import SearchInput from "@/components/search/SearchInput.vue";
 import SearchResultsPreview from "@/components/search/SearchResultsPreview.vue";
 
-import {getVocabulary, publish, updateVocabularyName, addToVocabulary, removeFromVocabulary} from '@/js/classes-api.js';
+import {
+  getVocabulary,
+  updateVocabularyName,
+  addToVocabulary,
+  removeFromVocabulary,
+  updateActivation
+} from '@/js/classes-api.js';
+import {formatDateTime} from "@/js/utils.js";
 
 export default {
   components: {SearchResultsPreview, WordsheetTable, SearchInput},
@@ -13,32 +20,35 @@ export default {
       name: '',
       isShared: false,
       wordsList: [],
+      updateTime: '',
       foundExplanations: {}
     }
   },
   methods: {
+    formatDateTime,
     async getData() {
       const response = await getVocabulary(this.classId, this.vocabId);
       const vocabulary = await response.json();
       this.name = vocabulary['name'];
       this.isShared = vocabulary['isShared'];
+      this.updateTime = vocabulary['updateTime'];
       this.wordsList = vocabulary['words'] || [];
     },
-    onNameEdit(event) {
-      let currVal = event.target.innerText.trim();
-      const actualVal = this.name;
-      if (currVal !== actualVal) {
-        updateVocabularyName(this.classId, this.vocabId, currVal)
+    onNameEdit() {
+      const editedText = this.$refs.editableEl.innerText.trim();
+      if (editedText && editedText !== this.name) {
+        updateVocabularyName(this.classId, this.vocabId, editedText)
             .then(response => {
               if (response.ok) {
-                this.name = currVal; // update model
-                console.log('Property [name] has been changed to:', currVal, ', for vocabulary id =', this.vocabId);
+                this.name = editedText; // update model
+                console.log('Name has been changed to:', editedText, ', for vocabulary id =', this.vocabId);
+                // todo success notification
               }
-              console.log("PATCH vocabulary has been requested. Response.status =", response.status);
+              // todo failure notification
             });
-        return;
+      } else {
+        this.$refs.editableEl.innerText = this.name // restore original if cleared
       }
-      console.log('No changes detected in property [name] for vocabulary id =', this.vocabId);
     },
     onSearch(searchResult) {
       this.foundExplanations = searchResult;
@@ -46,10 +56,13 @@ export default {
     reset() {
       this.foundExplanations = {}; // reset on success
     },
-    onReady() {
-      publish(this.classId, this.vocabId, true)
+    updateActivation() {
+      const newVal = !this.isShared;
+      updateActivation(this.classId, this.vocabId, newVal)
           .then(response => {
             if (response.ok) {
+              this.isShared = newVal; // update model
+              console.log('Is_shared flag has been changed to:', newVal, ', for vocabulary id =', this.vocabId);
               // todo success notification
             }
             // todo failure notification
@@ -89,6 +102,11 @@ export default {
   },
   mounted() {
     this.getData()
+  },
+  computed: {
+    hasNoWords() {
+      return !(this.wordsList && this.wordsList.length > 0);
+    }
   }
 };
 
@@ -99,23 +117,43 @@ export default {
     <router-link :to="{name: 'class-dashboard', params: {classId:this.classId}}" class="btn btn-secondary" title="Back">Back</router-link>
   </div>
 
-  <div class="container">
+  <div class="">
 
-    <div class="d-flex justify-content-left p-2">
-      <span contenteditable="true" class="h4 p-1" v-text="name" v-on:blur="onNameEdit">
+    <div class="d-flex justify-content-between p-4">
+      <span class="d-inline-flex align-items-center p-1 editable-name"
+            ref="editableEl"
+            contenteditable="true"
+            v-on:blur="onNameEdit">
+        {{ name }}
+      </span>
+      <span :class="['p-1', 'd-inline-flex', 'align-items-center', isShared ? 'text-success' : 'text-secondary']">
+        {{ isShared ? 'Shared: ' + formatDateTime(updateTime) : 'Not shared' }}
       </span>
     </div>
 
-    <div class="d-flex justify-content-center p-2">
+    <div class="d-flex justify-content-center p-4">
       <div style="padding-top:7px;" class="col-md-4 form-group pull-right">
         <search-input @wordsheet-search-submit="onSearch" v-bind="{onSearchEventName: 'wordsheet-search-submit'}"/>
         <small class="text-muted">Enter a word or phrase and click search</small>
       </div>
     </div>
 
-    <search-results-preview @add-to-vocabulary="handleAddToVocabulary" v-bind="{previewData: this.foundExplanations}"/>
+    <search-results-preview class="p-4" @add-to-vocabulary="handleAddToVocabulary" v-bind="{previewData: this.foundExplanations}"/>
 
-    <wordsheet-table class="p-2" v-bind="{items: this.wordsList}">
+    <div class="p-4">
+      <div class="d-flex flex-column align-items-end">
+        <button class="btn" v-on:click="" title="Save as template">
+          <i class="bi bi-plus-square me-1"></i>
+          <span>Save as template</span>
+        </button>
+        <button class="btn" v-on:click="" title="Print pdf">
+          <i class="bi bi-file-earmark-pdf me-1"></i>
+          <span>Print pdf</span>
+        </button>
+      </div>
+    </div>
+
+    <wordsheet-table class="p-4" v-bind="{items: this.wordsList}">
       <template #actions="{ row }">
         <router-link
             :to="{ name: 'edit-explanation', params: { vocabId: vocabId, wordId: row?.wordId } }"
@@ -136,8 +174,9 @@ export default {
     </wordsheet-table>
 
     <!-- submit -->
-    <div class="d-flex justify-content-end p-2">
-        <button type="button" class="btn btn-primary border btn-md" v-on:click="onReady">
+    <div class="d-flex justify-content-end p-4">
+        <button type="button" class="btn btn-primary border btn-md" v-on:click="updateActivation()"
+        :disabled="hasNoWords">
           {{ this.isShared === false ? 'Share' : 'Stop sharing' }}
         </button>
     </div>
@@ -145,5 +184,10 @@ export default {
   </div>
 </template>
 
-<style>
+<style scoped>
+.editable-name {
+  font-size: 1.25rem;
+  text-align: center;
+  white-space: nowrap;
+}
 </style>
