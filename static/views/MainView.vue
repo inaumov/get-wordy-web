@@ -1,26 +1,21 @@
 <script>
 import Sidebar from '@/components/Sidebar.vue';
 import {useMenuConfig} from "@/composables/useMenuConfig.js";
-import {getUserClasses} from "@/js/auth-check.js";
+import {getUserClasses, useAuth} from "@/js/auth-check.js";
 
 export default {
   name: 'DashboardPage',
   components: {
     Sidebar,
   },
+  setup() {
+    const {checkLoginStatus, permissions} = useAuth();
+    return {checkLoginStatus, permissions};
+  },
   props: {
-    // menuItems: {
-    //   type: Array,
-    //   default: () => [],
-    // },
-    // showSidebar: {
-    //   type: Boolean,
-    //   default: true,
-    // },
   },
   data() {
     return {
-      permissions: [null],
       assignedClasses: []
     };
   },
@@ -40,7 +35,7 @@ export default {
       return [];
     },
     showSidebar() {
-      return this.isLoggedIn && (this.permissions.includes('P_MANAGE_CLASSES') || this.permissions.includes('P_SHARED_CLASS'));
+      return this.isLoggedIn && this.menuItems.length > 0;
     },
     activeClass() {
       // show the first active class, or nothing if none are active
@@ -48,17 +43,11 @@ export default {
     }
   },
   mounted() {
-    // Example: Simulate fetching user data (replace with real auth logic)
-    this.fetchUserData();
     if (this.permissions.some(p => p === 'P_SHARED_CLASS')) {
       this.fetchAttendeeClasses();
     }
   },
   methods: {
-    fetchUserData() {
-      this.permissions = ['P_MANAGE_OWN_VOCAB', 'P_SHARED_CLASS'];
-      this.permissions = ['P_MANAGE_CLASSES'];
-    },
     async fetchAttendeeClasses() {
       const response = await getUserClasses();
       this.assignedClasses = await response.json();
@@ -73,7 +62,7 @@ export default {
     <sidebar class="sidebar" v-if="showSidebar" :menuItems="menuItems" :activeClass="this.activeClass"/>
     <!-- main content area -->
     <main class="main-content vh-100" style="overflow-y: auto;">
-      <router-view/>
+      <router-view v-if="isLoggedIn"/>
     </main>
   </div>
 </template>

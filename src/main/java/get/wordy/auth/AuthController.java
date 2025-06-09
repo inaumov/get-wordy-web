@@ -33,8 +33,8 @@ public class AuthController {
         return ResponseEntity.ok().headers(headers).body(response);
     }
 
-    @GetMapping("/permissions")
-    public ResponseEntity<List<String>> getUserPermissions(Authentication authentication) {
+    @GetMapping("/meta")
+    public ResponseEntity<Map<String, List<String>>> getUserPermissions(Authentication authentication) {
         log.info("Retrieving permissions for the user = {}", authentication.getName());
 
         // extract authorities directly and convert to a List of Strings
@@ -42,7 +42,7 @@ public class AuthController {
                 .map(GrantedAuthority::getAuthority)
                 .toList();
 
-        return ResponseEntity.ok(allowedPermissions);
+        return ResponseEntity.ok(Map.of("permissions", allowedPermissions));
     }
 
 }

@@ -50,7 +50,7 @@ export async function logout() {
 
 async function loadPermissions() {
     try {
-        const response = await fetch(usersAPI + '/permissions', {
+        const response = await fetch(usersAPI + '/meta', {
             method: 'GET',
             credentials: 'include', // include cookies in the request,
             headers: {
@@ -59,8 +59,8 @@ async function loadPermissions() {
         });
 
         if (response.ok) {
-            const data = await response.json();
-            permissions.value = [...data];
+            const meta = await response.json();
+            permissions.value = meta['permissions'];
         }
     } catch (error) {
         console.error('Error while getting user permissions:', error);
@@ -99,4 +99,8 @@ export function useAuth() {
         logout: inject('logout'),
         permissions: inject('permissions')
     };
+}
+
+export function hasPermissions() {
+    return permissions.value.length > 0;
 }

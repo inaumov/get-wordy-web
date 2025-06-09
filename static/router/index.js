@@ -1,4 +1,5 @@
 import {createRouter, createWebHistory} from 'vue-router'
+import {hasPermissions} from '@/js/auth-check.js';
 import LandingPage from "@/pages/LandingPage.vue";
 import MainView from "@/views/MainView.vue";
 import DictionariesView from "@/views/DictionariesView.vue";
@@ -9,15 +10,24 @@ import MyClasses from "@/views/shared/MyClasses.vue";
 
 const router = createRouter({
     history: createWebHistory(import.meta.env.BASE_URL),
+    // Public Routes
     routes: [
         {
             path: '/',
             name: 'home',
-            component: LandingPage,
+            component: LandingPage, // Public landing page
         },
+        // Protected Routes (authenticated layout)
         {
             path: "/Dashboard",
-            component: MainView,
+            component: MainView, // Wrapper for sidebar + main content
+            beforeEnter: (to, from, next) => {
+                if (hasPermissions()) {
+                    next(); // allow access
+                } else {
+                    next("/login"); // redirect if not logged in
+                }
+            },
             children: [
         // components rendered inside Dashboard
         {
@@ -163,7 +173,7 @@ const router = createRouter({
         {
             path: '/:catchAll(.*)',
             name: 'not-found',
-            component: () => import('@/pages/404Page.vue')
+            component: () => import('@/pages/404Page.vue') // Global 404
         }
     ]
 })

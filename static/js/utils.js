@@ -32,3 +32,7 @@ export function formatTimeSlot(timeSlot) {
 export function dateHappened(endDate) {
     return endDate;
 }
+
+export function formatDateTime(dateTime) {
+    return new Date(dateTime).toLocaleString();
+}

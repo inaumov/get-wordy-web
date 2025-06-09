@@ -72,4 +72,4 @@ package-lock.json
 !.vscode/extensions.json
 
 public
-data
+mock-data

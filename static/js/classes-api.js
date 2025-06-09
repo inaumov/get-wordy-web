@@ -68,7 +68,7 @@ export function updateVocabularyName(classId, vocabularyId, name) {
     }).catch(handleError);
 }
 
-export function publish(classId, vocabularyId, isReady) {
+export function updateActivation(classId, vocabularyId, isReady) {
     return fetch(`${classAPI}/${classId}/vocabularies/${vocabularyId}`, {
         method: 'PATCH',
         headers: jsonHeaders,
