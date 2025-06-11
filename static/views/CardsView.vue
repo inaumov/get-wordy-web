@@ -6,7 +6,7 @@ import {fetchCards} from '@/js/cards.js';
 
 export default {
   components: {ActionButtons, CardsTable},
-  props: ['dictionaryId', 'dictionaryName'],
+  props: ['vocabId', 'dictionaryName'],
   data() {
     return {
       cards: [],
@@ -14,13 +14,12 @@ export default {
   },
   methods: {
     async getData() {
-      const response = await fetchCards(this.dictionaryId);
+      const response = await fetchCards(this.vocabId);
       this.cards = await response.json();
     }
   },
   mounted() {
     this.getData()
-    console.log("Selected dictionary: id = ", this.dictionaryId, ", name = ", this.dictionaryName)
   }
 };
 
@@ -28,10 +27,10 @@ export default {
 
 <template>
   <div class="p-4 d-flex flex-column align-items-start">
-    <router-link :to="{name: 'dictionaries'}" class="btn btn-secondary" title="Back">Back</router-link>
+    <router-link :to="{name: 'user-vocabularies'}" class="btn btn-secondary" title="Back">Back</router-link>
   </div>
   <h4 class="p-4">{{ this.dictionaryName }}</h4>
   <action-buttons/>
-  <cards-table v-bind="{dictionaryId: this.dictionaryId, cards: this.cards}"/>
+  <cards-table v-bind="{vocabId: this.vocabId, cards: this.cards}"/>
 
 </template>

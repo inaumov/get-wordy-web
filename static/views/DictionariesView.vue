@@ -1,15 +1,23 @@
 <script>
 import {fetchDictionaries} from '@/js/dictionaries.js';
+import SharedMaterials from "@/views/shared/SharedMaterials.vue";
+import {getUserClasses} from "@/js/auth-check.js";
 
 export default {
   name: 'DictionariesView',
+  components: {SharedMaterials},
   data() {
     return {
       vocabularies: [],
       favorites: [],
+      assignedClasses: []
     }
   },
   methods: {
+    async fetchAttendeeClasses() {
+      const response = await getUserClasses();
+      this.assignedClasses = await response.json();
+    },
     async getData() {
       const response = await fetchDictionaries();
       const all = await response.json();
@@ -26,6 +34,7 @@ export default {
   },
   mounted() {
     this.getData()
+    this.fetchAttendeeClasses()
   },
   computed: {
     hasVocabularies() {
@@ -48,7 +57,7 @@ export default {
       <div class="card-body">
         <h5 class="card-title">{{ favorite['name'] }}</h5>
         <router-link class="btn btn-primary"
-                     :to="{ name: 'all-cards', params: { dictionaryId : favorite['dictionaryId']}, query: { dictionaryName: favorite['name'] }}">
+                     :to="{ name: 'all-cards', params: { vocabId : favorite['vocabId']}, query: { name: favorite['name'] }}">
           {{ favorite['wordsTotal'] }}
         </router-link>
       </div>
@@ -70,19 +79,24 @@ export default {
       </div>
     </div>
 
-    <div id="dictionary" class="card text-center" v-for="vcb in vocabularies">
-      <img v-bind:src="vcb['picture']" class="card-img-top mx-auto d-block" v-bind:alt="vcb['name']">
+    <div id="dictionary" class="card text-center" v-for="vocab in vocabularies">
+      <img v-bind:src="vocab['picture']" class="card-img-top mx-auto d-block" v-bind:alt="vocab['name']">
       <div class="card-body">
-        <h5 class="card-title">{{ vcb['name'] }}</h5>
+        <h5 class="card-title">{{ vocab['name'] }}</h5>
         <router-link class="btn btn-primary"
-                     :to="{ name: 'all-cards', params: { dictionaryId : vcb['dictionaryId']}, query: { dictionaryName: vcb['name'] }}">
-          {{ vcb['wordsTotal'] }}
+                     :to="{ name: 'all-cards', params: { vocabId : vocab['vocabId']}, query: { dictionaryName: vocab['name'] }}">
+          {{ vocab['wordsTotal'] }}
         </router-link>
       </div>
     </div>
   </div>
   <div v-else class="d-flex justify-content-center p-5">
     <p class="lead">No vocabularies has been created so far...</p>
+  </div>
+
+  <div v-if="hasVocabularies" class="container p-4" id="content">
+    <h4 class="pb-4">Shared vocabularies</h4>
+    <SharedMaterials :classId="cl.classId" :name="cl.name" v-for="cl in this.assignedClasses"></SharedMaterials>
   </div>
 </template>
 

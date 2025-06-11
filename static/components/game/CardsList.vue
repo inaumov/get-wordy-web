@@ -3,7 +3,7 @@ import {fetchCardsForExercise} from "@/js/cards.js";
 import {store} from "@/js/store.js";
 
 export default {
-  props: ['dictionaryId'],
+  props: ['vocabId'],
   setup: function () {
     return {
       limitSettings: store
@@ -17,7 +17,7 @@ export default {
   methods: {
     async getData() {
       const limit = this.limitSettings['exerciseLimit'];
-      const response = await fetchCardsForExercise(this.dictionaryId, limit);
+      const response = await fetchCardsForExercise(this.vocabId, limit);
       this.cards = await response.json();
     },
     start: function () {
@@ -26,7 +26,7 @@ export default {
   },
   mounted() {
     this.getData();
-    console.log('PlayGame view: 3rd step mounted. dictionaryId = ', this.dictionaryId);
+    console.log('PlayGame view: 3rd step mounted. vocabId = ', this.vocabId);
   }
 }
 </script>

@@ -9,7 +9,7 @@ function getExerciseLimitSelection() {
 
 export const store = reactive({
     exerciseLimitSelection: getExerciseLimitSelection(),
-    exerciseLimit: 5,
+    exerciseLimit: 0, // todo revise this
     selectLimit(selection) {
         this.exerciseLimitSelection = selection;
         localStorage.setItem('exerciseLimitSelection', selection);

@@ -4,7 +4,6 @@ import LandingPage from "@/pages/LandingPage.vue";
 import MainView from "@/views/MainView.vue";
 import DictionariesView from "@/views/DictionariesView.vue";
 import ClassListView from "@/views/ClassListView.vue";
-import SharedMaterials from "@/views/shared/SharedMaterials.vue";
 import ClassDashboard from "@/views/classes/ClassDashboard.vue";
 import MyClasses from "@/views/shared/MyClasses.vue";
 
@@ -31,22 +30,12 @@ const router = createRouter({
             children: [
         // components rendered inside Dashboard
         {
-            path: '/Dictionaries',
-            name: 'dictionaries',
+            path: '/User/Vocabularies',
+            name: 'user-vocabularies',
             component: DictionariesView
         },
         {
-            path: '/Classroom/:classId',
-            name: 'classroom',
-            component: SharedMaterials,
-            props: (route) => (
-                {
-                    classId: route.params.classId,
-                }
-            ),
-        },
-        {
-            path: '/MyClasses',
+            path: '/User/MyClasses',
             name: 'my-classes',
             component: MyClasses
         },
@@ -81,18 +70,18 @@ const router = createRouter({
             ),
         },
         {
-            path: '/Dictionaries/:dictionaryId/Cards',
+            path: '/User/Vocabularies/:vocabId/Cards',
             name: 'all-cards',
             component: () => import('@/views/CardsView.vue'),
             props: (route) => (
                 {
-                    dictionaryId: route.params.dictionaryId,
+                    vocabId: route.params.vocabId,
                     dictionaryName: route.query.dictionaryName
                 }
             ),
         },
         {
-            path: '/Dictionaries/:dictionaryId/Exercise',
+            path: '/User/Vocabularies/:vocabId/Exercise',
             name: 'play-game',
             // route level code-splitting
             // this generates a separate chunk (Settings.[hash].js) for this route
@@ -101,7 +90,7 @@ const router = createRouter({
             props: true
         },
         {
-            path: '/Dictionaries/:dictionaryId/Search',
+            path: '/User/Vocabularies/:vocabId/Search',
             name: 'generate',
             // route level code-splitting
             // this generates a separate chunk (Settings.[hash].js) for this route
@@ -146,7 +135,7 @@ const router = createRouter({
                     ),
                 },
         {
-            path: '/Materials/:classId/Vocabularies/:vocabId',
+            path: '/User/Classes/:classId/Vocabularies/:vocabId',
             name: 'vocabulary-preview',
             // route level code-splitting
             // this generates a separate chunk (Settings.[hash].js) for this route

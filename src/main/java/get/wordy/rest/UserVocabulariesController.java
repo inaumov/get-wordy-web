@@ -2,18 +2,20 @@ package get.wordy.rest;
 
 import get.wordy.core.api.IVocabularyService;
 import get.wordy.core.api.bean.Vocabulary;
+import get.wordy.core.api.bean.Word;
 import get.wordy.core.api.id.OwnerId;
-import get.wordy.model.DictionaryRequest;
-import get.wordy.model.DictionaryResponse;
+import get.wordy.model.*;
 import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.util.UriComponentsBuilder;
 
 import java.net.URI;
 import java.security.Principal;
@@ -94,6 +96,39 @@ public class UserVocabulariesController {
                 .build();
     }
 
+    @PostMapping(value = "/{vocabId}/words")
+    public ResponseEntity<WordResponse> addToVocabulary(Principal user,
+                                                        @PathVariable("vocabId") int vocabId,
+                                                        @Valid @RequestBody WordIdRequest wordId, UriComponentsBuilder ucBuilder) {
+
+        LOG.info("Adding new word to user vocabulary, id = {}, user = {}", vocabId, user.getName());
+
+        Word addedToVocabulary = vocabularyService.addToVocabulary(createOwnerId(user), vocabId, wordId.wordId());
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setLocation(ucBuilder
+                .path("/{vocabId}/words/{wordId}")
+                .buildAndExpand(vocabId, addedToVocabulary.getId())
+                .toUri()
+        );
+        WordResponse response = toWordResponse(addedToVocabulary);
+        return new ResponseEntity<>(response, headers, HttpStatus.ACCEPTED);
+    }
+
+    @DeleteMapping(value = "/{vocabId}/words")
+    public ResponseEntity<Void> removeFromVocabulary(Principal user,
+                                                     @PathVariable("vocabId") int vocabId,
+                                                     @Valid @RequestBody WordIdRequest wordId) {
+
+        LOG.info("Deleting a word = {} from user vocabulary, id = {}, user = {}", wordId, vocabId, user.getName());
+
+        vocabularyService.removeFromVocabulary(createOwnerId(user), vocabId, wordId.wordId());
+
+        return ResponseEntity
+                .noContent()
+                .build();
+    }
+
     private static OwnerId createOwnerId(Principal user) {
         return new OwnerId(user.getName(), "user");
     }
@@ -104,6 +139,20 @@ public class UserVocabulariesController {
                 vocabulary.getName(),
                 vocabulary.getPictureUrl(),
                 vocabulary.getWordsTotal()
+        );
+    }
+
+    private WordResponse toWordResponse(Word word) {
+        return new WordResponse(
+                word.getId(),
+                word.getValue(),
+                word.getTranscription(),
+                Explanation.builder()
+                        .partOfSpeech(word.getPartOfSpeech())
+                        .meaning(word.getMeaning())
+                        .inContext(word.getStrSentences())
+                        .collocations(word.getCollocations())
+                        .build()
         );
     }
 

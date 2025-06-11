@@ -2,7 +2,7 @@
 import {store} from '@/js/store.js';
 
 export default {
-  props: ['dictionaryId'],
+  props: ['vocabId'],
   setup: function () {
     return {
       limitSettings: store
@@ -17,7 +17,7 @@ export default {
     }
   },
   mounted() {
-    console.log('PlayGame view: 1st step mounted. dictionaryId = ', this.dictionaryId);
+    console.log('PlayGame view: 1st step mounted. vocabId = ', this.vocabId);
   }
 }
 </script>

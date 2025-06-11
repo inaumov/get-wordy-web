@@ -6,7 +6,7 @@ import SearchResultsPreview from "@/components/search/SearchResultsPreview.vue";
 
 export default {
   components: {SearchResultsPreview, SearchInput, ActionButtons},
-  props: ['dictionaryId'],
+  props: ['vocabId'],
   data() {
     return {
       searchResult: {

@@ -4,10 +4,9 @@ import {getSharedVocabularies} from '@/js/shared-vocabs-api.js';
 export default {
   name: 'SharedMaterialsView',
   components: {},
-  props: ['classId'],
+  props: ['classId', 'name'],
   data() {
     return {
-      name: '',
       vocabularies: [],
     }
   },
@@ -30,11 +29,10 @@ export default {
 
 <template>
 
-  <div v-if="hasVocabs" class="container p-4" id="vocabularies">
-    <h4 class="pb-4">Shared vocabularies</h4>
+  <div class="py-4" id="vocabularies">
+    <h5 class="py-2">{{ name }}</h5>
 
-    <div
-        v-for="item in vocabularies"
+    <div v-if="hasVocabs" v-for="item in vocabularies"
         :key="item['vocabId']"
         class="mb-4 bg-light bg-opacity-10 border border-danger-subtle rounded">
 
@@ -54,11 +52,13 @@ export default {
       </router-link>
 
     </div>
-  </div>
-  <div v-else class="d-flex justify-content-center align-items-center vh-100">
-    <div class="text-center w-50">
-      <p class="lead">No shared vocabularies assigned so far...</p>
+
+    <div v-else class="d-flex justify-content-center align-items-center vh-25">
+      <div class="text-center w-50">
+        <p class="lead">No shared vocabularies assigned so far...</p>
+      </div>
     </div>
+
   </div>
 
 </template>

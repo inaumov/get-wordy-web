@@ -1,3 +1,17 @@
+export function toReadableStatus(status) {
+    if (status === 'TO_LEARN') {
+        return 'To learn'
+    } else if (status === 'LEARNT') {
+        return 'Done'
+    } else if (status === 'POSTPONED') {
+        return 'Postponed'
+    } else if (status === 'EDIT') {
+        return 'Edit'
+    } else {
+        return status
+    }
+}
+
 export function shuffle(arr) {
     return [...arr].sort(() => Math.random() - 0.5)
 }

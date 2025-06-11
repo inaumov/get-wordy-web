@@ -68,24 +68,24 @@ export function updateVocabularyName(classId, vocabularyId, name) {
     }).catch(handleError);
 }
 
-export function updateActivation(classId, vocabularyId, isReady) {
+export function updateActivation(classId, vocabularyId, isShared) {
     return fetch(`${classAPI}/${classId}/vocabularies/${vocabularyId}`, {
         method: 'PATCH',
         headers: jsonHeaders,
-        body: JSON.stringify({isShared: isReady})
+        body: JSON.stringify({isShared})
     }).catch(handleError);
 }
 
-export function addToVocabulary(classId, vocabularyId, wordData) {
-    return fetch(`${classAPI}/${classId}/vocabularies/${vocabularyId}`, {
+export function addToVocabulary(classId, vocabularyId, wordId) {
+    return fetch(`${classAPI}/${classId}/vocabularies/${vocabularyId}/words`, {
         method: 'POST',
         headers: jsonHeaders,
-        body: JSON.stringify(wordData)
+        body: JSON.stringify({wordId})
     }).catch(handleError);
 }
 
 export function removeFromVocabulary(classId, vocabularyId, wordId) {
-    return fetch(`${classAPI}/${classId}/vocabularies/${vocabularyId}`, {
+    return fetch(`${classAPI}/${classId}/vocabularies/${vocabularyId}/words`, {
         method: 'DELETE',
         headers: jsonHeaders,
         body: JSON.stringify({wordId})

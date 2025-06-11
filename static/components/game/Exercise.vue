@@ -4,7 +4,7 @@ import {submitResultForExercise} from "@/js/cards.js";
 
 export default {
   name: 'base-exercise',
-  props: ['dictionaryId', 'cards'],
+  props: ['vocabId', 'cards'],
   data() {
     return {
       totalCards: 0,
@@ -71,7 +71,7 @@ export default {
       }
     },
     finishExercise() {
-      submitResultForExercise(this.dictionaryId, this.correctAnswers)
+      submitResultForExercise(this.vocabId, this.correctAnswers)
           .then(response => {
             if (!response.ok) {
               // todo notification

@@ -1,21 +1,22 @@
 <script>
-import {toReadableStatus, deleteCard, resetScore} from "@/js/cards.js";
+import {deleteCard, resetScore} from "@/js/cards.js";
+import {toReadableStatus} from "@/js/utils.js";
 
 export default {
-  props: ['dictionaryId', 'cards'],
+  props: ['vocabId', 'cards'],
   data() {
     return {
       // cards: []
     }
   },
   methods: {
-    toReadableStatus: toReadableStatus,
+    toReadableStatus,
     canBeReset: function (card) {
       return card.status === 'POSTPONED' || card.status === 'LEARNT';
     },
     resetScore(card) {
       const cardId = card['cardId'];
-      resetScore(this.dictionaryId, cardId)
+      resetScore(this.vocabId, cardId)
           .then(response => {
             if (response.ok) {
               card.score = 0;
@@ -26,7 +27,7 @@ export default {
     },
     deleteCard(card) {
       const cardId = card['cardId'];
-      deleteCard(this.dictionaryId, cardId)
+      deleteCard(this.vocabId, cardId)
           .then(response => {
             if (response.ok) {
               const index = this.cards.findIndex(obj => obj['cardId'] === cardId)

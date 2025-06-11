@@ -16,17 +16,50 @@ export default defineConfig({
   server: {
     proxy: {
       // Login flow: /users/auth/status → /status
-      '^/users/auth/status': {
+      '^/users/auth/status$': {
         target: 'http://localhost:3000',
         changeOrigin: true,
         rewrite: () => '/status'
       },
 
       // Login flow: /users/permissions → /permissions
-      '^/users/meta': {
+      '^/users/meta$': {
         target: 'http://localhost:3000',
         changeOrigin: true,
         rewrite: () => '/meta'
+      },
+
+      // User flow: /users/my-classes → /my-classes
+      '^/users/my-classes$': {
+        target: 'http://localhost:3000',
+        changeOrigin: true,
+        rewrite: () => '/my-classes'
+      },
+
+      // User flow: /user/my-classes → /my-classes
+      '^/api/v1/user/my-vocabularies$': {
+        target: 'http://localhost:3000',
+        changeOrigin: true,
+        rewrite: () => '/my-vocabularies'
+      },
+
+      // User flow: /user/my-classes → /my-classes
+      '^/api/v1/user/my-classes/([^/]+)/vocabularies$': {
+        target: 'http://localhost:3000',
+        changeOrigin: true,
+        rewrite: path => {
+          const classId = path.match(/\/my-classes\/([^/]+)\/vocabularies/)?.[1];
+          return `/vocabularies?classId=${classId}`; // Note: frontend must send classId in body/query if POST
+        }
+      },
+      // GET/PUT/DELETE single vocabulary → /vocabularies/:vocabId
+      '^/api/v1/user/my-classes/[^/]+/vocabularies/([^/]+)$': {
+        target: 'http://localhost:3000',
+        changeOrigin: true,
+        rewrite: path => {
+          const vocabId = path.match(/\/vocabularies\/([^/]+)$/)?.[1];
+          return `/vocabularies/${vocabId}`;
+        }
       },
 
       // Base: /api/v1/classes → /classes
@@ -49,7 +82,7 @@ export default defineConfig({
         changeOrigin: true,
         rewrite: path => {
           const classId = path.match(/\/classes\/([^/]+)\/vocabularies/)?.[1];
-          return `/vocabularies`; // Note: frontend must send classId in body/query if POST
+          return '/vocabularies'; // Note: frontend must send classId in body/query if POST
         }
       },
 
@@ -70,7 +103,7 @@ export default defineConfig({
         changeOrigin: true,
         rewrite: (path) => {
           // This will route to /explanations — must include vocabularyId in query (for GET) or body (for POST)
-          return `/explanations`;
+          return '/explanations';
         }
       },
 
@@ -92,6 +125,32 @@ export default defineConfig({
         rewrite: path => '/templates'
       },
 
+      // Search: /api/v1/words → /search
+      '^/api/v1/words': {
+        target: 'http://localhost:3000',
+        changeOrigin: true,
+        rewrite: () => '/search'
+      },
+
+      // User flow: /user/my-vocabularies/vocabId/cards → /cards
+      '^/api/v1/user/my-vocabularies/([^/]+)/cards/?$': {
+        target: 'http://localhost:3000',
+        changeOrigin: true,
+        rewrite: path => {
+          const vocabId = path.match(/\/my-vocabularies\/([^/]+)\/cards/)?.[1];
+          return '/cards'; // Note: frontend must send vocabId in body/query if POST
+        }
+      },
+
+      // User flow: /user/my-vocabularies/vocabId/exercise → /exercise
+      '^/api/v1/user/my-vocabularies/([^/]+)/exercise$': {
+        target: 'http://localhost:3000',
+        changeOrigin: true,
+        rewrite: path => {
+          const vocabId = path.match(/\/my-vocabularies\/([^/]+)\/exercise/)?.[1];
+          return `/exercise?vocabId=${vocabId}`;
+        }
+      }
     }
   }
 })

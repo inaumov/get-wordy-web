@@ -70,7 +70,7 @@ export default {
     },
     handleAddToVocabulary(wordExplanation) {
       if (!this.vocabularyContains(wordExplanation)) {
-        addToVocabulary(this.classId, this.vocabId, wordExplanation)
+        addToVocabulary(this.classId, this.vocabId, wordExplanation.wordId)
             .then(response => {
               if (response.ok) {
                 let itemAdded = response.json();

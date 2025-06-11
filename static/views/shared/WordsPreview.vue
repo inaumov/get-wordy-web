@@ -34,7 +34,7 @@ export default {
 
 <template>
   <div class="p-4 d-flex flex-column align-items-start">
-    <router-link :to="{name: 'classroom', params: { classId: this.classId}}" class="btn btn-secondary" title="Back">Back</router-link>
+    <router-link :to="{name: 'user-vocabularies'}" class="btn btn-secondary" title="Back">Back</router-link>
   </div>
   <div class="p-4">
     <div v-if="words" class="word-list">

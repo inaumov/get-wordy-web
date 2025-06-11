@@ -26,11 +26,12 @@ export default {
     menuItems() {
       if (this.isLoggedIn) {
         if (this.permissions.includes('P_SHARED_CLASS')) {
-          return useMenuConfig.sharedAccess(this.activeClass);
+          return useMenuConfig.sharedAccess();
         }
         if (this.permissions.includes('P_MANAGE_CLASSES')) {
           return useMenuConfig.teacherAccess();
         }
+        return useMenuConfig.default()
       }
       return [];
     },

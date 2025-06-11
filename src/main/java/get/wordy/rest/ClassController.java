@@ -126,11 +126,8 @@ public class ClassController {
                                                           @PathVariable("classId") String classId) {
         LOG.info("Getting a class info for the user = {}, class id = {}", user.getName(), classId);
 
-        Optional<ClassInfoResponse> response = Optional.of(classService.findClassInfo(createUserOwnerId(user), classId))
-                .map(ClassInfoResponse::new)
-                .map(this::enrichWithParticipants);
-
-        return ResponseEntity.ok(response.orElseThrow());
+        ClassInfo classInfo = classService.findClassInfo(createUserOwnerId(user), classId);
+        return ResponseEntity.ok(new ClassInfoResponse(classInfo));
     }
 
     @DeleteMapping(value = "/{classId}")
@@ -249,7 +246,7 @@ public class ClassController {
                                                         @PathVariable("vocabId") int vocabId,
                                                         @Valid @RequestBody WordIdRequest wordId, UriComponentsBuilder ucBuilder) {
 
-        LOG.info("Adding new word to vocabulary id = {}. User = {}, class id = {}", vocabId, user.getName(), classId);
+        LOG.info("Adding new word = {} to class vocabulary, id = {}, user = {}, class id = {}", wordId, vocabId, user.getName(), classId);
 
         Word addedToVocabulary = vocabularyService.addToVocabulary(createClassOwnerId(classId), vocabId, wordId.wordId());
 
@@ -263,15 +260,15 @@ public class ClassController {
         return new ResponseEntity<>(response, headers, HttpStatus.CREATED);
     }
 
-    @DeleteMapping(value = "/{classId}/vocabularies/{vocabId}/words/{wordId}")
+    @DeleteMapping(value = "/{classId}/vocabularies/{vocabId}/words")
     public ResponseEntity<Void> removeFromVocabulary(Principal user,
                                                      @PathVariable("classId") String classId,
                                                      @PathVariable("vocabId") int vocabId,
-                                                     @PathVariable("wordId") int wordId) {
+                                                     @Valid @RequestBody WordIdRequest wordId) {
 
-        LOG.info("Deleting a word = {} from vocabulary id = {} for the user = {}, classId id = {}", wordId, vocabId, user.getName(), classId);
+        LOG.info("Deleting a word = {} from class vocabulary, id = {}, user = {}, class id = {}", wordId, vocabId, user.getName(), classId);
 
-        vocabularyService.removeFromVocabulary(createClassOwnerId(classId), vocabId, wordId);
+        vocabularyService.removeFromVocabulary(createClassOwnerId(classId), vocabId, wordId.wordId());
 
         return ResponseEntity
                 .noContent()
