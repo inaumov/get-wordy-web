@@ -5,8 +5,8 @@
   "type": "module",
   "scripts": {
     "dev": "vite --mode development",
-    "build:staging": "vite build  --base=./ --mode staging",
-    "build:prod": "vite build  --base=./ --mode production"
+    "build:prod": "vite build --mode production",
+    "build:spring-boot": "vite build --mode spring"
   },
   "dependencies": {
     "vue": "^3.4.21",

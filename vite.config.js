@@ -2,12 +2,23 @@ import { fileURLToPath, URL } from 'node:url'
 
 import { defineConfig } from 'vite'
 import vue from '@vitejs/plugin-vue'
+import path from 'path'
 
 // https://vitejs.dev/config/
-export default defineConfig({
-  plugins: [
-    vue(),
-  ],
+export default defineConfig(({mode}) => {
+  const isSpring = mode === 'spring'
+
+  return {
+    plugins: [
+      vue()
+    ],
+    base: isSpring ? '/' : './',
+    build: {
+      outDir: isSpring
+          ? path.resolve(__dirname, 'src/main/resources/static') // Spring Boot static folder
+          : path.resolve(__dirname, 'dist'), // default Vite standalone build
+      emptyOutDir: true,
+    },
   resolve: {
     alias: {
       '@': fileURLToPath(new URL('./static', import.meta.url))
@@ -153,4 +164,4 @@ export default defineConfig({
       }
     }
   }
-})
+}})
