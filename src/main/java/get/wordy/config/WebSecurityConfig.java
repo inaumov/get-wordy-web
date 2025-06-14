@@ -51,7 +51,7 @@ public class WebSecurityConfig {
                         .loginPage("/login")
                         .usernameParameter("email")
                         .loginProcessingUrl("/login")
-                        .defaultSuccessUrl("/welcome", true)
+//                        .defaultSuccessUrl("/welcome", true)
                         .failureUrl("/login?error=true")
 //                        .successHandler(successHandler())  // Custom success handler
 //                        .failureHandler(failureHandler())   // Custom failure handler
@@ -61,6 +61,7 @@ public class WebSecurityConfig {
                         .logoutUrl("/logout")
                         .logoutSuccessUrl("/login?logout=true")
                         .invalidateHttpSession(true)
+                        .clearAuthentication(true)
                         .deleteCookies("JSESSIONID")
                         .permitAll()
                 );

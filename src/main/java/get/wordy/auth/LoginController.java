@@ -4,6 +4,7 @@ import get.wordy.users.CustomUserDetails;
 import get.wordy.users.UserDto;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -21,7 +22,12 @@ public class LoginController {
     }
 
     @GetMapping("/signup")
-    public String signup(WebRequest request, Model model) {
+    public String signup(Authentication authentication,
+                         WebRequest request,
+                         Model model) {
+        if (authentication != null && authentication.isAuthenticated()) {
+            return "redirect:/welcome";
+        }
         UserDto userDto = new UserDto();
         model.addAttribute("user", userDto);
         return "signup";
@@ -34,7 +40,7 @@ public class LoginController {
 
     @GetMapping("/welcome")
     public String loggedIn(Model model, @AuthenticationPrincipal CustomUserDetails userDetails) {
-        LOG.debug("A user {} just have logged in", userDetails.getUsername());
+        LOG.debug("A user {} just have signed up", userDetails.getUsername());
         return "welcome";
     }
 

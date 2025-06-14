@@ -2,6 +2,9 @@ package get.wordy.users;
 
 import get.wordy.users.exception.UserAlreadyExistException;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -50,7 +53,14 @@ public class UserService implements IUserService {
         userDetailsService.createUserProfile(userProfile);
         userDetailsService.addUserToGroup(user.getUsername(), "individual_users");
 
-        log.info("A new account successfully created for the email: {}", userDto.getEmail());
+        // auto-login logic after successful registration
+        CustomUserDetails userDetails = this.userDetailsService.loadUserByUsername(userDto.getEmail());
+        Authentication auth = new UsernamePasswordAuthenticationToken(
+                userDetails, userDetails.getPassword(), userDetails.getAuthorities());
+        SecurityContextHolder.getContext().setAuthentication(auth);
+        // verify what's stored in the context
+        log.debug("User {} is now authenticated with authorities: {}", auth.getName(), auth.getAuthorities());
+        log.info("A new account has been successfully created with email: {}", userDto.getEmail());
         return userDto;
     }
 

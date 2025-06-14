@@ -3,8 +3,13 @@ package get.wordy.auth;
 import get.wordy.users.IUserService;
 import get.wordy.users.UserDto;
 import get.wordy.users.exception.UserAlreadyExistException;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -17,9 +22,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 @Slf4j
 public class RegistrationController {
 
+    private final HttpServletRequest request;
     private final IUserService userService;
 
-    public RegistrationController(IUserService userService) {
+    public RegistrationController(HttpServletRequest request, IUserService userService) {
+        this.request = request;
         this.userService = userService;
     }
 
@@ -40,10 +47,15 @@ public class RegistrationController {
 
         if (result.hasErrors()) {
             model.addAttribute("user", userDto);
-            return "/signup";
+            return "redirect:/signup?errors";
         }
 
-        return "redirect:/signup?success";
+        SecurityContext context = SecurityContextHolder.getContext();
+        // Save to HTTP session:
+        HttpSession session = request.getSession(true); // inject HttpServletRequest
+        session.setAttribute(HttpSessionSecurityContextRepository.SPRING_SECURITY_CONTEXT_KEY, context);
+
+        return "redirect:/welcome";
     }
 
 }
