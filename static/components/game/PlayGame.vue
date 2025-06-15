@@ -9,9 +9,6 @@ export default {
     }
   },
   methods: {
-    roll_dice: function () {
-      this.$emit("nextStep", 'RollDice');
-    },
     print_cards: function () {
       this.$emit("nextStep", 'CardsList');
     }
@@ -27,22 +24,12 @@ export default {
     <p class="mb-3">
       You wanna play? let's play
     </p>
-    <div class="col pb-5" v-if="limitSettings['exerciseLimitSelection'] === 'ROLL_DICE'">
-      <button class="btn btn-lg" v-on:click="roll_dice()">
-        <i class="bi bi-dice-5"></i> Roll Dice
-      </button>
-    </div>
-    <div class="col pb-5" v-else-if="limitSettings['exerciseLimitSelection'] === 'DEFAULT_LIMIT'">
-      <button v-on:click="print_cards" class="btn btn-lg">
-        <i class="bi bi-arrow-right-square"></i> Pick cards
-      </button>
-    </div>
+    <button v-on:click="print_cards" class="btn btn-sm btn-secondary text-white">
+      <i class="bi bi-arrow-right-square"></i> Pick cards
+    </button>
   </div>
 </template>
 
 <style>
-div#play-game-panel i {
-  color: rgb(185, 87, 84)
-}
 
 </style>

@@ -1,11 +1,12 @@
 <script>
-import ActionButtons from "@/components/cards/ActionButtons.vue";
-
 import SearchInput from "@/components/search/SearchInput.vue";
 import SearchResultsPreview from "@/components/search/SearchResultsPreview.vue";
 
 export default {
-  components: {SearchResultsPreview, SearchInput, ActionButtons},
+  components: {
+    SearchInput,
+    SearchResultsPreview
+  },
   props: ['vocabId'],
   data() {
     return {
@@ -27,8 +28,6 @@ export default {
 </script>
 
 <template>
-
-  <action-buttons/>
 
   <div class="d-flex justify-content-center p-4" id="generate-cards-panel">
     <div style="padding-top:7px;" class="col-md-4 form-group pull-right">

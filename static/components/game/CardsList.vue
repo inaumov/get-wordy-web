@@ -47,7 +47,7 @@ export default {
       </div>
     </div>
     <div class="col pb-5 text-center">
-      <button type="button" class="btn btn-lg" v-on:click="start()">
+      <button type="button" class="btn btn-sm btn-secondary text-white" v-on:click="start()">
         <i class="bi bi-arrow-right-square"></i> Start
       </button>
     </div>
@@ -63,10 +63,6 @@ export default {
 
 div#game-cards-list .card {
   background: rgba(255, 115, 0, 0.10);
-}
-
-div#game-cards-list i {
-  color: rgb(185, 87, 84)
 }
 
 </style>
