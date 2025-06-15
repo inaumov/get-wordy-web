@@ -76,7 +76,7 @@ const router = createRouter({
             props: (route) => (
                 {
                     vocabId: route.params.vocabId,
-                    dictionaryName: route.query.dictionaryName
+                    vocabName: route.query.name
                 }
             ),
         },
@@ -87,15 +87,6 @@ const router = createRouter({
             // this generates a separate chunk (Settings.[hash].js) for this route
             // which is lazy-loaded when the route is visited.
             component: () => import('@/views/PlayGameView.vue'),
-            props: true
-        },
-        {
-            path: '/User/Vocabularies/:vocabId/Search',
-            name: 'generate',
-            // route level code-splitting
-            // this generates a separate chunk (Settings.[hash].js) for this route
-            // which is lazy-loaded when the route is visited.
-            component: () => import('@/views/GenerateCardsView.vue'),
             props: true
         },
         {

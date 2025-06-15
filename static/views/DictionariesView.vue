@@ -1,169 +1,123 @@
 <script>
-import {fetchDictionaries} from '@/js/dictionaries.js';
-import SharedMaterials from "@/views/shared/SharedMaterials.vue";
-import {getUserClasses} from "@/js/auth-check.js";
+import {fetchUserVocabularies} from "@/js/dictionaries.js";
+import {formatDateTime} from "@/js/utils.js";
 
 export default {
   name: 'DictionariesView',
-  components: {SharedMaterials},
   data() {
     return {
       vocabularies: [],
-      favorites: [],
-      assignedClasses: []
+      favorites: []
+    };
+  },
+  computed: {
+    sortedVocabularies() {
+      const sortedNonFav = this.vocabularies.sort((a, b) =>
+          new Date(b.updateTime) - new Date(a.updateTime)
+      );
+      return [...this.favorites, ...sortedNonFav];
     }
   },
   methods: {
-    async fetchAttendeeClasses() {
-      const response = await getUserClasses();
-      this.assignedClasses = await response.json();
-    },
     async getData() {
-      const response = await fetchDictionaries();
+      const response = await fetchUserVocabularies();
       const all = await response.json();
       const [favorites, vocabularies] = all.reduce(
           ([fav, nonFav], item) => {
-            item['isFavorite'] ? fav.push(item) : nonFav.push(item);
+            item.type === 'FAV' ? fav.push(item) : nonFav.push(item);
             return [fav, nonFav];
           },
           [[], []]
       );
       this.vocabularies = vocabularies;
       this.favorites = favorites;
-    }
+    },
+    formatDateTime,
+    getColor(type) {
+      switch (type) {
+        case 'FAV':
+          return '#fff8d6'; // pastel yellow
+        case 'OWN':
+          return '#e3f2fd'; // pastel blue
+        case 'SHARED':
+          return '#e8f5e9'; // pastel green
+        default:
+          return '#ffffff';
+      }
+    },
   },
   mounted() {
-    this.getData()
-    this.fetchAttendeeClasses()
-  },
-  computed: {
-    hasVocabularies() {
-      return this.vocabularies && this.vocabularies.length > 0;
-    },
-    hasFavorites() {
-      return this.favorites && this.favorites.length > 0;
-    }
+    this.getData();
   }
 };
 </script>
 
 <template>
-  <div v-if="hasFavorites" class="container p-4" id="active-vocabulary">
-    <h4 class="pb-4">Favorite words</h4>
 
-    <div id="favorite_words" class="card text-center" v-for="favorite in favorites">
-      <img v-bind:src="favorite['picture']" class="card-img-top mx-auto d-block"
-           v-bind:alt="favorite['name']">
-      <div class="card-body">
-        <h5 class="card-title">{{ favorite['name'] }}</h5>
-        <router-link class="btn btn-primary"
-                     :to="{ name: 'all-cards', params: { vocabId : favorite['vocabId']}, query: { name: favorite['name'] }}">
-          {{ favorite['wordsTotal'] }}
-        </router-link>
+  <div class="vocabulary-list px-4 py-2">
+    <div
+        v-for="vocab in sortedVocabularies"
+        :key="vocab.vocabId"
+        class="vocab-item p-3 mb-3 rounded shadow-sm"
+        :style="{ backgroundColor: getColor(vocab.type) }"
+    >
+      <div class="d-flex justify-content-between align-items-center mb-2">
+        <h5 class="mb-0">{{ vocab.name }}</h5>
+        <small class="text-muted">Last Updated: {{ formatDateTime(vocab.updateTime) }}</small>
       </div>
-    </div>
-  </div>
+      <div class="text-muted mb-1">
+        <span v-if="vocab.className">{{ vocab.className }} &nbsp;•&nbsp;</span>
+        {{ vocab.wordsTotal }} words
+      </div>
 
-  <div v-if="hasVocabularies" class="container p-4" id="content">
-    <h4 class="pb-4">Own vocabularies</h4>
-
-    <div class="row">
-      <div class="col" id="settings">
-        <div class="button-group d-flex flex-column align-items-end">
-
-          <router-link to="/Settings" class="btn btn-lg">
-            <i class="bi bi-gear"></i>
-          </router-link>
-
+      <div v-if="vocab.wordsTotal > 0" class="d-flex align-items-center gap-2 mb-2">
+        <span class="text-muted">Progress:</span>
+        <div class="progress flex-grow-1" style="height: 8px;">
+          <div
+              class="progress-bar"
+              :style="{ width: vocab.learningProgress + '%', backgroundColor: '#3b82f6' }"
+              role="progressbar"
+              :aria-valuenow="vocab.learningProgress"
+              aria-valuemin="0"
+              aria-valuemax="100"
+          ></div>
         </div>
+        <span class="text-muted small" style="min-width: 40px; text-align: right;">
+          {{ vocab.learningProgress }}%
+        </span>
       </div>
-    </div>
 
-    <div id="dictionary" class="card text-center" v-for="vocab in vocabularies">
-      <img v-bind:src="vocab['picture']" class="card-img-top mx-auto d-block" v-bind:alt="vocab['name']">
-      <div class="card-body">
-        <h5 class="card-title">{{ vocab['name'] }}</h5>
-        <router-link class="btn btn-primary"
-                     :to="{ name: 'all-cards', params: { vocabId : vocab['vocabId']}, query: { dictionaryName: vocab['name'] }}">
-          {{ vocab['wordsTotal'] }}
+      <div class="d-flex flex-wrap gap-2 mt-2">
+        <router-link
+            class="btn btn-sm btn-success text-white"
+            :to="{ name: 'all-cards', params: { vocabId: vocab.vocabId }, query: { vocabName: vocab.name } }"
+        >
+          <i class="bi bi-card-list"></i> View Words
         </router-link>
-      </div>
-    </div>
-  </div>
-  <div v-else class="d-flex justify-content-center p-5">
-    <p class="lead">No vocabularies has been created so far...</p>
-  </div>
 
-  <div v-if="hasVocabularies" class="container p-4" id="content">
-    <h4 class="pb-4">Shared vocabularies</h4>
-    <SharedMaterials :classId="cl.classId" :name="cl.name" v-for="cl in this.assignedClasses"></SharedMaterials>
+        <router-link
+            class="btn btn-sm btn-success text-white"
+            :to="{ name : 'play-game', params: { vocabId: vocab.vocabId }, query: { vocabName: vocab.name }}"
+            :disabled="vocab.wordsTotal === 0"
+            title="You wanna play? let's play"
+        >
+          <i :class="['bi', vocab.learningProgress > 0 ? 'bi-repeat' : 'bi-arrow-90deg-right']"></i>
+          {{ vocab.learningProgress > 0 ? 'Continue Learning' : 'Start Learning' }}
+        </router-link>
+
+      </div>
+
+    </div>
   </div>
 </template>
 
-<style>
-
-div#favorite_words.card,
-div#dictionary.card {
-  border-radius: 40px;
-  overflow: hidden;
-  border: 0;
-  box-shadow: 0 2px 20px rgba(0, 0, 0, 0.06),
-  0 2px 4px rgba(0, 0, 0, 0.07);
-  transition: all 0.15s ease;
-  display: inline-block;
+<style scoped>
+.vocab-item {
+  transition: background-color 0.2s ease;
 }
 
-div#favorite_words.card:hover,
-div#dictionary.card:hover {
-  box-shadow: 0 6px 30px rgba(0, 0, 0, 0.1),
-  0 10px 8px rgba(0, 0, 0, 0.015);
-}
-
-div#favorite_words.card .card-body .card-title,
-div#dictionary.card .card-body .card-title {
-  font-weight: 600;
-  font-size: 24px;
-}
-
-div#favorite_words.card:hover > img,
-div#dictionary.card:hover > img {
-  transform: scale(1.2);
-}
-
-div#favorite_words.card img,
-div#dictionary.card img {
-  padding: 75px;
-  margin-top: -40px;
-  margin-bottom: -40px;
-  transition: 0.4s ease;
-  cursor: pointer;
-  max-width: 256px;
-  height: auto;
-}
-
-div#favorite_words.card .btn,
-div#dictionary.card .btn {
-  background: #e9ecef;
-  border: 0;
-  color: #5535f0;
-  width: 98%;
-  font-weight: bold;
-  border-radius: 20px;
-  height: 40px;
-  transition: all 0.2s ease;
-}
-
-div#favorite_words.card .btn:hover,
-div#dictionary.card .btn:hover {
-  background: #d63384;
-  color: #e9ecef;
-}
-
-div#favorite_words.card .btn:focus,
-div#dictionary.card .btn:focus {
-  background: #d63384;
-  outline: 0;
-  color: #e9ecef;
+div.progress {
+  margin-top: 3px; /* dirty fix to keep centered */
 }
 
 </style>

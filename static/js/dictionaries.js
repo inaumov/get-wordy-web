@@ -1,6 +1,6 @@
 const vocabsAPI = import.meta.env.VITE_BACKEND_API + "/user/my-vocabularies";
 
-export function fetchDictionaries() {
+export function fetchUserVocabularies() {
     let headers = new Headers();
     headers.append('Content-Type', 'application/json');
 
@@ -19,14 +19,10 @@ export function updateName(vocabId, name) {
     let headers = new Headers();
     headers.append('Content-Type', 'application/json');
 
-    let jsonRequest = {
-        name: name
-    }
-
     let initObject = {
         method: 'PATCH',
         headers: headers,
-        body: JSON.stringify(jsonRequest),
+        body: JSON.stringify({name}),
     };
 
     let patchRequest = new Request(vocabsAPI + "/" + vocabId, initObject);
@@ -35,18 +31,14 @@ export function updateName(vocabId, name) {
         .catch(err => console.log("HTTP error: ", err));
 }
 
-export function updatePicture(vocabId, picture, forceRemovePicture) {
+export function updatePicture(vocabId, pictureUrl, forceRemovePicture) {
     let headers = new Headers();
     headers.append('Content-Type', 'application/json');
-
-    let jsonRequest = {
-        picture: picture
-    }
 
     let initObject = {
         method: 'PATCH',
         headers: headers,
-        body: JSON.stringify(jsonRequest),
+        body: JSON.stringify({pictureUrl}),
     };
 
     let queryString = "?";
@@ -59,7 +51,7 @@ export function updatePicture(vocabId, picture, forceRemovePicture) {
         .catch(err => console.log("HTTP error: ", err));
 }
 
-export function deleteDictionary(vocabId) {
+export function deleteVocabulary(vocabId) {
     let headers = new Headers();
 
     let initObject = {

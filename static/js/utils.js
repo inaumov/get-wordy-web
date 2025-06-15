@@ -48,5 +48,11 @@ export function dateHappened(endDate) {
 }
 
 export function formatDateTime(dateTime) {
-    return new Date(dateTime).toLocaleString();
+    return new Date(dateTime).toLocaleString(undefined,{
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric',
+        hour: 'numeric',
+        minute: 'numeric'
+    });
 }
