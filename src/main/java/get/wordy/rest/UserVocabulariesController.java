@@ -21,6 +21,7 @@ import java.net.URI;
 import java.security.Principal;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 
 @RestController
 @PreAuthorize("hasAuthority('P_MANAGE_OWN_VOCAB')")
@@ -138,8 +139,19 @@ public class UserVocabulariesController {
                 vocabulary.getVocabId(),
                 vocabulary.getName(),
                 vocabulary.getPictureUrl(),
-                vocabulary.getWordsTotal()
+                getVocabType(vocabulary),
+                vocabulary.getWordsTotal(),
+                0, // todo
+                vocabulary.getUpdateTime()
         );
+    }
+
+    private VocabType getVocabType(Vocabulary vocabulary) {
+        boolean shared = vocabulary.isShared();
+        if (shared) {
+            return VocabType.SHARED;
+        }
+        return Objects.equals("Favorite Words", vocabulary.getName()) ? VocabType.FAV : VocabType.OWN;
     }
 
     private WordResponse toWordResponse(Word word) {

@@ -1,9 +1,13 @@
 <script>
-import {fetchUserVocabularies} from "@/js/dictionaries.js";
+import {createVocabulary, fetchUserVocabularies} from "@/js/dictionaries.js";
 import {formatDateTime} from "@/js/utils.js";
+import CreateVocabularyModal from "@/components/modal/CreateVocabulary.vue";
 
 export default {
   name: 'DictionariesView',
+  components: {
+    CreateVocabularyModal
+  },
   data() {
     return {
       vocabularies: [],
@@ -45,6 +49,16 @@ export default {
           return '#ffffff';
       }
     },
+    showCreateModal() {
+      this.$refs.createModal.open();
+    },
+    async handleCreateVocabulary(name) {
+      let response = await createVocabulary(name);
+      console.log('Creating vocabulary:', name);
+      if (response.ok) {
+        this.vocabularies.unshift(await response.json());
+      }
+    }
   },
   mounted() {
     this.getData();
@@ -54,7 +68,20 @@ export default {
 
 <template>
 
-  <div class="vocabulary-list px-4 py-2">
+  <div class="vocabulary-list p-4">
+    <!-- new vocab creation block -->
+    <div v-if="!vocabularies || vocabularies.length === 0" class="text-center mt-5">
+      <p class="lead">You haven’t created any vocabularies yet.</p>
+      <button class="btn btn-sm btn-outline-primary" @click="showCreateModal">Create Your First Vocabulary</button>
+    </div>
+    <div v-else class="d-flex justify-content-between align-items-center mb-3">
+      <h4 class="mb-0">My Vocabularies</h4>
+      <button class="btn btn-sm btn-outline-primary" @click="showCreateModal">
+        <i class="bi bi-plus"></i> New Vocabulary
+      </button>
+    </div>
+    <CreateVocabularyModal ref="createModal" @create="handleCreateVocabulary"/>
+    <!-- all user own and shared vocabularies -->
     <div
         v-for="vocab in sortedVocabularies"
         :key="vocab.vocabId"

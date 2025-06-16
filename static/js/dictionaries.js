@@ -1,66 +1,49 @@
 const vocabsAPI = import.meta.env.VITE_BACKEND_API + "/user/my-vocabularies";
 
+const jsonHeaders = {
+    'Content-Type': 'application/json'
+};
+
+const handleError = (err) => {
+    console.error("HTTP error:", err);
+    throw err;
+};
+
 export function fetchUserVocabularies() {
-    let headers = new Headers();
-    headers.append('Content-Type', 'application/json');
-
-    let initObject = {
+    return fetch(vocabsAPI, {
         method: 'GET',
-        headers: headers,
-    };
+        headers: jsonHeaders
+    }).catch(handleError);
+}
 
-    let fetchAllRequest = new Request(vocabsAPI, initObject);
-
-    return fetch(fetchAllRequest)
-        .catch(err => console.log("HTTP error: ", err));
+export function createVocabulary(name) {
+    return fetch(vocabsAPI, {
+        method: 'POST',
+        headers: jsonHeaders,
+        body: JSON.stringify({name})
+    }).catch(handleError);
 }
 
 export function updateName(vocabId, name) {
-    let headers = new Headers();
-    headers.append('Content-Type', 'application/json');
-
-    let initObject = {
+    return fetch(`${vocabsAPI}/${vocabId}`, {
         method: 'PATCH',
-        headers: headers,
-        body: JSON.stringify({name}),
-    };
-
-    let patchRequest = new Request(vocabsAPI + "/" + vocabId, initObject);
-
-    return fetch(patchRequest)
-        .catch(err => console.log("HTTP error: ", err));
+        headers: jsonHeaders,
+        body: JSON.stringify({name})
+    }).catch(handleError);
 }
 
-export function updatePicture(vocabId, pictureUrl, forceRemovePicture) {
-    let headers = new Headers();
-    headers.append('Content-Type', 'application/json');
-
-    let initObject = {
+export function updatePicture(vocabId, pictureUrl, forceRemovePicture = false) {
+    const query = forceRemovePicture ? "?forceRemovePicture=true" : "";
+    return fetch(`${vocabsAPI}/${vocabId}${query}`, {
         method: 'PATCH',
-        headers: headers,
-        body: JSON.stringify({pictureUrl}),
-    };
-
-    let queryString = "?";
-    if (forceRemovePicture) {
-        queryString += "forceRemovePicture=true";
-    }
-    let patchRequest = new Request(vocabsAPI + "/" + vocabId + queryString, initObject);
-
-    return fetch(patchRequest)
-        .catch(err => console.log("HTTP error: ", err));
+        headers: jsonHeaders,
+        body: JSON.stringify({pictureUrl})
+    }).catch(handleError);
 }
 
 export function deleteVocabulary(vocabId) {
-    let headers = new Headers();
-
-    let initObject = {
+    return fetch(`${vocabsAPI}/${vocabId}`, {
         method: 'DELETE',
-        headers: headers
-    };
-
-    let patchRequest = new Request(vocabsAPI + "/" + vocabId, initObject);
-
-    return fetch(patchRequest)
-        .catch(err => console.log("HTTP error: ", err));
+        headers: jsonHeaders
+    }).catch(handleError);
 }
