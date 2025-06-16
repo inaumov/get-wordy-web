@@ -1,29 +1,47 @@
 <script>
 export default {
   name: 'CreateVocabularyModal',
+  props: {
+    createAction: {
+      type: Function,
+      required: true
+    }
+  },
   data() {
     return {
       visible: false,
       vocabName: '',
-      showError: false
+      error: ''
     };
   },
   methods: {
     open() {
       this.visible = true;
       this.vocabName = '';
-      this.showError = false;
+      this.error = '';
     },
     close() {
       this.visible = false;
     },
-    submit() {
-      if (!this.vocabName.trim()) {
-        this.showError = true;
+    clearError() {
+      this.error = '';
+    },
+    async submit() {
+      if (!this.vocabName) {
+        this.error = 'Vocabulary name is required.';
         return;
       }
-      this.$emit('create', this.vocabName.trim());
-      this.close();
+      try {
+        await this.createAction(this.vocabName);
+        this.close();
+      } catch (err) {
+        if (err.status === 409) {
+          this.error = err.message || 'Duplicate vocabulary name.';
+        } else {
+          this.error = 'Unexpected error. Please try again.';
+          console.error(err);
+        }
+      }
     }
   }
 };
@@ -40,14 +58,13 @@ export default {
             v-model="vocabName"
             type="text"
             class="form-control"
-            :class="{ 'is-invalid': showError }"
+            :class="{ 'is-invalid': error }"
             placeholder="Enter vocabulary name"
-            @input="showError = false"
+            @input="clearError"
+            autocomplete="off"
             required
         />
-        <div class="invalid-feedback" v-if="showError">
-          Vocabulary name cannot be empty.
-        </div>
+        <div v-if="error" class="form-text text-danger">{{ error }}</div>
       </div>
 
       <div class="mt-4 text-end">
@@ -85,8 +102,4 @@ export default {
   border-color: #dc3545;
 }
 
-.invalid-feedback {
-  color: #dc3545;
-  font-size: 0.875em;
-}
 </style>

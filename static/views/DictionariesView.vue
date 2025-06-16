@@ -54,10 +54,15 @@ export default {
     },
     async handleCreateVocabulary(name) {
       let response = await createVocabulary(name);
-      console.log('Creating vocabulary:', name);
-      if (response.ok) {
-        this.vocabularies.unshift(await response.json());
+
+      if (!response.ok) {
+        const err = await response.json();
+        const error = new Error(err.message);
+        Object.assign(error, {status: response.status});
+        throw error;
       }
+      const created = await response.json();
+      this.vocabularies.unshift(created);
     }
   },
   mounted() {
@@ -80,7 +85,7 @@ export default {
         <i class="bi bi-plus"></i> New Vocabulary
       </button>
     </div>
-    <CreateVocabularyModal ref="createModal" @create="handleCreateVocabulary"/>
+    <CreateVocabularyModal ref="createModal" :createAction="handleCreateVocabulary"/>
     <!-- all user own and shared vocabularies -->
     <div
         v-for="vocab in sortedVocabularies"
