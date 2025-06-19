@@ -2,7 +2,7 @@
 import {searchWordData} from "@/js/words-search-api.js";
 
 export default {
-  props: ['onSearchEventName'],
+  props: [''],
   methods: {
     async onSearch() {
       let form = document.getElementById('search-words-form');
@@ -14,7 +14,7 @@ export default {
       let searchResult = await response.json();
       if (response.ok && searchResult.hasOwnProperty('explanations') && searchResult.explanations.length > 0) {
         inputField.value = '';
-        this.$emit(this.onSearchEventName, searchResult);
+        this.$emit('search-submit', searchResult);
       }
     },
   }
@@ -27,10 +27,10 @@ export default {
       <div class="input-group">
         <input id="ai-search-input" type="text" class="form-control" name="words" autocomplete="off" required>
         <span class="input-group-btn">
-                <button type="submit" class="btn btn-md btn-default border">
-                  <i class="bi bi-search"></i>
-                </button>
-              </span>
+          <button type="submit" class="btn btn-md btn-default border">
+            <i class="bi bi-search"></i>
+          </button>
+        </span>
       </div>
     </div>
   </form>

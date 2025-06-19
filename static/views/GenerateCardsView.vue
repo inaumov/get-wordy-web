@@ -8,19 +8,18 @@ export default {
     SearchResultsPreview
   },
   props: ['vocabId'],
+  emits: ['add-to-vocabulary'],
   data() {
     return {
-      searchResult: {
-        explanations: []
-      }
+      foundExplanations: {}
     }
   },
   methods: {
     onSearch(result) {
-      this.searchResult = result;
+      this.foundExplanations = result;
     },
-    handleAddNewCard() {
-
+    handleAddToVocabulary(wordExplanation) {
+      this.$emit('add-to-vocabulary', wordExplanation);
     },
   },
 };
@@ -29,18 +28,15 @@ export default {
 
 <template>
 
-  <div class="d-flex justify-content-center p-4" id="generate-cards-panel">
+  <div class="d-flex justify-content-center p-4">
     <div style="padding-top:7px;" class="col-md-4 form-group pull-right">
-      <search-input @generate-cards-result="onSearch" v-bind="{onSearchEventName: 'generate-cards-result'}"/>
+      <search-input @search-submit="onSearch"/>
     </div>
   </div>
 
-  <search-results-preview @add-to-wordsheet="handleAddNewCard" v-bind="{previewData: this.searchResult}"/>
+  <search-results-preview @preview-item-selected="handleAddToVocabulary" v-bind="{previewData: this.foundExplanations}"/>
 
 </template>
 
 <style>
-div#generate-cards-panel i {
-  color: rgb(185, 87, 84)
-}
 </style>

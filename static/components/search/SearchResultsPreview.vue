@@ -1,6 +1,7 @@
 <script>
 export default {
   props: ['previewData'],
+  emits: ['preview-item-selected'],
   methods: {
     add(selectedExplanation) {
       // transformation logic to go further
@@ -10,7 +11,7 @@ export default {
         transcription: this.previewData.transcription,
         explanation: {...selectedExplanation}
       };
-      this.$emit('add-to-vocabulary', copy);
+      this.$emit('preview-item-selected', copy);
     },
   },
 };

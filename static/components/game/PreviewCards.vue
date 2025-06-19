@@ -26,7 +26,6 @@ export default {
   },
   mounted() {
     this.getData();
-    console.log('PlayGame view: 3rd step mounted. vocabId = ', this.vocabId);
   }
 }
 </script>

@@ -1,28 +1,28 @@
 <script>
 import PlayGame from "@/components/game/PlayGame.vue";
-import CardsList from "@/components/game/CardsList.vue";
+import PreviewCards from "@/components/game/PreviewCards.vue";
 import MatchExercise from "@/components/game/MatchExercise.vue";
 import UnscrambleExercise from "@/components/game/UnscrambleExercise.vue";
 import SpellingExercise from "@/components/game/SpellingExercise.vue";
 
 export default {
-  components: {PlayGame, CardsList, MatchExercise, UnscrambleExercise, SpellingExercise},
+  components: {PlayGame, PreviewCards, MatchExercise, UnscrambleExercise, SpellingExercise},
   props: ['vocabId', 'vocabName'],
   data() {
     return {
-      currentComponent: '',
+      currentComponent: 'PreviewCards',
       cards: []
     }
   },
   methods: {
     nextStep(component, cards) {
       this.currentComponent = component
+      console.log(`Next step ${this.currentComponent} selected`);
       this.cards = cards
     },
   },
   mounted() {
-    this.nextStep('PlayGame')
-    console.log('PlayGame parent view mounted. vocabId = ', this.vocabId);
+    console.log(`${this.currentComponent} mounted. vocabId: ${this.vocabId}, vocabName: ${this.vocabName}`);
   }
 }
 

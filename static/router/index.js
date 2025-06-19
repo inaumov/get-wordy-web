@@ -2,7 +2,7 @@ import {createRouter, createWebHistory} from 'vue-router'
 import {hasPermissions} from '@/js/auth-check.js';
 import LandingPage from "@/pages/LandingPage.vue";
 import MainView from "@/views/MainView.vue";
-import DictionariesView from "@/views/DictionariesView.vue";
+import DictionariesView from "@/views/AllVocabularies.vue";
 import ClassListView from "@/views/ClassListView.vue";
 import ClassDashboard from "@/views/classes/ClassDashboard.vue";
 import MyClasses from "@/views/shared/MyClasses.vue";
@@ -76,18 +76,20 @@ const router = createRouter({
             props: (route) => (
                 {
                     vocabId: route.params.vocabId,
-                    vocabName: route.query.name
+                    vocabName: route.query.vocabName
                 }
             ),
         },
         {
             path: '/User/Vocabularies/:vocabId/Exercise',
             name: 'play-game',
-            // route level code-splitting
-            // this generates a separate chunk (Settings.[hash].js) for this route
-            // which is lazy-loaded when the route is visited.
             component: () => import('@/views/PlayGameView.vue'),
-            props: true
+            props: (route) => (
+                {
+                    vocabId: route.params.vocabId,
+                    vocabName: route.query.vocabName
+                }
+            ),
         },
         {
             path: '/Classes',
@@ -97,9 +99,6 @@ const router = createRouter({
         {
             path: '/Classes/:classId/Vocabularies/:vocabId',
             name: 'vocabulary',
-            // route level code-splitting
-            // this generates a separate chunk (Settings.[hash].js) for this route
-            // which is lazy-loaded when the route is visited.
             component: () => import('@/views/classes/Vocabulary.vue'),
             props: (route) => (
                 {
@@ -128,9 +127,6 @@ const router = createRouter({
         {
             path: '/User/Classes/:classId/Vocabularies/:vocabId',
             name: 'vocabulary-preview',
-            // route level code-splitting
-            // this generates a separate chunk (Settings.[hash].js) for this route
-            // which is lazy-loaded when the route is visited.
             component: () => import('@/views/shared/WordsPreview.vue'),
             props: (route) => (
                 {

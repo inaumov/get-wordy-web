@@ -16,10 +16,15 @@ export default {
     async getData() {
       const response = await fetchCards(this.vocabId);
       this.cards = await response.json();
+    },
+    addWord(wordExplanation) {
+      // todo handle request
+      this.cards.push(wordExplanation);
     }
   },
   mounted() {
-    this.getData()
+    this.getData();
+    console.log(`CardsView mounted. vocabId: ${this.vocabId}, vocabName: ${this.vocabName}`);
   }
 };
 
@@ -30,7 +35,7 @@ export default {
     <router-link :to="{name: 'user-vocabularies'}" class="btn btn-secondary" title="Back">Back</router-link>
   </div>
   <h4 class="p-4">{{ this.vocabName }}</h4>
-  <GenerateCardsView :vocab-id="this.vocabId"></GenerateCardsView>
+  <GenerateCardsView @add-to-vocabulary="addWord" :vocab-id="this.vocabId"></GenerateCardsView>
   <cards-table v-bind="{vocabId: this.vocabId, cards: this.cards}"/>
 
 </template>
