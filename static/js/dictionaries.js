@@ -16,6 +16,13 @@ export function fetchUserVocabularies() {
     }).catch(handleError);
 }
 
+export function fetchUserVocabulary(vocabId) {
+    return fetch(`${vocabsAPI}/${vocabId}`, {
+        method: 'GET',
+        headers: jsonHeaders
+    }).catch(handleError);
+}
+
 export function createVocabulary(name) {
     return fetch(vocabsAPI, {
         method: 'POST',

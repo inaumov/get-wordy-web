@@ -52,6 +52,14 @@ public class UserVocabulariesController {
         return new ResponseEntity<>(vocabularies, HttpStatus.OK);
     }
 
+    @GetMapping
+    public ResponseEntity<DictionaryResponse> getVocabulary(Principal user, int vocabId) {
+        LOG.info("Getting vocabulary for the user = {} with id = {}", user.getName(), vocabId);
+
+        Vocabulary vocabulary = vocabularyService.getVocabulary(createOwnerId(user), vocabId);
+        return new ResponseEntity<>(toResponse(vocabulary), HttpStatus.OK);
+    }
+
     @PostMapping
     public ResponseEntity<DictionaryResponse> createVocabulary(Principal user,
                                                                @Valid @RequestBody DictionaryRequest dictionaryRequest) {

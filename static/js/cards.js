@@ -4,15 +4,20 @@ const jsonHeaders = {
     'Content-Type': 'application/json'
 };
 
+const handleError = (err) => {
+    console.error("HTTP error:", err);
+    throw err;
+};
+
 export function fetchCards(vocabId) {
     return fetch(`${vocabsAPI}/${vocabId}/cards`)
-        .catch(err => console.error("HTTP error:", err));
+        .catch(handleError);
 }
 
 export function fetchCardsForExercise(vocabId, limit = 0) {
     const query = limit > 0 ? `?limit=${limit}` : "";
     return fetch(`${vocabsAPI}/${vocabId}/exercise${query}`)
-        .catch(err => console.error("HTTP error:", err));
+        .catch(handleError);
 }
 
 export function submitResultForExercise(vocabId, cardIds) {
@@ -20,17 +25,27 @@ export function submitResultForExercise(vocabId, cardIds) {
         method: 'PUT',
         headers: jsonHeaders,
         body: JSON.stringify(cardIds)
-    }).catch(err => console.error("HTTP error:", err));
+    }).catch(handleError);
 }
 
 export function deleteCard(vocabId, cardId) {
-    return fetch(`${vocabsAPI}/${vocabId}/cards/${cardId}`, {
-        method: 'DELETE'
-    }).catch(err => console.error("HTTP error:", err));
+    return fetch(`${vocabsAPI}/${vocabId}/cards`, {
+        method: 'DELETE',
+        headers: jsonHeaders,
+        body: JSON.stringify({cardId})
+    }).catch(handleError);
 }
 
 export function resetScore(vocabId, cardId) {
     return fetch(`${vocabsAPI}/${vocabId}/cards/${cardId}/resetScore`, {
         method: 'PUT'
-    }).catch(err => console.error("HTTP error:", err));
+    }).catch(handleError);
+}
+
+export function addToVocabulary(vocabId, wordId) {
+    return fetch(`${vocabsAPI}/${vocabId}/cards`, {
+        method: 'PUT',
+        headers: jsonHeaders,
+        body: JSON.stringify({wordId})
+    }).catch(handleError);
 }

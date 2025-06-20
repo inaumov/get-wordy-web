@@ -75,8 +75,7 @@ const router = createRouter({
             component: () => import('@/views/CardsView.vue'),
             props: (route) => (
                 {
-                    vocabId: route.params.vocabId,
-                    vocabName: route.query.vocabName
+                    vocabId: route.params.vocabId
                 }
             ),
         },
@@ -86,8 +85,7 @@ const router = createRouter({
             component: () => import('@/views/PlayGameView.vue'),
             props: (route) => (
                 {
-                    vocabId: route.params.vocabId,
-                    vocabName: route.query.vocabName
+                    vocabId: route.params.vocabId
                 }
             ),
         },

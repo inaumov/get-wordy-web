@@ -47,14 +47,23 @@ export default defineConfig(({mode}) => {
         rewrite: () => '/my-classes'
       },
 
-      // User flow: /user/my-classes → /my-classes
+      // User flow: /user/my-vocabularies → /my-vocabularies
       '^/api/v1/user/my-vocabularies$': {
         target: 'http://localhost:3000',
         changeOrigin: true,
         rewrite: () => '/my-vocabularies'
       },
+      // User flow: GET /user/my-vocabularies/:id → /my-vocabularies/:vocabId
+      '^/api/v1/user/my-vocabularies/([^/]+)$': {
+        target: 'http://localhost:3000',
+        changeOrigin: true,
+        rewrite: path => {
+          const vocabId = path.match(/\/my-vocabularies\/([^/]+)$/)?.[1];
+          return `/my-vocabularies/${vocabId}`;
+        }
+      },
 
-      // User flow: /user/my-classes → /my-classes
+      // User flow: /user/my-classes/:classId/vocabularies → /vocabularies
       '^/api/v1/user/my-classes/([^/]+)/vocabularies$': {
         target: 'http://localhost:3000',
         changeOrigin: true,
@@ -143,7 +152,7 @@ export default defineConfig(({mode}) => {
         rewrite: () => '/search'
       },
 
-      // User flow: /user/my-vocabularies/vocabId/cards → /cards
+      // User flow: /user/my-vocabularies/:vocabId/cards → /cards
       '^/api/v1/user/my-vocabularies/([^/]+)/cards/?$': {
         target: 'http://localhost:3000',
         changeOrigin: true,
@@ -153,7 +162,7 @@ export default defineConfig(({mode}) => {
         }
       },
 
-      // User flow: /user/my-vocabularies/vocabId/exercise → /exercise
+      // User flow: /user/my-vocabularies/:vocabId/exercise → /exercise
       '^/api/v1/user/my-vocabularies/([^/]+)/exercise$': {
         target: 'http://localhost:3000',
         changeOrigin: true,

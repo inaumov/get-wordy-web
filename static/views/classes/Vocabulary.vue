@@ -1,8 +1,6 @@
 <script>
+import Search from "@/components/Search.vue";
 import WordsheetTable from "@/components/classes/WordsheetTable.vue";
-import SearchInput from "@/components/search/SearchInput.vue";
-import SearchResultsPreview from "@/components/search/SearchResultsPreview.vue";
-
 import {
   getVocabulary,
   updateVocabularyName,
@@ -13,15 +11,17 @@ import {
 import {formatDateTime} from "@/js/utils.js";
 
 export default {
-  components: {SearchResultsPreview, WordsheetTable, SearchInput},
+  components: {
+    Search,
+    WordsheetTable
+  },
   props: ['classId', 'vocabId'],
   data() {
     return {
       name: '',
       isShared: false,
       wordsList: [],
-      updateTime: '',
-      foundExplanations: {}
+      updateTime: ''
     }
   },
   methods: {
@@ -50,12 +50,6 @@ export default {
         this.$refs.editableEl.innerText = this.name // restore original if cleared
       }
     },
-    onSearch(searchResult) {
-      this.foundExplanations = searchResult;
-    },
-    reset() {
-      this.foundExplanations = {}; // reset on success
-    },
     updateActivation() {
       const newVal = !this.isShared;
       updateActivation(this.classId, this.vocabId, newVal)
@@ -75,7 +69,6 @@ export default {
               if (response.ok) {
                 let itemAdded = response.json();
                 this.wordsList.push(itemAdded);
-                this.reset();
               } else {
                 alert('Error');
               }
@@ -131,14 +124,7 @@ export default {
       </span>
     </div>
 
-    <div class="d-flex justify-content-center p-4">
-      <div style="padding-top:7px;" class="col-md-4 form-group pull-right">
-        <search-input @wordsheet-search-submit="onSearch" v-bind="{onSearchEventName: 'wordsheet-search-submit'}"/>
-        <small class="text-muted">Enter a word or phrase and click search</small>
-      </div>
-    </div>
-
-    <search-results-preview class="p-4" @add-to-vocabulary="handleAddToVocabulary" v-bind="{previewData: this.foundExplanations}"/>
+    <search @add-to-vocabulary="handleAddToVocabulary" :vocab-id="this.vocabId"/>
 
     <div class="p-4">
       <div class="d-flex flex-column align-items-end">
