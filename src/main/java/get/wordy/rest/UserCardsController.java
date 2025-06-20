@@ -6,6 +6,7 @@ import get.wordy.core.api.IUserCardsService;
 import get.wordy.core.api.bean.*;
 import get.wordy.model.*;
 import jakarta.servlet.http.HttpServlet;
+import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -76,6 +77,19 @@ public class UserCardsController extends HttpServlet {
 
         return ResponseEntity
                 .accepted()
+                .build();
+    }
+
+    @DeleteMapping(value = "/{vocabId}/cards")
+    public ResponseEntity<Void> deleteCard(Principal user,
+                                           @PathVariable("vocabId") int vocabId,
+                                           @Valid @RequestBody CardIdRequest cardId) {
+        LOG.info("Deleting a card = {} for the user = {}, vocab id = {}", cardId, user.getName(), vocabId);
+
+        userCardsService.deleteCard(createOwnerId(user), cardId.cardId());
+
+        return ResponseEntity
+                .noContent()
                 .build();
     }
 
