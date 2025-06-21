@@ -1,5 +1,6 @@
 package get.wordy.users;
 
+import get.wordy.auth.Settings;
 import get.wordy.users.exception.UserAlreadyExistException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -11,6 +12,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.HashMap;
 import java.util.List;
 
 @Slf4j
@@ -20,6 +22,7 @@ public class UserService implements IUserService {
 
     private final PasswordEncoder passwordEncoder;
     private final CustomUserDetailsService userDetailsService;
+    private final HashMap<String, Settings> userSettings = new HashMap<>();
 
     public UserService(PasswordEncoder passwordEncoder, CustomUserDetailsService userDetailsService) {
         this.passwordEncoder = passwordEncoder;
@@ -80,6 +83,17 @@ public class UserService implements IUserService {
         return users.stream()
                 .map(this::mapToUserDto)
                 .toList();
+    }
+
+    @Override
+    public Settings getSettings(String userId) {
+        return userSettings.get(userId);
+    }
+
+    @Override
+    public void updateSettings(String userId, Settings settings) {
+        log.debug("Updating settings for the the user = {}. New settings: {}", userId, settings);
+        userSettings.put(userId, settings);
     }
 
     private boolean emailExists(String email) {

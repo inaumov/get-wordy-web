@@ -31,13 +31,14 @@ public class UserController {
     }
 
     @PostMapping(value = "/profile", consumes = "application/x-www-form-urlencoded")
-    public String registration(@Valid @ModelAttribute("user") UserDto userDto,
-                               @AuthenticationPrincipal CustomUserDetails userDetails,
-                               BindingResult result,
-                               Model model) {
+    public String updateProfile(@Valid @ModelAttribute("userProfile") UserDto userDto,
+                                @AuthenticationPrincipal CustomUserDetails userDetails,
+                                BindingResult result,
+                                Model model) {
 
         log.info("Attempt to update account for user: {}", userDetails.getUsername());
-        userService.saveUser(userDto);
+        UserDto savedUser = userService.saveUser(userDto);
+
         return "account";
     }
 
@@ -45,6 +46,13 @@ public class UserController {
     public ResponseEntity<List<ClassViewerInfo>> getParticipantClasses(Principal user) {
         List<ClassViewerInfo> classes = classAccessService.getParticipantClasses(user.getName());
         return ResponseEntity.ok(classes);
+    }
+
+    @PostMapping(value = "/settings", consumes = "application/x-www-form-urlencoded")
+    public String updateSettings(@ModelAttribute("settings") Settings settings,
+                                 @AuthenticationPrincipal CustomUserDetails userDetails) {
+        userService.updateSettings(userDetails.getUsername(), settings);
+        return "redirect:/account";  // redirect to refresh page
     }
 
 }
