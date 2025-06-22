@@ -1,16 +1,10 @@
 <script>
-import {store} from '@/js/store.js';
 
 export default {
   props: ['vocabId'],
-  setup: function () {
-    return {
-      limitSettings: store
-    }
-  },
   methods: {
     print_cards: function () {
-      this.$emit("nextStep", 'CardsList');
+      this.$emit("nextStep", 'PreviewCards');
     }
   },
   mounted() {

@@ -1,5 +1,6 @@
 package get.wordy.auth;
 
+import get.wordy.users.UserService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.CacheControl;
 import org.springframework.http.HttpHeaders;
@@ -13,11 +14,18 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 @Slf4j
 @Controller
 @RequestMapping("/users")
 public class AuthController {
+
+    private final UserService userService;
+
+    public AuthController(UserService userService) {
+        this.userService = userService;
+    }
 
     @GetMapping("/auth/status")
     public ResponseEntity<Map<String, Object>> checkLoginStatus(Authentication authentication) {
@@ -34,7 +42,7 @@ public class AuthController {
     }
 
     @GetMapping("/meta")
-    public ResponseEntity<Map<String, List<String>>> getUserPermissions(Authentication authentication) {
+    public ResponseEntity<Meta> getUserPermissions(Authentication authentication) {
         log.info("Retrieving permissions for the user = {}", authentication.getName());
 
         // extract authorities directly and convert to a List of Strings
@@ -42,7 +50,26 @@ public class AuthController {
                 .map(GrantedAuthority::getAuthority)
                 .toList();
 
-        return ResponseEntity.ok(Map.of("permissions", allowedPermissions));
+        return ResponseEntity.ok(new Meta(allowedPermissions));
+    }
+
+    @GetMapping("/settings")
+    public ResponseEntity<Map<Object, Object>> getSettings(Authentication authentication) {
+        if (authentication.getAuthorities().stream()
+                .filter(grantedAuthority -> Objects.equals(grantedAuthority.getAuthority(), "P_MANAGE_OWN_CARDS"))
+                .findAny()
+                .isEmpty()) {
+            return ResponseEntity.ok(Map.of());
+        }
+        Settings settings = userService.getSettings(authentication.getName());
+        if (settings == null) {
+            return ResponseEntity.ok(Map.of());
+        }
+        Map<Object, Object> userSettings = Map.of(
+                "cardsLimitExercise", settings.cardsLimitExercise(),
+                "schoolUpdatesEnabled", settings.schoolUpdatesEnabled()
+        );
+        return ResponseEntity.ok(userSettings);
     }
 
 }

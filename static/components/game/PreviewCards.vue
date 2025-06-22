@@ -1,14 +1,8 @@
 <script>
 import {fetchCardsForExercise} from "@/js/cards.js";
-import {store} from "@/js/store.js";
 
 export default {
   props: ['vocabId'],
-  setup: function () {
-    return {
-      limitSettings: store
-    }
-  },
   data() {
     return {
       cards: []
@@ -16,7 +10,10 @@ export default {
   },
   methods: {
     async getData() {
-      const limit = this.limitSettings['exerciseLimit'];
+      let limit = localStorage.getItem("cardsLimitExercise");
+      if (limit) {
+        limit = parseInt(limit);
+      }
       const response = await fetchCardsForExercise(this.vocabId, limit);
       this.cards = await response.json();
     },

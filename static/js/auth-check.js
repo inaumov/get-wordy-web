@@ -20,6 +20,10 @@ export async function checkLoginStatus() {
             isLoggedIn.value = data['loggedIn'];
             if (data['loggedIn']) {
                 await loadPermissions();
+                // only learners have settings for now
+                if (permissions.value.some(p => p === 'P_MANAGE_OWN_CARDS')) {
+                    await loadUserSettings();
+                }
             }
         } else {
             isLoggedIn.value = false;
@@ -64,6 +68,38 @@ async function loadPermissions() {
         }
     } catch (error) {
         console.error('Error while getting user permissions:', error);
+    }
+}
+
+/**
+ * @typedef {Object} Settings
+ * @property {number} cardsLimitExercise
+ * @property {boolean} schoolUpdatesEnabled
+ */
+
+/**
+ * @returns {Promise<Settings>}
+ */
+async function loadUserSettings() {
+    try {
+        const response = await fetch(usersAPI + "/settings", {
+            method: 'GET',
+            credentials: 'include', // include cookies in the request,
+            headers: {
+                'Cache-Control': 'no-cache', // prevent browser caching
+            }
+        });
+        if (response.ok) {
+            /** @type {Settings} */
+            const data = await response.json();
+
+            if (data?.cardsLimitExercise) {
+                localStorage.setItem("cardsLimitExercise", data.cardsLimitExercise);
+                console.log("Cards limit:", data.cardsLimitExercise);
+            }
+        }
+    } catch (err) {
+        console.error("Failed to fetch settings:", err);
     }
 }
 

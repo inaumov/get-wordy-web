@@ -40,6 +40,13 @@ export default defineConfig(({mode}) => {
         rewrite: () => '/meta'
       },
 
+      // Login flow: /users/settings → /settings
+      '^/users/settings$': {
+        target: 'http://localhost:3000',
+        changeOrigin: true,
+        rewrite: () => '/settings'
+      },
+
       // User flow: /users/my-classes → /my-classes
       '^/users/my-classes$': {
         target: 'http://localhost:3000',
