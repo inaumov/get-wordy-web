@@ -20,24 +20,24 @@ export function fetchCardsForExercise(vocabId, limit = 0) {
         .catch(handleError);
 }
 
-export function submitResultForExercise(vocabId, cardIds) {
-    return fetch(`${vocabsAPI}/${vocabId}/exercise`, {
+export function saveProgress(vocabId, wordIds) {
+    return fetch(`${vocabsAPI}/${vocabId}/saveProgress`, {
         method: 'PUT',
         headers: jsonHeaders,
-        body: JSON.stringify(cardIds)
+        body: JSON.stringify(wordIds)
     }).catch(handleError);
 }
 
-export function deleteCard(vocabId, cardId) {
-    return fetch(`${vocabsAPI}/${vocabId}/cards`, {
+export function deleteCard(vocabId, wordId) {
+    return fetch(`${vocabsAPI}/${vocabId}/words`, {
         method: 'DELETE',
         headers: jsonHeaders,
-        body: JSON.stringify({cardId})
+        body: JSON.stringify({wordId})
     }).catch(handleError);
 }
 
-export function resetScore(vocabId, cardId) {
-    return fetch(`${vocabsAPI}/${vocabId}/cards/${cardId}/resetScore`, {
+export function resetProgress(vocabId, wordId) {
+    return fetch(`${vocabsAPI}/${vocabId}/cards/${wordId}/resetProgress`, {
         method: 'PUT'
     }).catch(handleError);
 }

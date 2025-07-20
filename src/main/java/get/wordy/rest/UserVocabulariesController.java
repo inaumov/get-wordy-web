@@ -37,10 +37,10 @@ public class UserVocabulariesController {
     }
 
     @GetMapping
-    public ResponseEntity<List<DictionaryResponse>> getUserVocabularies(Principal user) {
+    public ResponseEntity<List<UserVocabularyResponse>> getUserVocabularies(Principal user) {
         LOG.info("Getting vocabularies for the user = {}", user.getName());
 
-        List<DictionaryResponse> vocabularies = vocabularyService.getVocabularies(createOwnerId(user))
+        List<UserVocabularyResponse> vocabularies = vocabularyService.getVocabularies(createOwnerId(user))
                 .stream()
                 .map(this::toResponse)
                 .toList();
@@ -52,8 +52,9 @@ public class UserVocabulariesController {
         return new ResponseEntity<>(vocabularies, HttpStatus.OK);
     }
 
-    @GetMapping
-    public ResponseEntity<DictionaryResponse> getVocabulary(Principal user, int vocabId) {
+    @GetMapping("/{vocabId}")
+    public ResponseEntity<UserVocabularyResponse> getVocabulary(Principal user,
+                                                                @PathVariable("vocabId") int vocabId) {
         LOG.info("Getting vocabulary for the user = {} with id = {}", user.getName(), vocabId);
 
         Vocabulary vocabulary = vocabularyService.getVocabulary(createOwnerId(user), vocabId);
@@ -61,21 +62,21 @@ public class UserVocabulariesController {
     }
 
     @PostMapping
-    public ResponseEntity<DictionaryResponse> createVocabulary(Principal user,
-                                                               @Valid @RequestBody DictionaryRequest dictionaryRequest) {
+    public ResponseEntity<UserVocabularyResponse> createVocabulary(Principal user,
+                                                                   @Valid @RequestBody DictionaryRequest dictionaryRequest) {
         LOG.info("Creating a new vocabulary = {} for the user = {}", dictionaryRequest.name(), user.getName());
 
         Vocabulary vocabulary = vocabularyService.createVocabulary(createOwnerId(user), dictionaryRequest.name(), dictionaryRequest.pictureUrl());
-        DictionaryResponse response = toResponse(vocabulary);
+        UserVocabularyResponse response = toResponse(vocabulary);
         return ResponseEntity.created(URI.create("/vocabularies/" + response.vocabId()))
                 .body(response);
     }
 
     @PatchMapping("/{vocabId}")
-    public ResponseEntity<DictionaryResponse> partialUpdate(Principal user,
-                                                            @PathVariable("vocabId") int vocabId,
-                                                            @RequestBody DictionaryRequest partialUpdate,
-                                                            @RequestParam(value = "forceRemovePicture", required = false) boolean forceRemovePicture) {
+    public ResponseEntity<UserVocabularyResponse> partialUpdate(Principal user,
+                                                                @PathVariable("vocabId") int vocabId,
+                                                                @RequestBody DictionaryRequest partialUpdate,
+                                                                @RequestParam(value = "forceRemovePicture", required = false) boolean forceRemovePicture) {
         LOG.info("Updating vocabulary for the user = {}, vocab id = {}", user.getName(), vocabId);
 
         // handle name change
@@ -94,8 +95,8 @@ public class UserVocabulariesController {
     }
 
     @DeleteMapping(value = "/{vocabId}")
-    public ResponseEntity<DictionaryResponse> deleteVocabulary(Principal user,
-                                                               @PathVariable("vocabId") int vocabId) {
+    public ResponseEntity<Void> deleteVocabulary(Principal user,
+                                                 @PathVariable("vocabId") int vocabId) {
         LOG.info("Deleting a vocabulary for the user = {}, by id = {}", user.getName(), vocabId);
 
         vocabularyService.deleteVocabulary(createOwnerId(user), vocabId);
@@ -142,8 +143,8 @@ public class UserVocabulariesController {
         return new OwnerId(user.getName(), "user");
     }
 
-    private DictionaryResponse toResponse(Vocabulary vocabulary) {
-        return new DictionaryResponse(
+    private UserVocabularyResponse toResponse(Vocabulary vocabulary) {
+        return new UserVocabularyResponse(
                 vocabulary.getVocabId(),
                 vocabulary.getName(),
                 vocabulary.getPictureUrl(),

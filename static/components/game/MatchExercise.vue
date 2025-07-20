@@ -17,14 +17,14 @@ export default {
       this.prepareMatches();
     },
     onAnswered: function (answeredCardId) {
-      let currentCardId = this.displayed['cardId'];
-      const isAnswerCorrect = answeredCardId === currentCardId;
+      let wordId = this.displayed['wordId'];
+      const isAnswerCorrect = answeredCardId === wordId;
       // pre save card id
       if (isAnswerCorrect) {
-        this.preSaveAnswer(currentCardId);
+        this.preSaveAnswer(wordId);
       }
       highlightAnswer();
-      disableAllAnswers(this.cards.map((card) => card['cardId']));
+      disableAllAnswers(this.cards.map((card) => card['wordId']));
       this.enableNextButton();
 
       function highlightAnswer() {
@@ -41,9 +41,9 @@ export default {
         answerBtn.prepend(icon, document.createTextNode(" "));
       }
 
-      function disableAllAnswers(cardIds) {
-        cardIds.forEach(function (cardId) {
-          let button = document.getElementById("answerBtn_" + cardId);
+      function disableAllAnswers(wordIds) {
+        wordIds.forEach(function (wordId) {
+          let button = document.getElementById("answerBtn_" + wordId);
           button.setAttribute('disabled', 'disabled');
         });
       }
@@ -51,7 +51,7 @@ export default {
     prepareMatches: function () {
       const arr = shuffle(this.cards);
       // simplify to key value
-      this.preparedMatches = arr.map(i => ({id: i.cardId, value: i.value}));
+      this.preparedMatches = arr.map(i => ({id: i.wordId, value: i.value}));
     },
     nextExercise: function () {
       this.$emit("nextStep", 'UnscrambleExercise', this.cards);
@@ -65,7 +65,7 @@ export default {
 </script>
 
 <template>
-  <div class="container" id="match-exercise" :key="displayed['cardId']" v-if="!isExerciseDone">
+  <div class="container" id="match-exercise" :key="displayed['wordId']" v-if="!isExerciseDone">
     <p class="text-center mb-3">
       Exercise 1: Match each meaning with its corresponding word
     </p>

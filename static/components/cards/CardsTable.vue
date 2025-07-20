@@ -1,5 +1,5 @@
 <script>
-import {deleteCard, resetScore} from "@/js/cards.js";
+import {deleteCard, resetProgress} from "@/js/cards.js";
 import {toReadableStatus} from "@/js/utils.js";
 
 export default {
@@ -15,8 +15,8 @@ export default {
       return card.status === 'POSTPONED' || card.status === 'LEARNT';
     },
     resetScore(card) {
-      const cardId = card['cardId'];
-      resetScore(this.vocabId, cardId)
+      const wordId = card['wordId'];
+      resetProgress(this.vocabId, wordId)
           .then(response => {
             if (response.ok) {
               card.score = 0;
@@ -26,11 +26,11 @@ export default {
           });
     },
     deleteCard(card) {
-      const cardId = card['cardId'];
-      deleteCard(this.vocabId, cardId)
+      const wordId = card['wordId'];
+      deleteCard(this.vocabId, wordId)
           .then(response => {
             if (response.ok) {
-              const index = this.cards.findIndex(obj => obj['cardId'] === cardId)
+              const index = this.cards.findIndex(obj => obj['wordId'] === wordId)
               this.cards.splice(index, 1)
             }
             console.log("DELETE card has been requested. Response.status =", response.status);

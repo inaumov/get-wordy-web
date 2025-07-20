@@ -1,6 +1,6 @@
 <script>
 import {shuffle} from "@/js/utils.js";
-import {submitResultForExercise} from "@/js/cards.js";
+import {saveProgress} from "@/js/cards.js";
 
 export default {
   name: 'base-exercise',
@@ -9,7 +9,7 @@ export default {
     return {
       totalCards: 0,
       displayed: {
-        cardId: '',
+        wordId: '',
         explanation: {}
       },
       shuffledCards: [],
@@ -38,10 +38,10 @@ export default {
     shuffleCards() {
       this.shuffledCards = shuffle(this.cards);
     },
-    preSaveAnswer(cardId) {
-      // pre save card id
-      if (this.correctAnswers.indexOf(cardId) === -1) {
-        this.correctAnswers.push(cardId);
+    preSaveAnswer(wordId) {
+      // pre save word id
+      if (this.correctAnswers.indexOf(wordId) === -1) {
+        this.correctAnswers.push(wordId);
       }
     },
     highlightAnswer(isAnswerCorrect) {
@@ -71,7 +71,10 @@ export default {
       }
     },
     finishExercise() {
-      submitResultForExercise(this.vocabId, this.correctAnswers)
+      if (this.correctAnswers === 0) {
+        return;
+      }
+      saveProgress(this.vocabId, this.correctAnswers)
           .then(response => {
             if (!response.ok) {
               // todo notification

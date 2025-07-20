@@ -71,7 +71,7 @@ const router = createRouter({
         },
         {
             path: '/User/Vocabularies/:vocabId/Cards',
-            name: 'all-cards',
+            name: 'view-cards',
             component: () => import('@/views/CardsView.vue'),
             props: (route) => (
                 {

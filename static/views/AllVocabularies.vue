@@ -28,7 +28,7 @@ export default {
       const all = await response.json();
       const [favorites, vocabularies] = all.reduce(
           ([fav, nonFav], item) => {
-            item.type === 'FAV' ? fav.push(item) : nonFav.push(item);
+            item.accessType === 'FAV' ? fav.push(item) : nonFav.push(item);
             return [fav, nonFav];
           },
           [[], []]
@@ -37,16 +37,14 @@ export default {
       this.favorites = favorites;
     },
     formatDateTime,
-    getColor(type) {
-      switch (type) {
+    getColor(accessType) {
+      switch (accessType) {
         case 'FAV':
-          return '#fff8d6'; // pastel yellow
-        case 'OWN':
-          return '#e3f2fd'; // pastel blue
+          return '#fff8d6';
         case 'SHARED':
-          return '#e8f5e9'; // pastel green
+          return '#e8f5e9';
         default:
-          return '#ffffff';
+          return '#e3f2fd';
       }
     },
     showCreateModal() {
@@ -77,7 +75,7 @@ export default {
     <!-- new vocab creation block -->
     <div v-if="!vocabularies || vocabularies.length === 0" class="text-center mt-5">
       <p class="lead">You haven’t created any vocabularies yet.</p>
-      <button class="btn btn-sm btn-outline-primary" @click="showCreateModal">Create Your First Vocabulary</button>
+      <button class="btn btn-outline-primary" @click="showCreateModal">Create Your First Vocabulary</button>
     </div>
     <div v-else class="d-flex justify-content-between align-items-center mb-3">
       <h4 class="mb-0">My Vocabularies</h4>
@@ -91,7 +89,7 @@ export default {
         v-for="vocab in sortedVocabularies"
         :key="vocab.vocabId"
         class="vocab-item p-3 mb-3 rounded shadow-sm"
-        :style="{ backgroundColor: getColor(vocab.type) }"
+        :style="{ backgroundColor: getColor(vocab.accessType) }"
     >
       <div class="d-flex justify-content-between align-items-center mb-2">
         <h5 class="mb-0">{{ vocab.name }}</h5>
@@ -119,24 +117,46 @@ export default {
         </span>
       </div>
 
-      <div class="d-flex flex-wrap gap-2 mt-2">
+      <div v-if="vocab.accessType === 'FAV' && vocab.wordsTotal > 0" class="d-flex flex-wrap gap-2 mt-2">
         <router-link
             class="btn btn-sm btn-success text-white"
-            :to="{ name: 'all-cards', params: { vocabId: vocab.vocabId }, query: { vocabName: vocab.name } }"
+            :to="{ name: 'view-cards', params: { vocabId: vocab.vocabId }, query: { vocabName: vocab.name } }"
+            title="View favorite words"
         >
-          <i class="bi bi-card-list"></i> View Words
+          <i class="bi bi-card-list me-2"></i>
+          <span>View Words</span>
+        </router-link>
+      </div>
+
+      <div v-if="vocab.accessType === 'SHARED'" class="d-flex flex-wrap gap-2 mt-2">
+        <router-link
+            class="btn btn-md btn-success text-white"
+            :to="{ name: 'view-cards', params: { vocabId: vocab.vocabId }, query: { vocabName: vocab.name } }"
+        >
+          <i class="bi bi-card-list me-2"></i>
+          <span>View Words</span>
+        </router-link>
+      </div>
+
+      <div v-else-if="vocab.accessType !== 'FAV'" class="d-flex flex-wrap gap-2 mt-2">
+        <router-link
+            class="btn btn-md btn-success text-white"
+            :to="{ name: 'view-cards', params: { vocabId: vocab.vocabId }, query: { vocabName: vocab.name } }"
+        >
+          <i class="bi bi-card-list me-2"></i>
+          <span v-if="vocab.wordsTotal > 0">View Words</span>
+          <span v-else>Add Words</span>
         </router-link>
 
         <router-link
-            class="btn btn-sm btn-success text-white"
+            v-if="vocab.wordsTotal > 0"
+            class="btn btn-md btn-success text-white"
             :to="{ name : 'play-game', params: { vocabId: vocab.vocabId }, query: { vocabName: vocab.name }}"
-            :disabled="vocab.wordsTotal === 0"
             title="You wanna play? let's play"
         >
           <i :class="['bi', vocab.learningProgress > 0 ? 'bi-repeat' : 'bi-arrow-90deg-right']"></i>
           {{ vocab.learningProgress > 0 ? 'Continue Learning' : 'Start Learning' }}
         </router-link>
-
       </div>
 
     </div>

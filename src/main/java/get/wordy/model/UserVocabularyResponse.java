@@ -1,14 +1,14 @@
 package get.wordy.model;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 
-public record DictionaryResponse(
+public record UserVocabularyResponse(
         int vocabId,
         String name,
         String pictureUrl,
-        VocabType type,
+        VocabType accessType,
         int wordsTotal,
         int learningProgress,
-        LocalDateTime updateTime
+        Instant updateTime
 ) {
 }

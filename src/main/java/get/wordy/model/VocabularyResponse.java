@@ -1,12 +1,12 @@
 package get.wordy.model;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 
 public record VocabularyResponse(
         int vocabId,
         String name,
         int wordsTotal,
         boolean isShared,
-        LocalDateTime updateTime
+        Instant updateTime
 ) {
 }

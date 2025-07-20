@@ -47,12 +47,11 @@ public class GetWordyConfiguration implements WebMvcConfigurer {
     @Bean
     public GetWordyService coreService(DataSource dataSource, NamedParameterJdbcTemplate jdbcTemplate) {
         LocalTxManager txManager = LocalTxManager.withDataSource(dataSource);
-        DaoFactory factory = DaoFactory.withTxManager(txManager);
         LOG.info("Creating vocabulary and user cards service for data source = {}", dataSource);
         return new GetWordyService(
                 new VocabularyDao(jdbcTemplate),
-                factory.getWordDao(),
-                factory.getCardDao(),
+                new WordDao(txManager),
+                new ProgressDao(txManager),
                 new CardHeadlineDao(jdbcTemplate),
                 txManager
         );

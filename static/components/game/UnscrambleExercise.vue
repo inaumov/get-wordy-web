@@ -24,7 +24,7 @@ export default {
           let isAnswerCorrect = clearedInput === this.displayed.value;
           // pre save card id
           if (isAnswerCorrect) {
-            let currentCardId = this.displayed['cardId'];
+            let currentCardId = this.displayed['wordId'];
             this.preSaveAnswer(currentCardId);
           }
           this.highlightAnswer(isAnswerCorrect);
@@ -72,7 +72,7 @@ export default {
 </script>
 
 <template>
-  <div class="container" id="unscramble-exercise" :key="displayed.cardId" v-if="!isExerciseDone">
+  <div class="container" id="unscramble-exercise" :key="displayed.wordId" v-if="!isExerciseDone">
     <p class="text-center mb-3">
       Exercise 2: Unscramble the word by selecting the letters in the correct sequence
     </p>

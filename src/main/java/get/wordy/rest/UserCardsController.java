@@ -6,7 +6,6 @@ import get.wordy.core.api.IUserCardsService;
 import get.wordy.core.api.bean.*;
 import get.wordy.model.*;
 import jakarta.servlet.http.HttpServlet;
-import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -66,69 +65,36 @@ public class UserCardsController extends HttpServlet {
         return new ResponseEntity<>(cards, HttpStatus.OK);
     }
 
-    @PutMapping(value = "/{vocabId}/exercise")
-    public ResponseEntity<Void> submitExerciseResult(Principal user,
-                                                     @PathVariable("vocabId") int vocabId,
-                                                     @RequestBody int[] cardIds) {
+    @PutMapping(value = "/{vocabId}/saveProgress")
+    public ResponseEntity<Void> saveProgress(Principal user,
+                                             @PathVariable("vocabId") int vocabId,
+                                             @RequestBody int[] wordIds) {
 
-        LOG.info("Submitting exercise result for the user = {} and cards: {}", user.getName(), Arrays.toString(cardIds));
+        LOG.info("Submitting exercise result for the user = {}, received word refs: {}", user.getName(), Arrays.toString(wordIds));
 
-        userCardsService.increaseScoreUp(createOwnerId(user), vocabId, cardIds, 12);
+        userCardsService.saveProgress(createOwnerId(user), vocabId, wordIds, 12);
 
         return ResponseEntity
                 .accepted()
                 .build();
     }
 
-    @DeleteMapping(value = "/{vocabId}/cards")
-    public ResponseEntity<Void> deleteCard(Principal user,
-                                           @PathVariable("vocabId") int vocabId,
-                                           @Valid @RequestBody CardIdRequest cardId) {
-        LOG.info("Deleting a card = {} for the user = {}, vocab id = {}", cardId, user.getName(), vocabId);
-
-        userCardsService.deleteCard(createOwnerId(user), cardId.cardId());
-
-        return ResponseEntity
-                .noContent()
-                .build();
-    }
-
-    @PutMapping(value = "/{vocabId}/cards/{cardId}/resetScore")
-    public ResponseEntity<Void> resetCard(Principal user,
+    @PutMapping(value = "/{vocabId}/cards/{wordId}/resetProgress")
+    public ResponseEntity<Void> resetProgress(Principal user,
                                           @PathVariable("vocabId") int vocabId,
-                                          @PathVariable("cardId") int cardId) {
-        LOG.info("Resetting a card = {} for the user = {}, vocab id = {}", cardId, user.getName(), vocabId);
+                                          @PathVariable("wordId") int wordId) {
+        LOG.info("Resetting a card = {} for the user = {}, vocab id = {}", wordId, user.getName(), vocabId);
 
-        userCardsService.resetScore(createOwnerId(user), cardId);
+        userCardsService.resetProgress(createOwnerId(user), vocabId, wordId);
 
         return ResponseEntity
                 .accepted()
                 .build();
     }
-
-/*
-    @PostMapping(value = "/{dictionaryId}/generate")
-    public ResponseEntity<List<CardResponse>> generate(Principal user,
-                                                       @PathVariable("dictionaryId") int dictionaryId,
-                                                       @RequestBody String[] wordsArray) {
-
-        Set<String> uniqueWords = new LinkedHashSet<>(wordsArray.length);
-        Collections.addAll(uniqueWords, wordsArray);
-
-        LOG.info("Generating cards for the user = {} and new words: {}", user.getName(), uniqueWords);
-
-        List<CardResponse> cards = dictionaryService.generateCards(createOwnerId(user), dictionaryId, uniqueWords)
-                .stream()
-                .map(this::toCardResponse)
-                .toList();
-
-        return new ResponseEntity<>(cards, HttpStatus.ACCEPTED);
-    }
-*/
 
     private CardResponse toCardResponse(Card card) {
         return new CardResponse(
-                card.getId(),
+                card.getWordId(),
                 card.getStatus(),
                 card.getScore(),
                 card.getWord().getValue(),
@@ -143,7 +109,7 @@ public class UserCardsController extends HttpServlet {
 
     private ExerciseResponse toExerciseResponse(Exercise exercise) {
         return new ExerciseResponse(
-                exercise.getCardId(),
+                exercise.getWordId(),
                 exercise.getWord().getValue(),
                 Explanation.builder()
                         .partOfSpeech(exercise.getWord().getPartOfSpeech())

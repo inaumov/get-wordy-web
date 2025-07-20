@@ -15,12 +15,12 @@ export default {
   watch: {
     answer: {
       handler(input) {
-        let currentCardId = this.displayed['cardId'];
+        let wordId = this.displayed['wordId'];
         let allAnswers = new Set([this.displayed.value, this.spellingExercise['matchedWords']]);
         if (allAnswers.has(input)) {
           this.highlightAnswer(true);
           this.enableNextButton();
-          this.preSaveAnswer(currentCardId);
+          this.preSaveAnswer(wordId);
         } else {
           this.highlightAnswer(false);
         }
