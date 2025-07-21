@@ -123,8 +123,8 @@ const router = createRouter({
                     ),
                 },
         {
-            path: '/User/Classes/:classId/Vocabularies/:vocabId',
-            name: 'vocabulary-preview',
+            path: '/User/MyClasses/:classId/Vocabularies/:vocabId/Cards',
+            name: 'shared-vocabulary-preview',
             component: () => import('@/views/shared/WordsPreview.vue'),
             props: (route) => (
                 {

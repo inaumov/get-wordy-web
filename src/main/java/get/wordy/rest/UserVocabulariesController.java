@@ -151,7 +151,8 @@ public class UserVocabulariesController {
                 getVocabType(vocabulary),
                 vocabulary.getWordsTotal(),
                 0, // todo
-                vocabulary.getUpdateTime()
+                vocabulary.getUpdateTime(),
+                null
         );
     }
 

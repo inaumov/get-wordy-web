@@ -6,6 +6,8 @@ import get.wordy.core.api.bean.Vocabulary;
 import get.wordy.core.api.bean.Word;
 import get.wordy.core.api.id.OwnerId;
 import get.wordy.model.Explanation;
+import get.wordy.model.UserVocabularyResponse;
+import get.wordy.model.VocabType;
 import get.wordy.model.WordResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,9 +22,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.security.Principal;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 @RestController
 @PreAuthorize("hasAuthority('P_SHARED_CLASS')")
@@ -41,13 +41,13 @@ public class SharedVocabulariesController {
     }
 
     @GetMapping(value = "/{classId}/vocabularies")
-    public ResponseEntity<List<Map<String, Object>>> getVocabularies(Principal user,
-                                                                     @PathVariable("classId") String classId) {
+    public ResponseEntity<List<UserVocabularyResponse>> getVocabularies(Principal user,
+                                                                        @PathVariable("classId") String classId) {
         LOG.info("Getting shared vocabularies for the user = {}, and class id = {}", user.getName(), classId);
 
         accessService.hasAccess(classId, user.getName());
 
-        List<Map<String, Object>> vocabulariesResponse = vocabularyService.getVocabularies(createClassOwnerId(classId))
+        List<UserVocabularyResponse> vocabulariesResponse = vocabularyService.getVocabularies(createClassOwnerId(classId))
                 .stream()
                 .filter(Vocabulary::isShared) // !important
                 .map(this::toResponse)
@@ -60,16 +60,8 @@ public class SharedVocabulariesController {
         return new ResponseEntity<>(vocabulariesResponse, HttpStatus.OK);
     }
 
-    private Map<String, Object> toResponse(Vocabulary vocabulary) {
-        return Map.of(
-                "vocabId", vocabulary.getVocabId(),
-                "name", vocabulary.getName(),
-                "updateTime", vocabulary.getUpdateTime(),
-                "wordsTotal", vocabulary.getWordsTotal());
-    }
-
     @GetMapping(value = "/{classId}/vocabularies/{vocabId}")
-    public ResponseEntity<Map<String, Object>> getVocabulary(Principal user,
+    public ResponseEntity<UserVocabularyResponse> getVocabulary(Principal user,
                                                              @PathVariable("classId") String classId,
                                                              @PathVariable("vocabId") int vocabId) {
 
@@ -81,29 +73,36 @@ public class SharedVocabulariesController {
             throw new AccessDeniedException("Permission denied: no access to this vocabulary = " + vocabId);
         }
 
-        Map<String, Object> vocabularyResponse = new HashMap<>();
-        vocabularyResponse.put("vocabId", vocabId);
-        vocabularyResponse.put("name", vocabulary.getName());
-        vocabularyResponse.put("updateTime", vocabulary.getUpdateTime());
-
         if (vocabulary.getWordsTotal() == 0) {
-            vocabularyResponse.put("wordsTotal", 0);
-            vocabularyResponse.put("words", Collections.emptyList());
-            return new ResponseEntity<>(vocabularyResponse, HttpStatus.OK);
+            return new ResponseEntity<>(toResponse(vocabulary), HttpStatus.OK);
         }
 
         List<WordResponse> vocabWords = vocabularyService.getWords(createClassOwnerId(classId), vocabId)
                 .stream()
                 .map(this::toWordResponse)
                 .toList();
-        vocabularyResponse.put("wordsTotal", vocabulary.getWordsTotal());
-        vocabularyResponse.put("words", vocabWords);
-
-        return new ResponseEntity<>(vocabularyResponse, HttpStatus.OK);
+        return new ResponseEntity<>(toResponse(vocabulary, vocabWords), HttpStatus.OK);
     }
 
     private OwnerId createClassOwnerId(String classId) {
         return new OwnerId(classId, "class");
+    }
+
+    private UserVocabularyResponse toResponse(Vocabulary vocabulary) {
+        return toResponse(vocabulary, Collections.emptyList());
+    }
+
+    private UserVocabularyResponse toResponse(Vocabulary vocabulary, List<WordResponse> words) {
+        return new UserVocabularyResponse(
+                vocabulary.getVocabId(),
+                vocabulary.getName(),
+                null,
+                VocabType.SHARED,
+                vocabulary.getWordsTotal(),
+                0,
+                vocabulary.getUpdateTime(),
+                words
+        );
     }
 
     private WordResponse toWordResponse(Word word) {

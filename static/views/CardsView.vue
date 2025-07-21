@@ -55,7 +55,7 @@ export default {
   },
   computed: {
     viewOnly() {
-      return !this.vocabulary?.accessType === 'OWN'; // has no type
+      return this.vocabulary?.accessType !== 'OWN'; // has no type
     }
   }
 };
@@ -68,7 +68,7 @@ export default {
   </div>
   <h4 class="p-4">{{ this.vocabulary?.name }}</h4>
 
-  <search v-if="viewOnly" @add-to-vocabulary="addWord" :vocab-id="this.vocabId"/>
+  <search v-if="!viewOnly" @add-to-vocabulary="addWord" :vocab-id="this.vocabId"/>
   <cards-table v-bind="{vocabId: this.vocabId, cards: this.cards}"/>
 
 </template>

@@ -1,6 +1,7 @@
 package get.wordy.model;
 
 import java.time.Instant;
+import java.util.List;
 
 public record UserVocabularyResponse(
         int vocabId,
@@ -9,6 +10,7 @@ public record UserVocabularyResponse(
         VocabType accessType,
         int wordsTotal,
         int learningProgress,
-        Instant updateTime
+        Instant updateTime,
+        List<WordResponse> words
 ) {
 }
