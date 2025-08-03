@@ -127,7 +127,7 @@ public class ClassController {
         LOG.info("Getting a class info for the user = {}, class id = {}", user.getName(), classId);
 
         ClassInfo classInfo = classService.findClassInfo(createUserOwnerId(user), classId);
-        return ResponseEntity.ok(new ClassInfoResponse(classInfo));
+        return ResponseEntity.ok(enrichWithParticipants(new ClassInfoResponse(classInfo)));
     }
 
     @DeleteMapping(value = "/{classId}")
@@ -196,10 +196,11 @@ public class ClassController {
         Vocabulary vocabulary = vocabularyService.getVocabulary(createClassOwnerId(classId), vocabId);
         if (vocabulary.getWordsTotal() == 0) {
             Map<String, Object> empty = Map.of(
-                    "vocabId", vocabId,
-                    "wordsTotal", 0,
-                    "isShared", vocabulary.isShared(),
                     "name", vocabulary.getName(),
+                    "vocabId", vocabId,
+                    "isShared", vocabulary.isShared(),
+                    "updateTime", vocabulary.getUpdateTime(),
+                    "wordsTotal", 0,
                     "words", Collections.emptyList()
             );
             return new ResponseEntity<>(empty, HttpStatus.OK);
@@ -207,10 +208,11 @@ public class ClassController {
         List<Word> vocabWords = vocabularyService.getWords(createClassOwnerId(classId), vocabId);
 
         Map<String, Object> vocabularyResponse = Map.of(
-                "vocabId", vocabId,
-                "wordsTotal", vocabulary.getWordsTotal(),
-                "isShared", vocabulary.isShared(),
                 "name", vocabulary.getName(),
+                "vocabId", vocabId,
+                "isShared", vocabulary.isShared(),
+                "updateTime", vocabulary.getUpdateTime(),
+                "wordsTotal", vocabulary.getWordsTotal(),
                 "words", vocabWords
                         .stream()
                         .map(this::toWordResponse)

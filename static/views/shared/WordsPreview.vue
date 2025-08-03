@@ -1,16 +1,18 @@
 <script>
 import {getSharedVocabulary} from "@/js/shared-vocabs-api.js";
+import {toReadableStatus} from "@/js/utils.js";
 
 export default {
   props: ['classId', 'vocabId'],
   data() {
     return {
-      name: '',
+      name: "",
       words: [],
       isAddedToFavorite: false,
     }
   },
   methods: {
+    toReadableStatus,
     async getData() {
       const response = await getSharedVocabulary(this.classId, this.vocabId);
       const vocabulary = await response.json();
@@ -18,11 +20,11 @@ export default {
       this.words = vocabulary['words'] || [];
     },
     remove(item) {
-      this.$emit('stop-to-learn', item);
+      this.$emit('remove-fav', item);
       this.isAddedToFavorite = false;
     },
     add(item) {
-      this.$emit('add-to-learn', item);
+      this.$emit('add-to-fav', item);
       this.isAddedToFavorite = true;
     },
   },
@@ -53,6 +55,7 @@ export default {
       <div v-for="item in words" class="word-card">
         <div class="word-info">
           <p><strong>Word:</strong> {{ item.value }} ({{ item.explanation.partOfSpeech }})</p>
+          <p><strong>Status:</strong> {{ toReadableStatus(item.status) }} <strong>Score:</strong> {{ item.score }}</p>
           <p><strong>Transcription:</strong> {{ item.transcription }}</p>
           <p><strong>Meaning:</strong> {{ item.explanation.meaning }}</p>
           <div v-if="item.explanation?.inContext" class="sentences">

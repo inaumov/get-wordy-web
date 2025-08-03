@@ -120,7 +120,7 @@ export default {
         {{ name }}
       </span>
       <span :class="['p-1', 'd-inline-flex', 'align-items-center', isShared ? 'text-success' : 'text-secondary']">
-        {{ isShared ? 'Shared: ' + formatDateTime(updateTime) : 'Not shared' }}
+        {{ isShared ? 'Shared on: ' + formatDateTime(updateTime) : 'Not shared' }}
       </span>
     </div>
 
