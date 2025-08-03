@@ -1,12 +1,12 @@
 export function toReadableStatus(status) {
     if (status === 'TO_LEARN') {
-        return 'To learn'
+        return 'Learning'
     } else if (status === 'LEARNT') {
         return 'Done'
-    } else if (status === 'POSTPONED') {
-        return 'Postponed'
-    } else if (status === 'EDIT') {
-        return 'Edit'
+    } else if (status === 'DEFERRED') {
+        return 'Deferred'
+    } else if (status === 'UNSEEN') {
+        return 'Unseen'
     } else {
         return status
     }

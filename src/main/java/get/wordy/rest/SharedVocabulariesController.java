@@ -1,16 +1,17 @@
 package get.wordy.rest;
 
 import get.wordy.core.api.IClassAccessService;
+import get.wordy.core.api.IUserCardsService;
 import get.wordy.core.api.IVocabularyService;
+import get.wordy.core.api.bean.CardStatus;
+import get.wordy.core.api.bean.Progress;
 import get.wordy.core.api.bean.Vocabulary;
 import get.wordy.core.api.bean.Word;
 import get.wordy.core.api.id.OwnerId;
-import get.wordy.model.Explanation;
-import get.wordy.model.UserVocabularyResponse;
-import get.wordy.model.VocabType;
-import get.wordy.model.WordResponse;
+import get.wordy.model.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
@@ -23,6 +24,9 @@ import org.springframework.web.bind.annotation.RestController;
 import java.security.Principal;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 @RestController
 @PreAuthorize("hasAuthority('P_SHARED_CLASS')")
@@ -33,11 +37,15 @@ public class SharedVocabulariesController {
 
     private final IVocabularyService vocabularyService;
     private final IClassAccessService accessService;
+    private final IUserCardsService progressService;
 
     public SharedVocabulariesController(IVocabularyService vocabularyService,
-                                        IClassAccessService accessService) {
+                                        IClassAccessService accessService,
+                                        @Qualifier("userCardsService") IUserCardsService progressService
+    ) {
         this.vocabularyService = vocabularyService;
         this.accessService = accessService;
+        this.progressService = progressService;
     }
 
     @GetMapping(value = "/{classId}/vocabularies")
@@ -60,7 +68,7 @@ public class SharedVocabulariesController {
         return new ResponseEntity<>(vocabulariesResponse, HttpStatus.OK);
     }
 
-    @GetMapping(value = "/{classId}/vocabularies/{vocabId}")
+    @GetMapping(value = "/{classId}/vocabularies/{vocabId}/cards")
     public ResponseEntity<UserVocabularyResponse> getVocabulary(Principal user,
                                                              @PathVariable("classId") String classId,
                                                              @PathVariable("vocabId") int vocabId) {
@@ -77,22 +85,35 @@ public class SharedVocabulariesController {
             return new ResponseEntity<>(toResponse(vocabulary), HttpStatus.OK);
         }
 
-        List<WordResponse> vocabWords = vocabularyService.getWords(createClassOwnerId(classId), vocabId)
+        List<Word> vocabWords = vocabularyService.getWords(createClassOwnerId(classId), vocabId);
+        Map<Integer, Progress> userProgress = progressService.getProgress(createOwnerId(user), vocabId)
                 .stream()
-                .map(this::toWordResponse)
+                .collect(Collectors.toMap(Progress::getWordId, Function.identity()));
+
+        List<CardResponse> cards = vocabWords
+                .stream()
+                .map(word -> {
+                    Progress progress = userProgress.get(word.getId());
+                    return toCardResponse(word, progress);
+                })
                 .toList();
-        return new ResponseEntity<>(toResponse(vocabulary, vocabWords), HttpStatus.OK);
+
+        return new ResponseEntity<>(toResponse(vocabulary, cards), HttpStatus.OK);
     }
 
     private OwnerId createClassOwnerId(String classId) {
         return new OwnerId(classId, "class");
     }
 
+    private static OwnerId createOwnerId(Principal user) {
+        return new OwnerId(user.getName(), "user");
+    }
+
     private UserVocabularyResponse toResponse(Vocabulary vocabulary) {
         return toResponse(vocabulary, Collections.emptyList());
     }
 
-    private UserVocabularyResponse toResponse(Vocabulary vocabulary, List<WordResponse> words) {
+    private UserVocabularyResponse toResponse(Vocabulary vocabulary, List<CardResponse> words) {
         return new UserVocabularyResponse(
                 vocabulary.getVocabId(),
                 vocabulary.getName(),
@@ -105,9 +126,11 @@ public class SharedVocabulariesController {
         );
     }
 
-    private WordResponse toWordResponse(Word word) {
-        return new WordResponse(
+    private CardResponse toCardResponse(Word word, Progress progress) {
+        return new CardResponse(
                 word.getId(),
+                progress == null ? CardStatus.UNSEEN : progress.getStatus(),
+                progress == null ? 0 : progress.getScore(),
                 word.getValue(),
                 word.getTranscription(),
                 Explanation.builder()

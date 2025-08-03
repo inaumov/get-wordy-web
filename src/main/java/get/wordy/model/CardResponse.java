@@ -7,6 +7,7 @@ public record CardResponse(
         CardStatus status,
         int score,
         String value,
+        String transcription,
         Explanation explanation
 ) {
 

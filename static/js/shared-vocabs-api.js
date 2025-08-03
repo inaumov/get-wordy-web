@@ -23,7 +23,7 @@ export function getSharedVocabulary(classId, vocabularyId) {
         method: 'GET', headers: headers,
     };
 
-    let getRequest = new Request(myClassesAPI + "/" + classId + "/vocabularies/" + vocabularyId, initObject);
+    let getRequest = new Request(myClassesAPI + "/" + classId + "/vocabularies/" + vocabularyId + "/cards", initObject);
 
     return fetch(getRequest)
         .catch(err => console.log("HTTP error: ", err));

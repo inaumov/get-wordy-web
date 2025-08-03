@@ -1,8 +1,9 @@
 package get.wordy.rest;
 
+import get.wordy.core.api.IUserCardsService;
+import get.wordy.core.api.IVocabularyService;
 import get.wordy.core.api.id.OwnerId;
 import get.wordy.model.Explanation;
-import get.wordy.core.api.IUserCardsService;
 import get.wordy.core.api.bean.*;
 import get.wordy.model.*;
 import jakarta.servlet.http.HttpServlet;
@@ -16,6 +17,8 @@ import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
 import java.util.*;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 @RestController
 @PreAuthorize("hasAuthority('P_MANAGE_OWN_VOCAB')")
@@ -24,9 +27,11 @@ public class UserCardsController extends HttpServlet {
     private static final Logger LOG = LoggerFactory.getLogger(UserCardsController.class);
 
     private final IUserCardsService userCardsService;
+    private final IVocabularyService vocabularyService;
 
-    public UserCardsController(IUserCardsService userCardsService) {
+    public UserCardsController(IUserCardsService userCardsService, IVocabularyService vocabularyService) {
         this.userCardsService = userCardsService;
+        this.vocabularyService = vocabularyService;
     }
 
     @GetMapping(value = "/{vocabId}/cards")
@@ -34,15 +39,26 @@ public class UserCardsController extends HttpServlet {
 
         LOG.info("Getting all cards for the user = {}, vocab id = {}", user.getName(), vocabId);
 
-        List<CardResponse> cards = userCardsService.getCards(createOwnerId(user), vocabId)
-                .stream()
-                .map(this::toCardResponse)
-                .toList();
+        OwnerId ownerId = createOwnerId(user);
 
-        if (cards.isEmpty()) {
+        List<Word> vocabWords = vocabularyService.getWords(ownerId, vocabId);
+        if (vocabWords.isEmpty()) {
             LOG.info("No cards found for the user = {}", user.getName());
             return new ResponseEntity<>(Collections.emptyList(), HttpStatus.OK);
         }
+
+        Map<Integer, Progress> userProgress = userCardsService.getProgress(ownerId, vocabId)
+                .stream()
+                .collect(Collectors.toMap(Progress::getWordId, Function.identity()));
+
+        List<CardResponse> cards = vocabWords
+                .stream()
+                .map(word -> {
+                    Progress progress = userProgress.get(word.getId());
+                    return toCardResponse(word, progress);
+                })
+                .toList();
+
         return new ResponseEntity<>(cards, HttpStatus.OK);
     }
 
@@ -81,8 +97,8 @@ public class UserCardsController extends HttpServlet {
 
     @PutMapping(value = "/{vocabId}/cards/{wordId}/resetProgress")
     public ResponseEntity<Void> resetProgress(Principal user,
-                                          @PathVariable("vocabId") int vocabId,
-                                          @PathVariable("wordId") int wordId) {
+                                              @PathVariable("vocabId") int vocabId,
+                                              @PathVariable("wordId") int wordId) {
         LOG.info("Resetting a card = {} for the user = {}, vocab id = {}", wordId, user.getName(), vocabId);
 
         userCardsService.resetProgress(createOwnerId(user), vocabId, wordId);
@@ -92,17 +108,18 @@ public class UserCardsController extends HttpServlet {
                 .build();
     }
 
-    private CardResponse toCardResponse(Card card) {
+    private CardResponse toCardResponse(Word word, Progress progress) {
         return new CardResponse(
-                card.getWordId(),
-                card.getStatus(),
-                card.getScore(),
-                card.getWord().getValue(),
+                word.getId(),
+                progress == null ? CardStatus.UNSEEN : progress.getStatus(),
+                progress == null ? 0 : progress.getScore(),
+                word.getValue(),
+                word.getTranscription(),
                 Explanation.builder()
-                        .partOfSpeech(card.getWord().getPartOfSpeech())
-                        .meaning(card.getWord().getMeaning())
-                        .collocations(card.getWord().getCollocations())
-                        .inContext(card.getWord().getStrSentences())
+                        .partOfSpeech(word.getPartOfSpeech())
+                        .meaning(word.getMeaning())
+                        .inContext(word.getStrSentences())
+                        .collocations(word.getCollocations())
                         .build()
         );
     }

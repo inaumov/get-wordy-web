@@ -11,6 +11,6 @@ public record UserVocabularyResponse(
         int wordsTotal,
         int learningProgress,
         Instant updateTime,
-        List<WordResponse> words
+        List<CardResponse> words
 ) {
 }
