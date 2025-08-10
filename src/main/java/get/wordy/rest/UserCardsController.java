@@ -1,7 +1,6 @@
 package get.wordy.rest;
 
 import get.wordy.core.api.IUserCardsService;
-import get.wordy.core.api.IVocabularyService;
 import get.wordy.core.api.id.OwnerId;
 import get.wordy.model.Explanation;
 import get.wordy.core.api.bean.*;
@@ -17,8 +16,6 @@ import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
 import java.util.*;
-import java.util.function.Function;
-import java.util.stream.Collectors;
 
 @RestController
 @PreAuthorize("hasAuthority('P_MANAGE_OWN_VOCAB')")
@@ -27,11 +24,9 @@ public class UserCardsController extends HttpServlet {
     private static final Logger LOG = LoggerFactory.getLogger(UserCardsController.class);
 
     private final IUserCardsService userCardsService;
-    private final IVocabularyService vocabularyService;
 
-    public UserCardsController(IUserCardsService userCardsService, IVocabularyService vocabularyService) {
+    public UserCardsController(IUserCardsService userCardsService) {
         this.userCardsService = userCardsService;
-        this.vocabularyService = vocabularyService;
     }
 
     @GetMapping(value = "/{vocabId}/cards")
@@ -41,22 +36,9 @@ public class UserCardsController extends HttpServlet {
 
         OwnerId ownerId = createOwnerId(user);
 
-        List<Word> vocabWords = vocabularyService.getWords(ownerId, vocabId);
-        if (vocabWords.isEmpty()) {
-            LOG.info("No cards found for the user = {}", user.getName());
-            return new ResponseEntity<>(Collections.emptyList(), HttpStatus.OK);
-        }
-
-        Map<Integer, Progress> userProgress = userCardsService.getProgress(ownerId, vocabId)
+        List<CardResponse> cards = userCardsService.getCards(ownerId, vocabId)
                 .stream()
-                .collect(Collectors.toMap(Progress::getWordId, Function.identity()));
-
-        List<CardResponse> cards = vocabWords
-                .stream()
-                .map(word -> {
-                    Progress progress = userProgress.get(word.getId());
-                    return toCardResponse(word, progress);
-                })
+                .map(CardResponse::fromCard)
                 .toList();
 
         return new ResponseEntity<>(cards, HttpStatus.OK);
@@ -106,22 +88,6 @@ public class UserCardsController extends HttpServlet {
         return ResponseEntity
                 .accepted()
                 .build();
-    }
-
-    private CardResponse toCardResponse(Word word, Progress progress) {
-        return new CardResponse(
-                word.getId(),
-                progress == null ? CardStatus.UNSEEN : progress.getStatus(),
-                progress == null ? 0 : progress.getScore(),
-                word.getValue(),
-                word.getTranscription(),
-                Explanation.builder()
-                        .partOfSpeech(word.getPartOfSpeech())
-                        .meaning(word.getMeaning())
-                        .inContext(word.getStrSentences())
-                        .collocations(word.getCollocations())
-                        .build()
-        );
     }
 
     private ExerciseResponse toExerciseResponse(Exercise exercise) {

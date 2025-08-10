@@ -51,7 +51,6 @@ export default {
   mounted() {
     this.getVocabulary();
     this.getData();
-    console.log(`CardsView mounted. vocabId: ${this.vocabId}, vocabName: ${this.vocabName}`);
   },
   computed: {
     viewOnly() {
@@ -69,6 +68,8 @@ export default {
   <h4 class="p-4">{{ this.vocabulary?.name }}</h4>
 
   <search v-if="!viewOnly" @add-to-vocabulary="addWord" :vocab-id="this.vocabId"/>
+
+  <p class="text-end fw-light px-4">Words total: {{vocabulary.wordsTotal}}</p>
   <cards-table v-bind="{vocabId: this.vocabId, cards: this.cards}"/>
 
 </template>

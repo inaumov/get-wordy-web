@@ -52,9 +52,9 @@ export default {
       this.vocabularies = this.sortVocabularies(combined);
     },
     sortVocabularies(vocabList) {
-      const fav = vocabList.find(v => v.type === 'FAV');
+      const fav = vocabList.find(v => v.accessType === 'FAV');
       const rest = vocabList
-          .filter(v => v.type !== 'FAV')
+          .filter(v => v.accessType !== 'FAV')
           .sort((a, b) => new Date(b.updateTime) - new Date(a.updateTime));
       return fav ? [fav, ...rest] : rest;
     },
@@ -114,7 +114,10 @@ export default {
         :style="{ backgroundColor: getColor(vocab.accessType) }"
     >
       <div class="d-flex justify-content-between align-items-center mb-2">
-        <h5 class="mb-0">{{ vocab.name }}</h5>
+        <span class="h5">
+          <span class="me-2">{{ vocab.name }}</span>
+          <i v-if="vocab.accessType === 'FAV'" class="bi bi-pin-angle"></i>
+        </span>
         <small class="text-muted">Last Updated: {{ formatDateTime(vocab.updateTime) }}</small>
       </div>
       <div class="text-muted mb-1">

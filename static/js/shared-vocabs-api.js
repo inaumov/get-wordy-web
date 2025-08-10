@@ -1,30 +1,21 @@
-const myClassesAPI = import.meta.env.VITE_BACKEND_API + "/user/my-classes";
+const myClassesAPI = `${import.meta.env.VITE_BACKEND_API}/user/my-classes`;
 
-export function getSharedVocabularies(classId) {
-    let headers = new Headers();
-    headers.append('Content-Type', 'application/json');
+const jsonHeaders = new Headers({
+    'Content-Type': 'application/json'
+});
 
-    let initObject = {
+function apiGet(path) {
+    return fetch(`${myClassesAPI}${path}`, {
         method: 'GET',
-        headers: headers,
-    };
-
-    let getRequest = new Request(myClassesAPI + "/" + classId + "/vocabularies", initObject);
-
-    return fetch(getRequest)
-        .catch(err => console.log("HTTP error: ", err));
+        headers: jsonHeaders
+    }).catch(err => console.error("HTTP error:", err));
 }
 
-export function getSharedVocabulary(classId, vocabularyId) {
-    let headers = new Headers();
-    headers.append('Content-Type', 'application/json');
+export const getSharedVocabularies = (classId) =>
+    apiGet(`/${classId}/vocabularies`);
 
-    let initObject = {
-        method: 'GET', headers: headers,
-    };
+export const getSharedVocabulary = (classId, vocabularyId) =>
+    apiGet(`/${classId}/vocabularies/${vocabularyId}`);
 
-    let getRequest = new Request(myClassesAPI + "/" + classId + "/vocabularies/" + vocabularyId + "/cards", initObject);
-
-    return fetch(getRequest)
-        .catch(err => console.log("HTTP error: ", err));
-}
+export const getSharedVocabularyCards = (classId, vocabularyId) =>
+    apiGet(`/${classId}/vocabularies/${vocabularyId}/cards`);

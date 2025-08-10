@@ -1,23 +1,25 @@
 <script>
-import {getSharedVocabulary} from "@/js/shared-vocabs-api.js";
+import {getSharedVocabulary, getSharedVocabularyCards} from "@/js/shared-vocabs-api.js";
 import {toReadableStatus} from "@/js/utils.js";
 
 export default {
   props: ['classId', 'vocabId'],
   data() {
     return {
-      name: "",
-      words: [],
+      vocabulary: {},
+      cards: [],
       isAddedToFavorite: false,
     }
   },
   methods: {
     toReadableStatus,
-    async getData() {
+    async getVocabulary() {
       const response = await getSharedVocabulary(this.classId, this.vocabId);
-      const vocabulary = await response.json();
-      this.name = vocabulary['name'];
-      this.words = vocabulary['words'] || [];
+      this.vocabulary = await response.json();
+    },
+    async getData() {
+      const response = await getSharedVocabularyCards(this.classId, this.vocabId);
+      this.cards = await response.json();
     },
     remove(item) {
       this.$emit('remove-fav', item);
@@ -29,6 +31,7 @@ export default {
     },
   },
   mounted() {
+    this.getVocabulary();
     this.getData()
   }
 };
@@ -39,8 +42,8 @@ export default {
     <router-link :to="{name: 'user-vocabularies'}" class="btn btn-secondary" title="Back">Back</router-link>
   </div>
   <div class="p-4">
-    <div v-if="words" class="word-list">
-      <h4 class="pb-4" style="vertical-align: middle;">{{this.name}}</h4>
+    <div v-if="cards" class="word-list">
+      <h4 class="pb-4" style="vertical-align: middle;">{{vocabulary.name}}</h4>
 
       <div class="row">
         <div class="col">
@@ -52,7 +55,8 @@ export default {
         </div>
       </div>
 
-      <div v-for="item in words" class="word-card">
+      <p class="text-end fw-light">Words total: {{vocabulary.wordsTotal}}</p>
+      <div v-for="item in cards" class="word-card">
         <div class="word-info">
           <p><strong>Word:</strong> {{ item.value }} ({{ item.explanation.partOfSpeech }})</p>
           <p><strong>Status:</strong> {{ toReadableStatus(item.status) }} <strong>Score:</strong> {{ item.score }}</p>
