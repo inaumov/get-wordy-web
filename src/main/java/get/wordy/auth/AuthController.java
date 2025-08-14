@@ -50,7 +50,12 @@ public class AuthController {
                 .map(GrantedAuthority::getAuthority)
                 .toList();
 
-        return ResponseEntity.ok(new Meta(allowedPermissions));
+        Meta.MetaBuilder meta = Meta.builder()
+                .permissions(allowedPermissions);
+        if (allowedPermissions.contains("P_SHARED_CLASS") || allowedPermissions.contains("P_MANAGE_CLASSES")) {
+            meta.school(new School("Desna Academy", null, "Steve Jobs"));
+        }
+        return ResponseEntity.ok(meta.build());
     }
 
     @GetMapping("/settings")

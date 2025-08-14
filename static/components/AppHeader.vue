@@ -20,16 +20,16 @@ export default {
 <template>
   <header class="text-muted">
     <div class="container py-4">
-      <div class="row">
-        <div class="col" id="settings">
-          <div class="button-group d-flex flex-column align-items-end">
-            <router-link v-if="isLoggedIn" to="/account" class="btn btn-md">
-              <i class="bi bi-person-gear"></i>
-            </router-link>
-            <button v-if="isLoggedIn" class="btn btn-link" @click="logout">Logout</button>
-            <button v-else class="btn btn-link" @click="redirectToLogin">Login</button>
-          </div>
+      <div class="d-flex justify-content-end">
+        <div v-if="isLoggedIn">
+          <router-link to="/account" class="btn btn-md">
+            <i class="bi bi-person-gear"></i>
+          </router-link>
+          <button v-if="isLoggedIn" class="btn p-1" title="Logout" @click="logout">
+            <i class="bi bi-box-arrow-right"></i>
+          </button>
         </div>
+        <button v-else class="btn btn-link" title="Account" @click="redirectToLogin">Login</button>
       </div>
     </div>
   </header>

@@ -4,6 +4,7 @@ import {ref, provide, inject} from 'vue';
 
 const isLoggedIn = ref(false);
 const permissions = ref([]);
+const school = ref([]);
 
 export async function checkLoginStatus() {
     try {
@@ -65,6 +66,7 @@ async function loadPermissions() {
         if (response.ok) {
             const meta = await response.json();
             permissions.value = meta['permissions'];
+            school.value = meta['school'];
         }
     } catch (error) {
         console.error('Error while getting user permissions:', error);
@@ -125,6 +127,7 @@ export function provideAuth() {
     });
     provide('logout', logout);
     provide('permissions', permissions);
+    provide('school', school);
 }
 
 export function useAuth() {
@@ -133,7 +136,8 @@ export function useAuth() {
         checkLoginStatus: inject('checkLoginStatus'),
         setLoginStatus: inject('setLoginStatus'),
         logout: inject('logout'),
-        permissions: inject('permissions')
+        permissions: inject('permissions'),
+        school: inject('school')
     };
 }
 

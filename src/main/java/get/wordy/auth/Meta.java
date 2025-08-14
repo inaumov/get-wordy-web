@@ -1,6 +1,9 @@
 package get.wordy.auth;
 
+import lombok.Builder;
+
 import java.util.List;
 
-public record Meta(List<String> permissions) {
+@Builder
+public record Meta(List<String> permissions, School school) {
 }

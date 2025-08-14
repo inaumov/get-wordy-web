@@ -1,6 +1,7 @@
 <script>
 import {useRouter} from 'vue-router';
 import {formatTimeSlot} from "@/js/utils.js";
+import {useAuth} from "@/js/auth-check.js";
 
 export default {
   props: {
@@ -9,17 +10,14 @@ export default {
       required: true,
       default: () => [],
     },
-    schoolName: {
-      type: String,
-      default: 'Top Gear',
-    },
-    schoolLogo: {
-      type: String,
-      default: 'public/default_img_2.png',
-    },
-    teacherName: {
-      type: String,
-      default: 'Jaremy Clarkson',
+    school: {
+      type: Object,
+      default: () => ({
+        name: null,
+        logo: null,
+        teacherName: null
+      }),
+      required: false
     },
     activeClass: {
       type: Object,
@@ -27,6 +25,8 @@ export default {
     }
   },
   setup() {
+    const {isLoggedIn, logout, school} = useAuth();
+
     const router = useRouter();
 
     const navigate = (path) => {
@@ -37,10 +37,49 @@ export default {
       return router.currentRoute.value.path.startsWith(path);
     };
 
-    return {navigate, isActive};
+    return {navigate, isActive, isLoggedIn, logout, school};
   },
   methods: {
     formatTimeSlot,
+    logout() {
+      this.logout();
+      this.$router.push("/login?logout=true");
+    },
+    getInitials(name) {
+      return name
+          .split(' ')
+          .map(word => word[0]?.toUpperCase())
+          .slice(0, 2)
+          .join('');
+    },
+    stringToColor(str) {
+      // Generates a consistent background color from string
+      let hash = 0;
+      for (let i = 0; i < str.length; i++) {
+        hash = str.charCodeAt(i) + ((hash << 5) - hash);
+      }
+      let color = '#';
+      for (let i = 0; i < 3; i++) {
+        const value = (hash >> (i * 8)) & 0xff;
+        color += ('00' + value.toString(16)).slice(-2);
+      }
+      return color;
+    }
+  },
+  computed: {
+    generatedLogo() {
+      const initials = this.getInitials(this.school?.name || 'My School');
+      const bgColor = this.stringToColor(this.school?.name || 'My School');
+      return `
+        <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" class="logo">
+          <rect width="100%" height="100%" fill="${bgColor}" />
+          <text x="50%" y="50%" font-size="28" dy=".35em"
+                text-anchor="middle" fill="white" font-family="Arial, sans-serif">
+            ${initials}
+          </text>
+        </svg>
+      `;
+    }
   }
 };
 </script>
@@ -83,10 +122,18 @@ export default {
         </div>
         <span class="active-class-schedule" v-else>No time slots assigned</span>
       </div>
-      <hr class="sidebar-divider"/>
-      <img :src="schoolLogo" alt="School Logo" class="logo img-fluid mb-2"/>
-      <p class="school-name mb-1">{{ schoolName }}</p>
-      <p v-if="teacherName" class="teacher-name text-muted">{{ teacherName }}</p>
+      <hr v-if="school" class="sidebar-divider"/>
+      <div v-if="school">
+        <div v-if="school.logo" class="d-flex justify-content-center align-items-center mb-2">
+          <img :src="school.logo" alt="School logo" class="logo img-fluid"/>
+        </div>
+        <div v-else v-html="generatedLogo" class="d-flex justify-content-center align-items-center mb-2"></div>
+        <p class="school-name mb-1">{{ school.name }}</p>
+        <p v-if="school.teacherName" class="teacher-name text-muted">{{ school.teacherName }}</p>
+        <button v-if="school.name" class="btn p-1" title="Logout" @click="logout">
+          <i class="bi bi-box-arrow-right"></i>
+        </button>
+      </div>
     </div>
   </aside>
 </template>

@@ -38,19 +38,19 @@
             <div class="card text-center border-0 shadow-sm">
                 <div class="card-body bg-light rounded p-4">
                     <!-- School Profile Logo -->
-                    <img th:src="@{${schoolInfo.schoolLogo != null && !#strings.isEmpty(schoolInfo.schoolLogo) ? schoolInfo.schoolLogo : './education.png'}}"
+                    <img th:src="@{${schoolInfo.logo() != null && !#strings.isEmpty(schoolInfo.logo()) ? schoolInfo.logo() : './education.png'}}"
                          class="rounded-circle mb-3 border border-secondary"
                          alt="School Profile Logo"
                          width="150" height="150"/>
 
                     <!-- Teacher Name -->
-                    <h5 class="fw-bold mb-2" th:text="${schoolInfo.teacherName}"></h5>
+                    <h5 class="fw-bold mb-2" th:text="${schoolInfo.name()}"></h5>
 
                     <hr class="my-3"/>
 
                     <!-- School Name -->
                     <p class="mb-0">
-                        My school: <span class="fw-semibold" th:text="${schoolInfo.schoolName}"></span>
+                        My teacher: <span class="fw-semibold" th:text="${schoolInfo.teacherName()}"></span>
                     </p>
                 </div>
             </div>
@@ -61,7 +61,7 @@
 
             <!-- Profile Form -->
             <div class="mb-4">
-                <form th:action="@{/users/profile}" th:object="${userProfile}" method="post" class="pb-3">
+                <form id="profileForm" th:action="@{/users/profile}" th:object="${userProfile}" method="post" class="pb-3">
 
                     <div class="border rounded bg-light p-3 mb-3 d-flex flex-column flex-md-row gap-3">
                         <div class="flex-fill">
@@ -77,15 +77,13 @@
                                  th:errors="*{lastName}"></div>
                         </div>
                     </div>
-
-                    <p class="mb-3 text-muted">A platform user since October 8, 2024</p>
-
                     <div class="border rounded bg-light p-3 mb-3">
                         <label for="email" class="form-label fw-semibold">Email</label>
                         <input type="email" id="email" th:field="*{email}" class="form-control" required/>
                         <div class="text-danger small mt-1" th:if="${#fields.hasErrors('email')}"
                              th:errors="*{email}"></div>
                     </div>
+                    <p class="mb-3 text-muted">A platform user since October 8, 2024</p>
 
                     <div class="d-flex justify-content-end">
                         <button class="btn btn-outline-danger" type="submit">Update profile</button>
@@ -98,7 +96,7 @@
 
             <!-- Settings Form -->
             <div>
-                <form th:action="@{/users/settings}" th:object="${settings}" method="post" class="pb-3">
+                <form id="settingsForm" th:action="@{/users/settings}" th:object="${settings}" method="post" class="pb-3">
 
                     <h6 class="pt-3">Select cards limit for exercise</h6>
                     <div class="border rounded bg-light p-3 mb-3 d-flex align-items-center justify-content-between flex-wrap">
