@@ -1,187 +1,205 @@
 <script>
-import {fetchDictionaries, updateName, updatePicture, deleteDictionary} from '@/js/dictionaries.js';
-import {store} from '@/js/store.js';
-
-let selectedDictionaryId = 0;
+import {fetchUserVocabularies, updateName, updatePicture, deleteVocabulary} from '@/js/dictionaries.js';
 
 export default {
-  setup: function () {
-    return {
-      limitSettings: store
-    }
-  },
   data() {
     return {
-      dictionaries: [],
+      vocabularies: [],
+      editingNameId: null,
+      newName: '',
     }
   },
   methods: {
     async getData() {
-      const response = await fetchDictionaries();
-      this.dictionaries = await response.json();
+      const response = await fetchUserVocabularies();
+      let data = await response.json();
+      this.vocabularies = data.filter(v => v.accessType === 'OWN');
     },
-    onSelectElement(dictionary) {
-      selectedDictionaryId = dictionary['dictionaryId'];
+    startNameEdit(vocab) {
+      this.editingNameId = vocab.vocabId;
+      this.newName = vocab.name;
     },
-    getSelectedDictionary() {
-      return this.dictionaries.find(obj => {
-        return obj['dictionaryId'] === selectedDictionaryId
-      });
-    },
-    onNameEdit(event) {
-      let currVal = event.target.innerText.trim();
-      const dictionary = this.getSelectedDictionary();
-      let actualVal = dictionary['name'];
-      if (currVal !== actualVal) {
-        updateName(selectedDictionaryId, currVal)
-            .then(response => {
-              if (response.ok) {
-                dictionary['name'] = currVal; // update model
-                console.log('Property [name] has been changed to:', currVal, ', for dictionary id =', selectedDictionaryId);
-              }
-              console.log("PATCH dictionary has been requested. Response.status =", response.status);
-            });
-        return;
-      }
-      console.log('No changes detected in property [name] for dictionary id =', selectedDictionaryId);
-    },
-    onPictureEdit(event) {
-      let currVal = event.target.innerText.trim();
-      const dictionary = this.getSelectedDictionary();
-      let actualVal = dictionary['picture'] || "";
-      if (currVal !== actualVal) {
-        if (currVal === "") {
-          updatePicture(selectedDictionaryId, currVal, true)
-              .then(response => {
-                if (response.ok) {
-                  dictionary['picture'] = ""; // update model
-                  console.log('Property [pictureUrl] has been changed to empty, for dictionary id =', selectedDictionaryId);
-                }
-                console.log("PATCH dictionary has been requested. Response.status =", response.status);
-              });
-          return;
+    async saveName(vocab) {
+      if (this.newName.trim() && this.newName !== vocab.name) {
+        const res = await updateName(vocab.vocabId, this.newName.trim());
+        if (res.ok) {
+          vocab.name = this.newName.trim();
         }
-        updatePicture(selectedDictionaryId, currVal)
-            .then(response => {
-              if (response.ok) {
-                dictionary['picture'] = currVal; // update model
-                console.log('Property [pictureUrl] has been changed to:', currVal, ', for dictionary id =', selectedDictionaryId);
-              }
-              console.log("PATCH dictionary has been requested. Response.status =", response.status);
-            });
-        return;
       }
-      console.log('No changes detected in property [pictureUrl] for dictionary id =', selectedDictionaryId);
+      this.editingNameId = null;
     },
-    deleteDictionary(id) {
-      deleteDictionary(id)
-          .then(response => {
-            if (response.ok) {
-              const index = this.dictionaries.findIndex(dictionary => dictionary['dictionaryId'] === id)
-              this.dictionaries.splice(index, 1)
-            }
-            console.log("DELETE dictionary has been requested. Response.status =", response.status);
-          })
+    cancelEdit() {
+      this.editingNameId = null;
     },
-    onLimitSelectionToggle(selection) {
-      this.limitSettings.selectLimit(selection);
-      console.log('Limit Settings selected:', selection)
+    async changePicture(vocab) {
+      const newUrl = prompt("Enter new picture URL:", vocab.pictureUrl || '');
+      if (newUrl !== null && newUrl !== vocab.pictureUrl) {
+        const isClearing = newUrl.trim() === '';
+        const res = await updatePicture(vocab.vocabId, newUrl.trim(), isClearing);
+        if (res.ok) {
+          vocab.pictureUrl = newUrl.trim();
+        }
+      }
+    },
+    async onDelete(vocab) {
+      if (!confirm(`Delete vocabulary "${vocab.name}"? This action cannot be undone.`)) return;
+      const res = await deleteVocabulary(vocab.vocabId);
+      if (res.ok) {
+        this.vocabularies = this.vocabularies.filter(v => v.vocabId !== vocab.vocabId);
+      }
+    },
+    getColor(name) {
+      let hash = 0;
+      for (let i = 0; i < name.length; i++) {
+        hash = name.charCodeAt(i) + ((hash << 5) - hash);
+      }
+      return `hsl(${Math.abs(hash) % 360}, 70%, 80%)`;
+    },
+    getFontSize(name) {
+      const baseSize = 18; // default font size
+      const length = name.length;
+      if (length <= 8) return `${baseSize}px`;
+      if (length <= 16) return `${baseSize - 2}px`;
+      if (length <= 24) return `${baseSize - 4}px`;
+      return `${baseSize - 6}px`; // very long names
     }
   },
   mounted() {
-    this.getData()
+    this.getData();
   }
-};
-
+}
 </script>
 
 <template>
-  <div v-if="dictionaries.length > 0" class="container p-4" id="all-settings">
-    <h6>Edit dictionaries</h6>
-    <table class="table table-hover table-bordered table-light">
-      <tbody>
-      <tr v-for="dictionary in dictionaries">
-        <td>
-          <span contenteditable="true" class="p-1" v-text="dictionary.name"
-                v-on:blur="onNameEdit"
-                v-on:focusin="onSelectElement(dictionary)"
-          >
-          </span>
-        </td>
-        <td>
-          <div style="display: flex">
-            <div style="width: 95.33%">
-              <span contenteditable="true" class="p-1" v-text="dictionary.pictureUrl"
-                    v-on:blur="onPictureEdit"
-                    v-on:focusin="onSelectElement(dictionary)"
-              >
-              </span>
-            </div>
-            <div id="actions" style="width: 4.67%">
-              <button class="btn btn-lg float-end" @click="deleteDictionary(dictionary['dictionaryId'])">
-                <i class="bi bi-x-lg"></i>
-              </button>
+  <div class="p-4">
+    <router-link :to="{ name: 'user-vocabularies' }" class="btn btn-secondary mb-4">← Back</router-link>
+    <h4 class="mb-3">Manage My Vocabularies</h4>
+
+    <div v-if="vocabularies.length" class="row g-3">
+      <div v-for="vocab in vocabularies" :key="vocab.vocabId" class="col-md-4 col-sm-6">
+        <div class="card h-100">
+          <div class="m-3">
+            <!-- picture or placeholder -->
+            <img v-if="vocab.pictureUrl"
+                 :src="vocab.pictureUrl"
+                 class="card-img-top vocab-thumbnail me-3"
+                 alt="Vocabulary Image"
+                 title="Click to change picture"
+                 @click="changePicture(vocab)"/>
+            <div v-else
+                 class="vocab-placeholder me-3"
+                 :style="{backgroundColor: getColor(vocab.name), fontSize: getFontSize(vocab.name)}"
+                 title="Click to change picture"
+                 @click="changePicture(vocab)">
+              <span class="ellipsis-multiline">{{ vocab.name }}</span>
             </div>
           </div>
-        </td>
-      </tr>
-      </tbody>
-    </table>
-    <h6 class="pt-3">Select cards limit for exercise</h6>
-    <div class="border bg-light p-2">
-      <div class="form-check pt-1 pb-1">
-        <input class="form-check-input" type="radio" name="exerciseLimit" id="defaultLimit" value="DEFAULT_LIMIT"
-               v-model="limitSettings['exerciseLimitSelection']"
-               @change="onLimitSelectionToggle('DEFAULT_LIMIT')"
-        >
-        <label class="form-check-label" for="defaultLimit">
-          Predefined number, where 5 is the default
-        </label>
-      </div>
-      <div class="form-check pt-1 pb-1">
-        <input class="form-check-input" type="radio" name="exerciseLimit" id="rollDice" value="ROLL_DICE"
-               v-model="limitSettings['exerciseLimitSelection']"
-               @change="onLimitSelectionToggle('ROLL_DICE')"
-        >
-        <label class="form-check-label" for="rollDice">
-          Roll dice before each game, from 2 to 12
-        </label>
+          <div class="card-body">
+            <div v-if="editingNameId === vocab.vocabId" class="d-flex justify-content-between gap-2 w-100">
+              <input type="text"
+                     v-model="newName"
+                     class="inline-edit-input vocab-name-input me-1"
+                     @keyup.enter="saveName(vocab)"
+                     @keyup.esc="cancelEdit"/>
+              <div class="d-flex gap-1">
+                <button class="btn btn-success btn-sm" @click="saveName(vocab)">
+                  <i class="bi bi-check-lg"></i>
+                </button>
+                <button class="btn btn-outline-secondary btn-sm" @click="cancelEdit">
+                  <i class="bi bi-x-lg"></i>
+                </button>
+              </div>
+            </div>
+            <div v-else class="d-flex align-items-center justify-content-between w-100">
+              <span class="card-title mb-0 h5 card-title-ellipsis">{{ vocab.name }}</span>
+              <div class="d-flex gap-1">
+                <button class="btn btn-outline-primary btn-sm" @click="startNameEdit(vocab)">
+                  <i class="bi bi-pencil"></i>
+                </button>
+                <button class="btn btn-sm btn-outline-danger" @click="onDelete(vocab)">
+                  <i class="bi bi-trash"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
-  </div>
-  <div v-else class="d-flex justify-content-center p-4" id="first-dictionary">
-    <div class="text-center">
-      <p class="fs-4">Create your first dictionary</p>
-      <p class="lead">
-        Dictionaries are an isolated space for grouping cards and tracking your progress
-      </p>
-      <button class="btn btn-lg mt-4">
-        <i class="bi bi-plus-square"></i> Add dictionary
-      </button>
+
+    <div v-else class="text-center mt-5">
+      <p class="h4">You haven’t created any vocabularies yet.</p>
     </div>
   </div>
 </template>
 
 <style scoped>
-div#first-dictionary i {
-  color: rgb(185, 87, 84)
+.vocab-thumbnail,
+.vocab-placeholder {
+  width: 120px;
+  height: 120px;
+  border-radius: 8px;
+  cursor: pointer; /* show it's clickable */
+  transition: transform 0.2s ease;
 }
 
-td span {
-  width: 100%;
-  display: inline-block;
+.vocab-thumbnail {
+  object-fit: cover;
 }
 
-tr .btn {
-  opacity: 0;
+.vocab-placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 8px;
+  font-weight: bold;
+  word-wrap: break-word;
+  font-size: clamp(12px, 2.5vw, 18px);
+  user-select: none;
 }
 
-tr:hover .btn {
-  opacity: 1;
+.vocab-thumbnail:hover,
+.vocab-placeholder:hover {
+  transform: scale(1.05);
 }
 
-table #actions .btn {
-  padding: 0 5px !important;
+/* multi-line ellipsis */
+.ellipsis-multiline {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  line-height: 1.2;
+  max-height: calc(1.2em * 2); /* keep height aligned with clamp */
 }
 
+.card-title-ellipsis {
+  flex: 1;
+  min-width: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.inline-edit-input {
+  border: none;
+  border-bottom: 1px solid #ccc;
+  background: transparent;
+  font-size: 1.25rem;
+  font-weight: 500;
+  line-height: 1.5;
+  padding: 0;
+  margin: 0;
+  height: auto;
+  flex: 1;
+}
+
+.inline-edit-input:focus {
+  outline: none;
+  border-bottom: 1px solid #007bff; /* blue underline on focus */
+}
+.vocab-name-input {
+  flex: 1;          /* take available space */
+  min-width: 0;     /* allow shrinking */
+  max-width: 60%;   /* keep buttons visible */
+}
 </style>

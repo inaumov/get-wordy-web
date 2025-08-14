@@ -37,7 +37,8 @@ export default {
             // inject classId into each element
             return vocabList.map(item => ({
               ...item,
-              classId: myClass.classId
+              classId: myClass.classId,
+              className: myClass.className
             }));
           })
       );
@@ -97,13 +98,23 @@ export default {
     <!-- new vocab creation block -->
     <div v-if="hasVocabs === false" class="text-center mt-5">
       <p class="lead">You haven’t created any vocabularies yet.</p>
-      <button class="btn btn-outline-primary" @click="showCreateModal">Create Your First Vocabulary</button>
+      <p class="text-muted">Vocabularies group your cards and track your progress. Create your first one to start learning!</p>
+      <button class="btn btn-sm btn-outline-primary" @click="showCreateModal">Create Your First Vocabulary</button>
     </div>
-    <div v-else class="d-flex justify-content-between align-items-center mb-3">
-      <h4 class="mb-0">My Vocabularies</h4>
-      <button class="btn btn-sm btn-outline-primary" @click="showCreateModal">
-        <i class="bi bi-plus"></i> New Vocabulary
-      </button>
+    <div v-else class="mb-3">
+      <!-- first row: title aligned left -->
+      <div class="mb-2">
+        <h4 class="mb-0">My Vocabularies</h4>
+      </div>
+      <!-- second row: buttons aligned right -->
+      <div class="d-flex justify-content-end gap-2">
+        <router-link v-if="hasVocabs" :to="{ name: 'manage-vocabs'}" class="btn btn-sm btn-outline-primary">
+          Manage
+        </router-link>
+        <button class="btn btn-sm btn-outline-primary" @click="showCreateModal">
+          <i class="bi bi-plus"></i> New Vocabulary
+        </button>
+      </div>
     </div>
     <CreateVocabularyModal ref="createModal" :createAction="handleCreateVocabulary"/>
     <!-- all user own and shared vocabularies -->
@@ -111,17 +122,17 @@ export default {
         v-for="vocab in vocabularies"
         :key="vocab.vocabId"
         class="vocab-item p-3 mb-3 rounded shadow-sm"
-        :style="{ backgroundColor: getColor(vocab.accessType) }"
+        :style="{ backgroundColor: this.getColor(vocab.accessType) }"
     >
       <div class="d-flex justify-content-between align-items-center mb-2">
-        <span class="h5">
+        <span class="text-start">
           <span class="me-2">{{ vocab.name }}</span>
           <i v-if="vocab.accessType === 'FAV'" class="bi bi-pin-angle"></i>
         </span>
         <small class="text-muted">Last Updated: {{ formatDateTime(vocab.updateTime) }}</small>
       </div>
       <div class="text-muted mb-1">
-        <span v-if="vocab.className">{{ vocab.className }} &nbsp;•&nbsp;</span>
+        <span v-if="vocab.classId">{{ vocab.className }} &nbsp;•&nbsp;</span>
         {{ vocab.wordsTotal }} words
       </div>
 
@@ -153,7 +164,7 @@ export default {
         </router-link>
         <router-link
             v-if="vocab.wordsTotal > 0"
-            class="btn btn-md btn-success text-white"
+            class="btn btn-sm btn-success text-white"
             :to="{ name : 'play-game', params: { vocabId: vocab.vocabId }}"
             title="You wanna play? let's play"
         >
@@ -164,7 +175,7 @@ export default {
 
       <div v-if="vocab.accessType === 'SHARED'" class="d-flex flex-wrap gap-2 mt-2">
         <router-link
-            class="btn btn-md btn-success text-white"
+            class="btn btn-sm btn-success text-white"
             :to="{ name: 'shared-vocabulary-preview', params: { classId: vocab.classId, vocabId: vocab.vocabId }}"
         >
           <i class="bi bi-card-list me-2"></i>
@@ -172,7 +183,7 @@ export default {
         </router-link>
         <router-link
             v-if="vocab.wordsTotal > 0"
-            class="btn btn-md btn-success text-white"
+            class="btn btn-sm btn-success text-white"
             :to="{ name : 'play-game', params: { vocabId: vocab.vocabId }}"
             title="You wanna play? let's play"
         >
@@ -183,7 +194,7 @@ export default {
 
       <div v-if="vocab.accessType === 'OWN'" class="d-flex flex-wrap gap-2 mt-2">
         <router-link
-            class="btn btn-md btn-success text-white"
+            class="btn btn-sm btn-success text-white"
             :to="{ name: 'view-cards', params: { vocabId: vocab.vocabId }}"
         >
           <i class="bi bi-card-list me-2"></i>
@@ -193,7 +204,7 @@ export default {
 
         <router-link
             v-if="vocab.wordsTotal > 0"
-            class="btn btn-md btn-success text-white"
+            class="btn btn-sm btn-success text-white"
             :to="{ name : 'play-game', params: { vocabId: vocab.vocabId }}"
             title="You wanna play? let's play"
         >

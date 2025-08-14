@@ -134,8 +134,8 @@ const router = createRouter({
             ),
         },
         {
-            path: '/Settings',
-            name: 'settings',
+            path: '/User/Vocabularies/Manage',
+            name: 'manage-vocabs',
             // route level code-splitting
             // this generates a separate chunk (Settings.[hash].js) for this route
             // which is lazy-loaded when the route is visited.
