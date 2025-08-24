@@ -9,6 +9,8 @@ import lombok.Data;
 @PasswordMatches
 public class UserDto {
 
+    private String username;
+
     @NotNull
     @NotEmpty
     private String firstName;
@@ -26,5 +28,10 @@ public class UserDto {
     @NotEmpty
     @Email
     private String email;
+
+    public UserDto withUsername(String username) {
+        this.username = username;
+        return this;
+    }
 
 }

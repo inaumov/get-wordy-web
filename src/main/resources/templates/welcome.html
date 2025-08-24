@@ -24,11 +24,11 @@
     <hr/>
     <p class="text-center mb-4">Congratulations! You've successfully created your account.</p>
     <div class="text-center mb-4" th:if="${#authorization.expression('hasAuthority(''P_MANAGE_CLASSES'')')}">
-        <span>You now have access as a tutor.</span>
+        <p>You now have access as a <strong>teacher</strong>.</p>
         <a href="/"><span>Let's get started</span></a>
     </div>
     <div class="text-center mb-4" th:if="${#authorization.expression('hasAuthority(''P_MANAGE_OWN_CARDS'')')}">
-        <span>You now have access as a learner.</span>
+        <p>You now have access as an <strong>individual user</strong>.</p>
         <a href="/"><span>Let's get started</span></a>
     </div>
 </div>

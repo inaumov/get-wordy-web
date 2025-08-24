@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Teacher Onboarding</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+    <style>
+        body {
+            background-color: #f8f9fa;
+        }
+
+        .container {
+            max-width: 400px;
+            margin-top: 100px;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="row">
+        <h4 class="text-center mb-4">Teacher Onboarding</h4>
+
+        <form th:action="@{/onboarding}" th:object="${onboardingForm}" method="POST" enctype="multipart/form-data">
+
+            <!-- global errors (not tied to a specific field) -->
+            <div th:if="${#fields.hasGlobalErrors()}" class="alert alert-danger">
+                <ul>
+                    <li th:each="err : ${#fields.globalErrors()}" th:text="${err}"></li>
+                </ul>
+            </div>
+
+            <!-- school name -->
+            <div class="mb-3">
+                <label for="schoolName" class="form-label">School Name (optional)</label>
+                <input type="text" id="schoolName" th:field="*{schoolName}" class="form-control"
+                       th:classappend="${#fields.hasErrors('schoolName')} ? 'is-invalid'"/>
+
+                <div class="invalid-feedback" th:if="${#fields.hasErrors('schoolName')}"
+                     th:errors="*{schoolName}">Invalid school name
+                </div>
+            </div>
+
+            <!-- school logo -->
+            <div class="mb-3">
+                <label for="schoolLogo" class="form-label">School Logo (optional)</label>
+                <input type="file" id="schoolLogo" th:field="*{schoolLogo}" class="form-control"
+                       th:classappend="${#fields.hasErrors('schoolLogo')} ? 'is-invalid'"/>
+
+                <div class="invalid-feedback" th:if="${#fields.hasErrors('schoolLogo')}"
+                     th:errors="*{schoolLogo}">Invalid logo
+                </div>
+            </div>
+
+            <!-- special file size/type errors (from controller, not validation) -->
+            <div th:if="${fileError}" class="alert alert-danger">
+                <span th:text="${fileError}"></span>
+            </div>
+
+            <div class="text-center mb-4">
+                <input type="submit" value="Finish Setup" class="btn btn-outline-primary w-100"/>
+            </div>
+        </form>
+
+        <hr/>
+        <div class="text-center mb-4">
+            <p>Not a teacher? <a href="/welcome">Skip onboarding</a></p>
+        </div>
+    </div>
+</div>
+</body>
+</html>

@@ -3,9 +3,6 @@ package get.wordy.users;
 import get.wordy.auth.Settings;
 import get.wordy.users.exception.UserAlreadyExistException;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -30,17 +27,18 @@ public class UserService implements IUserService {
     }
 
     @Override
-    public UserDto registerNewUserAccount(UserDto userDto) throws UserAlreadyExistException {
+    @Transactional
+    public UserDto registerUser(UserDto userDto, String userGroup)
+            throws UserAlreadyExistException {
+
         if (emailExists(userDto.getEmail())) {
-            throw new UserAlreadyExistException("There is an account with that email address: "
-                    + userDto.getEmail());
+            throw new UserAlreadyExistException("Account already exists with email: " + userDto.getEmail());
         }
 
         // the rest of the registration operation
         UserDetails user = User.builder()
                 .username(userDto.getFirstName() + userDto.getLastName() + "-temp")
                 .password(userDto.getPassword())
-                // encrypt the password using spring security
                 .passwordEncoder(passwordEncoder::encode)
                 .roles("USER")
                 .build();
@@ -54,17 +52,10 @@ public class UserService implements IUserService {
                 .email(userDto.getEmail())
                 .build();
         userDetailsService.createUserProfile(userProfile);
-        userDetailsService.addUserToGroup(user.getUsername(), "individual_users");
+        userDetailsService.addUserToGroup(user.getUsername(), userGroup);
 
-        // auto-login logic after successful registration
-        CustomUserDetails userDetails = this.userDetailsService.loadUserByUsername(userDto.getEmail());
-        Authentication auth = new UsernamePasswordAuthenticationToken(
-                userDetails, userDetails.getPassword(), userDetails.getAuthorities());
-        SecurityContextHolder.getContext().setAuthentication(auth);
-        // verify what's stored in the context
-        log.debug("User {} is now authenticated with authorities: {}", auth.getName(), auth.getAuthorities());
-        log.info("A new account has been successfully created with email: {}", userDto.getEmail());
-        return userDto;
+        log.info("New account in '{}' group has been created for email: {}", userGroup, userDto.getEmail());
+        return userDto.withUsername(user.getUsername());
     }
 
     @Override

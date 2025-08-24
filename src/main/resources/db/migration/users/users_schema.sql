@@ -52,7 +52,7 @@ VALUES (1, 'individual_users');
 INSERT INTO groups (id, group_name)
 VALUES (2, 'learners');
 INSERT INTO groups (id, group_name)
-VALUES (3, 'tutors');
+VALUES (3, 'teachers');
 
 INSERT INTO group_authorities (group_id, authority)
 VALUES (1, 'P_MANAGE_OWN_CARDS');
@@ -60,3 +60,13 @@ INSERT INTO group_authorities (group_id, authority)
 VALUES (1, 'P_MANAGE_OWN_VOCAB');
 INSERT INTO group_authorities (group_id, authority)
 VALUES (3, 'P_MANAGE_CLASSES');
+
+CREATE TABLE schools
+(
+    id          BIGSERIAL PRIMARY KEY,
+    school_name VARCHAR(255) NOT NULL,
+    logo_path   VARCHAR(500),
+    created_at  TIMESTAMP DEFAULT now(),
+    owner_id    VARCHAR(50) UNIQUE, -- 1:1 link
+    CONSTRAINT fk_school_user FOREIGN KEY (owner_id) REFERENCES users (username) ON DELETE CASCADE
+);

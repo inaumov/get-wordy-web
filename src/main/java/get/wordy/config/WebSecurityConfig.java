@@ -38,6 +38,7 @@ public class WebSecurityConfig {
                         .requestMatchers(
                                 "/login",
                                 "/signup",
+                                "/onboarding",
                                 "/users/registration",
                                 "/reset_password"
                         )
