@@ -63,8 +63,14 @@
 
         <hr/>
         <div class="text-center mb-4">
-            <p>Not a teacher? <a href="/welcome">Skip onboarding</a></p>
+            <p>
+                Don't have a school?
+                <button type="submit" form="skipForm" class="btn btn-link p-0 align-baseline">
+                    Skip onboarding
+                </button>
+            </p>
         </div>
+        <form id="skipForm" th:action="@{/onboarding/skip}" method="post" style="display:none;"></form>
     </div>
 </div>
 </body>

@@ -5,6 +5,7 @@ import jakarta.annotation.PostConstruct;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.util.StringUtils;
@@ -22,6 +23,7 @@ import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.UUID;
 
+@Slf4j
 @Controller
 @RequestMapping("/onboarding")
 public class OnboardingController {
@@ -69,6 +71,19 @@ public class OnboardingController {
             return "onboarding";
         }
 
+        return finalizeOnboarding(request, session, form);
+    }
+
+    @PostMapping("/skip")
+    public String skipOnboarding(HttpServletRequest request, HttpSession session) {
+        // just authenticate, no school created
+        String username = (String) session.getAttribute("pendingUsername");
+        log.info("Skip registering a school for the user '{}'", username);
+        return finalizeOnboarding(request, session, null);
+    }
+
+    /** Shared logic: authenticate user and clear session. */
+    private String finalizeOnboarding(HttpServletRequest request, HttpSession session, OnboardingForm registerSchool) {
         String email = (String) session.getAttribute("pendingEmail");
         String username = (String) session.getAttribute("pendingUsername");
         if (!StringUtils.hasText(email) || !StringUtils.hasText(username)) {
@@ -76,9 +91,9 @@ public class OnboardingController {
         }
 
         // Only onboarding-specific data comes from form
-        if (StringUtils.hasText(form.getSchoolName())) {
-            String logoPath = saveToFileStorageService(form.getSchoolLogo());
-            schoolService.registerSchool(username, form.getSchoolName(), logoPath);
+        if (registerSchool != null && StringUtils.hasText(registerSchool.getSchoolName())) {
+            String logoPath = saveToFileStorageService(registerSchool.getSchoolLogo());
+            schoolService.registerSchool(username, registerSchool.getSchoolName(), logoPath);
         }
 
         authService.authenticateUser(email, request);
