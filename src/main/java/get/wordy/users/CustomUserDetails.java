@@ -1,7 +1,6 @@
 package get.wordy.users;
 
 import lombok.Getter;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
@@ -58,7 +57,7 @@ public class CustomUserDetails implements UserDetails {
     }
 
     public String getDisplayName() {
-        return firstName + StringUtils.SPACE + lastName;
+        return String.format("%s %s", firstName, lastName);
     }
 
     public boolean hasPermissionOrRole(String authority) {

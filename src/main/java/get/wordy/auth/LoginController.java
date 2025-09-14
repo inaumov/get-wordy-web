@@ -1,5 +1,6 @@
 package get.wordy.auth;
 
+import get.wordy.school.SchoolService;
 import get.wordy.users.CustomUserDetails;
 import get.wordy.users.UserDto;
 import get.wordy.users.UserService;
@@ -16,9 +17,11 @@ import org.springframework.web.context.request.WebRequest;
 public class LoginController {
 
     private final UserService userService;
+    private final SchoolService schoolService;
 
-    public LoginController(UserService userService) {
+    public LoginController(UserService userService, SchoolService schoolService) {
         this.userService = userService;
+        this.schoolService = schoolService;
     }
 
     @GetMapping("/login")
@@ -46,6 +49,7 @@ public class LoginController {
     @GetMapping("/welcome")
     public String loggedIn(Model model, @AuthenticationPrincipal CustomUserDetails userDetails) {
         log.debug("A user {} just have signed up", userDetails.getUsername());
+        model.addAttribute("displayName", userDetails.getDisplayName());
         return "welcome";
     }
 
@@ -57,7 +61,12 @@ public class LoginController {
             settings = new Settings(5, true);  // ensure non-null
         }
         model.addAttribute("settings", settings);
-        model.addAttribute("schoolInfo", new School("Desna Academy", null, "Steve Jobs"));
+        if (userDetails.hasPermissionOrRole("P_MANAGE_CLASSES")) {
+            model.addAttribute("schoolInfo", schoolService.getSchoolInfoByOwner(userDetails.getUsername()));
+        }
+        if (userDetails.hasPermissionOrRole("P_SHARED_CLASS")) {
+            model.addAttribute("schoolInfo", schoolService.getSchoolInfoByViewer(userDetails.getUsername()));
+        }
         return "account";
     }
 

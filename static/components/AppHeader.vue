@@ -8,10 +8,14 @@ export default {
   },
   methods: {
     redirectToLogin() {
-      window.location.href = '/login';
+      window.location.href = '/login'; // server handled page
     },
     logout() {
       this.logout();
+      window.location.href = "/login?logout=true"; // server handled page
+    },
+    goToAccount() {
+      window.location.href = "/account";
     }
   }
 }
@@ -22,14 +26,14 @@ export default {
     <div class="container py-4">
       <div class="d-flex justify-content-end">
         <div v-if="isLoggedIn">
-          <router-link to="/account" class="btn btn-md">
+          <button class="btn btn-md" title="Account" @click="goToAccount">
             <i class="bi bi-person-gear"></i>
-          </router-link>
+          </button>
           <button v-if="isLoggedIn" class="btn p-1" title="Logout" @click="logout">
             <i class="bi bi-box-arrow-right"></i>
           </button>
         </div>
-        <button v-else class="btn btn-link" title="Account" @click="redirectToLogin">Login</button>
+        <button v-else class="btn btn-link" title="Login" @click="redirectToLogin">Login</button>
       </div>
     </div>
   </header>

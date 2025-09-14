@@ -1,5 +1,7 @@
 package get.wordy.auth;
 
+import get.wordy.school.SchoolService;
+import get.wordy.users.UserProfile;
 import get.wordy.users.UserService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.CacheControl;
@@ -22,9 +24,11 @@ import java.util.Objects;
 public class AuthController {
 
     private final UserService userService;
+    private final SchoolService schoolService;
 
-    public AuthController(UserService userService) {
+    public AuthController(UserService userService, SchoolService schoolService) {
         this.userService = userService;
+        this.schoolService = schoolService;
     }
 
     @GetMapping("/auth/status")
@@ -35,6 +39,8 @@ public class AuthController {
         if (authentication != null && authentication.isAuthenticated()) {
             response.put("loggedIn", true);
             response.put("username", authentication.getName());
+            UserProfile profile = userService.getProfile(authentication.getName());
+            response.put("displayName", String.format("%s %s", profile.getFirstName(), profile.getLastName()));
         } else {
             response.put("loggedIn", false);
         }
@@ -45,15 +51,17 @@ public class AuthController {
     public ResponseEntity<Meta> getUserPermissions(Authentication authentication) {
         log.info("Retrieving permissions for the user = {}", authentication.getName());
 
-        // extract authorities directly and convert to a List of Strings
+        // extract authorities
         List<String> allowedPermissions = authentication.getAuthorities().stream()
                 .map(GrantedAuthority::getAuthority)
                 .toList();
 
         Meta.MetaBuilder meta = Meta.builder()
                 .permissions(allowedPermissions);
-        if (allowedPermissions.contains("P_SHARED_CLASS") || allowedPermissions.contains("P_MANAGE_CLASSES")) {
-            meta.school(new School("Desna Academy", null, "Steve Jobs"));
+        if (allowedPermissions.contains("P_MANAGE_CLASSES")) {
+            meta = meta.school(schoolService.getSchoolInfoByOwner(authentication.getName()));
+        } else if (allowedPermissions.contains("P_SHARED_CLASS")) {
+            meta = meta.school(schoolService.getSchoolInfoByViewer(authentication.getName()));
         }
         return ResponseEntity.ok(meta.build());
     }

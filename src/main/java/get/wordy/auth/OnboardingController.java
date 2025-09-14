@@ -90,10 +90,10 @@ public class OnboardingController {
             return "redirect:/signup";
         }
 
-        // Only onboarding-specific data comes from form
+        // Only onboarding-specific data comes from wizard
         if (registerSchool != null && StringUtils.hasText(registerSchool.getSchoolName())) {
-            String logoPath = saveToFileStorageService(registerSchool.getSchoolLogo());
-            schoolService.registerSchool(username, registerSchool.getSchoolName(), logoPath);
+            String logoFilename = saveToFileStorageService(registerSchool.getSchoolLogo());
+            schoolService.registerSchool(username, registerSchool.getSchoolName(), logoFilename);
         }
 
         authService.authenticateUser(email, request);
@@ -111,7 +111,7 @@ public class OnboardingController {
             try {
                 Path destination = rootLocation.resolve(filename).normalize();
                 Files.copy(schoolLogo.getInputStream(), destination, StandardCopyOption.REPLACE_EXISTING);
-                return destination.toString(); // store only the path in DB
+                return filename; // store only filename in DB
             } catch (IOException e) {
                 throw new RuntimeException("Failed to store file " + filename, e);
             }

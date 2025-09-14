@@ -34,24 +34,16 @@
     <div class="d-flex flex-column flex-lg-row gap-4">
 
         <!-- Left: School Info Card -->
-        <div class="flex-shrink-0" style="width: 100%; max-width: 350px;">
+        <div th:if="${schoolInfo != null}" class="flex-shrink-0" style="width: 100%; max-width: 350px;">
             <div class="card text-center border-0 shadow-sm">
                 <div class="card-body bg-light rounded p-4">
                     <!-- School Profile Logo -->
-                    <img th:src="@{${schoolInfo.logo() != null && !#strings.isEmpty(schoolInfo.logo()) ? schoolInfo.logo() : './education.png'}}"
+                    <img th:src="@{${schoolInfo.logo() != null && !#strings.isEmpty(schoolInfo.logo()) ? '/logos/'+ schoolInfo.logo() : './education.png'}}"
                          class="rounded-circle mb-3 border border-secondary"
                          alt="School Profile Logo"
                          width="150" height="150"/>
-
-                    <!-- Teacher Name -->
-                    <h5 class="fw-bold mb-2" th:text="${schoolInfo.name()}"></h5>
-
-                    <hr class="my-3"/>
-
                     <!-- School Name -->
-                    <p class="mb-0">
-                        My teacher: <span class="fw-semibold" th:text="${schoolInfo.teacherName()}"></span>
-                    </p>
+                    <h5 class="fw-bold mb-2" th:text="${schoolInfo.name()}"></h5>
                 </div>
             </div>
         </div>

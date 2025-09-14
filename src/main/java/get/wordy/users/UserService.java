@@ -68,6 +68,10 @@ public class UserService implements IUserService {
         return mapToUserDto(userDetailsService.loadUserByUsername(email));
     }
 
+    public UserProfile getProfile(String username) {
+        return userDetailsService.loadUserProfile(username);
+    }
+
     @Override
     public List<UserDto> findAllUsers() {
         List<CustomUserDetails> users = List.of();
