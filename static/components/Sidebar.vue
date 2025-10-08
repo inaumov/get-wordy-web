@@ -25,7 +25,8 @@ export default {
     }
   },
   setup() {
-    const {isLoggedIn, logout, school} = useAuth();
+    const backendBase = import.meta.env.VITE_LOGOS_API; // from .env
+    const {isLoggedIn, loggedInUser, permissions, logout, school} = useAuth();
 
     const router = useRouter();
 
@@ -37,13 +38,13 @@ export default {
       return router.currentRoute.value.path.startsWith(path);
     };
 
-    return {navigate, isActive, isLoggedIn, logout, school};
+    return {navigate, isActive, logout, isLoggedIn, loggedInUser, permissions, school, backendBase};
   },
   methods: {
     formatTimeSlot,
-    logout() {
+    doLogout() {
       this.logout();
-      this.$router.push("/login?logout=true");
+      window.location.href = "/login?logout=true"; // server handled page
     },
     getInitials(name) {
       return name
@@ -68,8 +69,8 @@ export default {
   },
   computed: {
     generatedLogo() {
-      const initials = this.getInitials(this.school?.name || 'My School');
-      const bgColor = this.stringToColor(this.school?.name || 'My School');
+      const initials = this.getInitials(this.school?.name || this.school?.teacherName);
+      const bgColor = this.stringToColor(this.school?.name || this.school?.teacherName);
       return `
         <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" class="logo">
           <rect width="100%" height="100%" fill="${bgColor}" />
@@ -106,8 +107,10 @@ export default {
 
     <!-- Bottom Section -->
     <div class="footer text-center py-3">
-      <div v-if="activeClass" class="active-class-item">
-        <!-- Bell Icon centered with class name -->
+
+      <!-- school and class info (if student) -->
+      <div v-if="isLoggedIn && permissions.includes('P_SHARED_CLASS') && activeClass" class="school-info">
+        <!-- bell icon centered with class name -->
         <div class="active-class-header">
           <h5 class="active-class-name">{{ activeClass.name }}</h5>
           <span class="status-badge">
@@ -116,22 +119,38 @@ export default {
         </div>
         <!-- time slots section -->
         <div v-if="activeClass?.timeSlots">
-          <span v-for="timeSlot in activeClass.timeSlots" :key="timeSlot.dayOfWeek" class="active-class-schedule">
+          <span v-for="timeSlot in activeClass.timeSlots" :key="timeSlot.dayOfWeek">
             <strong>{{ timeSlot.dayOfWeek }}</strong>: {{ formatTimeSlot(timeSlot) }}<br/>
           </span>
         </div>
-        <span class="active-class-schedule" v-else>No time slots assigned</span>
-      </div>
-      <hr v-if="school" class="sidebar-divider"/>
-      <div v-if="school">
-        <div v-if="school.logo" class="d-flex justify-content-center align-items-center mb-2">
-          <img :src="school.logo" alt="School logo" class="logo img-fluid"/>
+
+        <hr class="sidebar-divider"/>
+        <!-- school info (optional) -->
+        <div v-if="school">
+          <div v-if="school.logo" class="d-flex justify-content-center align-items-center mb-2">
+            <img class="logo img-fluid" :src="`${backendBase}/${school.logo}`" alt="School logo"/>
+          </div>
+          <div v-else v-html="generatedLogo" class="d-flex justify-content-center align-items-center mb-2"></div>
+          <p v-if="school.name" class="fw-bold mb-1">{{ school.name }}</p>
+          <p v-if="school.teacherName" class="small text-muted">Teacher: {{ school.teacherName }}</p>
         </div>
-        <div v-else v-html="generatedLogo" class="d-flex justify-content-center align-items-center mb-2"></div>
-        <p class="school-name mb-1">{{ school.name }}</p>
-        <p v-if="school.teacherName" class="teacher-name text-muted">{{ school.teacherName }}</p>
-        <button v-if="school.name" class="btn p-1" title="Logout" @click="logout">
-          <i class="bi bi-box-arrow-right"></i>
+      </div>
+
+      <!-- school info (if teacher) -->
+      <div v-if="isLoggedIn && permissions.includes('P_MANAGE_CLASSES') && school?.name" class="school-info">
+        <div v-if="school.logo" class="d-flex justify-content-center align-items-center mt-3">
+          <img class="logo img-fluid" :src="`${backendBase}/${school.logo}`" alt="School logo"/>
+        </div>
+        <div v-else v-html="generatedLogo" class="d-flex justify-content-center align-items-center mt-3"></div>
+        <p v-if="school.name" class="fw-bold">{{ school.name }}</p>
+      </div>
+
+      <hr class="sidebar-divider"/>
+      <!-- user info + sign out -->
+      <div class="d-flex flex-column align-items-center text-center mb-3">
+        <p class="fw-bold mb-1">{{ loggedInUser.displayName }}</p>
+        <button class="btn btn-link p-1 d-flex align-items-center" title="Sign Out" @click="doLogout">
+          <i class="bi bi-box-arrow-right me-2"></i><small>Sign Out</small>
         </button>
       </div>
     </div>
@@ -168,15 +187,7 @@ export default {
   max-width: 80px;
 }
 
-.school-name {
-  font-weight: bold;
-}
-
-.teacher-name {
-  font-size: 0.9rem;
-}
-
-.active-class-item {
+.school-info {
   background: #fff;
   border: 1px solid #ddd;
   border-radius: 8px;
@@ -207,11 +218,6 @@ export default {
   display: flex;
   align-items: center;
   gap: 5px;
-}
-
-.active-class-schedule {
-  font-size: 0.9rem;
-  color: #444;
 }
 
 /* bell icon animation */

@@ -8,10 +8,10 @@ export const useMenuConfig = {
                 title: 'Manage classes, participants, and organize vocabularies'
             },
             {
-                uri: '/Templates',
-                label: 'Templates',
+                uri: '/Library',
+                label: 'Library',
                 icon: 'bi bi-arrow-repeat',
-                title: 'Manage reusable vocabulary templates and search by themes'
+                title: 'Manage prepared vocabularies and search by themes'
             },
         ];
     },

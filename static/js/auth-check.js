@@ -3,8 +3,9 @@ const usersAPI = import.meta.env.VITE_USERS_API;
 import {ref, provide, inject} from 'vue';
 
 const isLoggedIn = ref(false);
+const loggedInUser = ref({})
 const permissions = ref([]);
-const school = ref([]);
+const school = ref({});
 
 export async function checkLoginStatus() {
     try {
@@ -19,6 +20,7 @@ export async function checkLoginStatus() {
         if (response.ok) {
             const data = await response.json();
             isLoggedIn.value = data['loggedIn'];
+            loggedInUser.value = {username: data['username'], displayName: data['displayName']};
             if (data['loggedIn']) {
                 await loadPermissions();
                 // only learners have settings for now
@@ -47,6 +49,9 @@ export async function logout() {
 
         if (response.ok) {
             isLoggedIn.value = false;
+            permissions.value = [];
+            loggedInUser.value = {};
+            school.value = {};
         }
     } catch (error) {
         console.error('Error while logout:', error);
@@ -121,6 +126,7 @@ export function getUserClasses() {
 
 export function provideAuth() {
     provide('isLoggedIn', isLoggedIn);
+    provide('loggedInUser', loggedInUser);
     provide('checkLoginStatus', checkLoginStatus);
     provide('setLoginStatus', (status) => {
         isLoggedIn.value = status;
@@ -133,6 +139,7 @@ export function provideAuth() {
 export function useAuth() {
     return {
         isLoggedIn: inject('isLoggedIn'),
+        loggedInUser: inject('loggedInUser'),
         checkLoginStatus: inject('checkLoginStatus'),
         setLoginStatus: inject('setLoginStatus'),
         logout: inject('logout'),
