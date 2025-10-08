@@ -9,10 +9,9 @@ import get.wordy.core.dao.impl.*;
 import get.wordy.core.db.LocalTxManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.core.env.Environment;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.method.HandlerTypePredicate;
@@ -25,13 +24,6 @@ import javax.sql.DataSource;
 @Configuration
 public class GetWordyConfiguration implements WebMvcConfigurer {
     private static final Logger LOG = LoggerFactory.getLogger(GetWordyConfiguration.class);
-
-    private final Environment environment;
-
-    @Autowired
-    public GetWordyConfiguration(Environment environment) {
-        this.environment = environment;
-    }
 
     @Override
     public void addCorsMappings(CorsRegistry registry) {
@@ -50,8 +42,8 @@ public class GetWordyConfiguration implements WebMvcConfigurer {
         LOG.info("Creating vocabulary and user cards service for data source = {}", dataSource);
         return new GetWordyService(
                 new VocabularyDao(jdbcTemplate),
-                new WordDao(txManager),
-                new ProgressDao(txManager),
+                new WordDao(jdbcTemplate.getJdbcTemplate()),
+                new ProgressDao(jdbcTemplate.getJdbcTemplate()),
                 new CardHeadlineDao(jdbcTemplate),
                 txManager
         );
@@ -90,11 +82,11 @@ public class GetWordyConfiguration implements WebMvcConfigurer {
     }
 
     @Bean
-    public IWordExplanationService wordExplanationService(DataSource dataSource, NamedParameterJdbcTemplate jdbcTemplate) {
+    public IWordExplanationService wordExplanationService(DataSource dataSource, JdbcTemplate jdbcTemplate) {
         LocalTxManager txManager = LocalTxManager.withDataSource(dataSource);
         LOG.info("Creating words service for data source = {}", dataSource);
         return new WordsExplanationService(
-                new WordDao(txManager),
+                new WordDao(jdbcTemplate),
                 txManager
         );
     }
