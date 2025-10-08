@@ -1,6 +1,11 @@
 {
   "properties": [
     {
+      "name": "openai.search.enabled",
+      "type": "java.lang.String",
+      "description": "Description for openai.search.enabled."
+    },
+    {
       "name": "openai.client.logging.http.enabled",
       "type": "java.lang.Boolean",
       "description": "Enable or disable HTTP request and response logging for the OpenAI client.",

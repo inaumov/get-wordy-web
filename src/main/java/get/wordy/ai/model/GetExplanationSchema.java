@@ -13,20 +13,34 @@ class GetExplanationSchema {
     private String type = "object";
     private LinkedHashMap<String, Object> properties;
     private Boolean additionalProperties = false;
-    private String[] required = {"value", "transcription", "explanations"};
+    private String[] required = {"lemma", "transcription", "explanations"};
 
     GetExplanationSchema() {
         this.properties = LinkedHashMap.newLinkedHashMap(3);
-        this.properties.put("value", getValueDefinition());
+        this.properties.put("lemma", getLemmaDefinition());
         this.properties.put("transcription", getTranscriptionDefinition());
         this.properties.put("explanations", getExplanationsDefinition()
         );
     }
 
-    private static Map<String, String> getValueDefinition() {
+    private static Map<String, String> getLemmaDefinition() {
         return Map.of(
                 "type", "string",
-                "description", "A requested word or phrase"
+                "description", "Requested word or phrase (lemma)"
+        );
+    }
+
+    private static Map<String, String> getRegisterDefinition() {
+        return Map.of(
+                "type", "string",
+                "description", "-- e.g. formal, slang"
+        );
+    }
+
+    private static Map<String, String> getDomainDefinition() {
+        return Map.of(
+                "type", "string",
+                "description", "-- e.g. medicine, sports"
         );
     }
 
@@ -47,6 +61,8 @@ class GetExplanationSchema {
                                         "enum", new String[]{"noun", "pronoun", "verb", "adjective", "adverb", "phrasal verb", "phrase"}
                                 ),
                                 "meaning", Map.of("type", "string"),
+                                "register", getRegisterDefinition(),
+                                "domain", getDomainDefinition(),
                                 "sentences", Map.of(
                                         "type", "array",
                                         "items", Map.of("type", "string"),
@@ -59,7 +75,7 @@ class GetExplanationSchema {
                                 )
                         ),
                         "additionalProperties", false,
-                        "required", new String[]{"part_of_speech", "meaning", "sentences", "collocations"}
+                        "required", new String[]{"part_of_speech", "meaning", "register", "domain", "sentences", "collocations"}
                 )
         );
     }
