@@ -4,7 +4,7 @@ import java.util.List;
 
 public record ExerciseResponse(
         Integer wordId,
-        String value,
+        String lemma,
         Explanation explanation,
         List<SentenceResponse> exerciseSentences
 ) {

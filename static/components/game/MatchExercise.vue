@@ -50,8 +50,7 @@ export default {
     },
     prepareMatches: function () {
       const arr = shuffle(this.cards);
-      // simplify to key value
-      this.preparedMatches = arr.map(i => ({id: i.wordId, value: i.value}));
+      this.preparedMatches = arr.map(i => ({id: i.wordId, lemma: i.lemma}));
     },
     nextExercise: function () {
       this.$emit("nextStep", 'UnscrambleExercise', this.cards);

@@ -12,7 +12,7 @@ import lombok.Setter;
 @AllArgsConstructor
 public class WordRequest {
     @NotBlank
-    private String value;
+    private String lemma;
 
     private String transcription;
 

@@ -51,7 +51,7 @@ public class UserCardsController extends HttpServlet {
 
         LOG.info("Getting cards to exercise for the user = {}, vocab id = {}", user.getName(), vocabId);
 
-        List<ExerciseResponse> cards = userCardsService.getCardsForExercise(createOwnerId(user), vocabId, limit)
+        List<ExerciseResponse> cards = userCardsService.pickFlashCards(createOwnerId(user), vocabId, limit)
                 .stream()
                 .map(this::toExerciseResponse)
                 .toList();
@@ -90,15 +90,15 @@ public class UserCardsController extends HttpServlet {
                 .build();
     }
 
-    private ExerciseResponse toExerciseResponse(Exercise exercise) {
+    private ExerciseResponse toExerciseResponse(FlashCard exercise) {
         return new ExerciseResponse(
-                exercise.getWordId(),
-                exercise.getWord().getValue(),
+                exercise.wordId(),
+                exercise.lemma(),
                 Explanation.builder()
-                        .partOfSpeech(exercise.getWord().getPartOfSpeech())
-                        .meaning(exercise.getWord().getMeaning())
+                        .partOfSpeech(exercise.partOfSpeech())
+                        .meaning(exercise.meaning())
                         .build(),
-                toSentencesResponse(exercise.getSentences())
+                toSentencesResponse(exercise.sentences())
         );
     }
 
@@ -106,8 +106,8 @@ public class UserCardsController extends HttpServlet {
         return sentences
                 .stream()
                 .map(sentence -> {
-                    String originalSentenceStr = sentence.getExample();
-                    String matchedWords = sentence.getMatchedWords();
+                    String originalSentenceStr = sentence.example();
+                    String matchedWords = sentence.matchedWords();
                     if (StringUtils.hasText(matchedWords)) {
                         String replacedSentence = prepareReplacedSentence(originalSentenceStr, matchedWords);
                         return new SentenceResponse(originalSentenceStr, matchedWords, replacedSentence);

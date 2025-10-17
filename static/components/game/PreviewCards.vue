@@ -36,7 +36,7 @@ export default {
       <div class="col" v-for="card in cards">
         <div class="card">
           <div class="card-body">
-            <h4 class="card-title">{{ card.value }}</h4>
+            <h4 class="card-title">{{ card.lemma }}</h4>
             <p class="card-text">{{ card.explanation.meaning }}</p>
           </div>
         </div>

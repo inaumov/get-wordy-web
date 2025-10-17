@@ -8,7 +8,7 @@ import java.util.List;
 @Builder
 public class WordSearchResponse {
 
-    private String value;
+    private String lemma;
     private String transcription;
     private List<Explanation> explanations;
 }

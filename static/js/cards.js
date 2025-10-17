@@ -43,8 +43,8 @@ export function resetProgress(vocabId, wordId) {
 }
 
 export function addToVocabulary(vocabId, wordId) {
-    return fetch(`${vocabsAPI}/${vocabId}/cards`, {
-        method: 'PUT',
+    return fetch(`${vocabsAPI}/${vocabId}/words`, {
+        method: 'POST',
         headers: jsonHeaders,
         body: JSON.stringify({wordId})
     }).catch(handleError);

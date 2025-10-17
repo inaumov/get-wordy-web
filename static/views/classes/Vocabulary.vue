@@ -34,61 +34,62 @@ export default {
       this.updateTime = vocabulary['updateTime'];
       this.wordsList = vocabulary['words'] || [];
     },
-    onNameEdit() {
+    async onNameEdit() {
       const editedText = this.$refs.editableEl.innerText.trim();
       if (editedText && editedText !== this.name) {
-        updateVocabularyName(this.classId, this.vocabId, editedText)
-            .then(response => {
-              if (response.ok) {
-                this.name = editedText; // update model
-                console.log('Name has been changed to:', editedText, ', for vocabulary id =', this.vocabId);
-                // todo success notification
-              }
-              // todo failure notification
-            });
+        let response = await updateVocabularyName(this.classId, this.vocabId, editedText);
+        if (response.ok) {
+          this.name = editedText; // update model
+          console.log('Name has been changed to:', editedText, ', for vocabulary id =', this.vocabId);
+          // todo success notification
+        } else {
+          alert('Failed')
+          // todo failure notification
+        }
       } else {
         this.$refs.editableEl.innerText = this.name // restore original if cleared
       }
     },
-    updateActivation() {
+    async updateActivation() {
       const newVal = !this.isShared;
-      updateActivation(this.classId, this.vocabId, newVal)
-          .then(response => {
-            if (response.ok) {
-              this.isShared = newVal; // update model
-              console.log('Is_shared flag has been changed to:', newVal, ', for vocabulary id =', this.vocabId);
-              // todo success notification
-            }
-            // todo failure notification
-          });
+      let response = await updateActivation(this.classId, this.vocabId, newVal);
+      if (response.ok) {
+        this.isShared = newVal; // update model
+        console.log('Is_shared flag has been changed to:', newVal, ', for vocabulary id =', this.vocabId);
+        // todo success notification
+      } else {
+        alert('Error');
+        // todo failure notification
+      }
     },
-    handleAddToVocabulary(wordExplanation) {
+    async handleAddToVocabulary(wordExplanation) {
       if (!this.vocabularyContains(wordExplanation)) {
-        addToVocabulary(this.classId, this.vocabId, wordExplanation.wordId)
-            .then(response => {
-              if (response.ok) {
-                let itemAdded = response.json();
-                this.wordsList.push(itemAdded);
-              } else {
-                alert('Error');
-              }
-            })
+        let response = await addToVocabulary(this.classId, this.vocabId, wordExplanation.wordId);
+        if (response.ok) {
+          let itemAdded = await response.json();
+          if (itemAdded.wordId) {
+            console.log(itemAdded)
+            this.wordsList.push(itemAdded);
+          }
+        } else {
+          alert('Error');
+        }
       } else {
         alert('This word is already added.');
       }
     },
-    handleRemoveItemAction(wordId) {
-      removeFromVocabulary(this.classId, this.vocabId, wordId)
-          .then(response => {
-            if (response.ok) {
-              const index = this.wordsList.findIndex(obj => obj['wordId'] === wordId)
-              this.wordsList.splice(index, 1)
-            }
-          });
+    async handleRemoveItemAction(wordId) {
+      let response = await removeFromVocabulary(this.classId, this.vocabId, wordId);
+      if (response.ok) {
+        const index = this.wordsList.findIndex(obj => obj['wordId'] === wordId)
+        this.wordsList.splice(index, 1)
+      } else {
+        alert('Error');
+      }
     },
     vocabularyContains(wordExplanation) {
       return this.wordsList.some((item) => {
-        return item.value === wordExplanation.value
+        return item.lemma === wordExplanation.lemma
             && item.explanation.partOfSpeech === wordExplanation.explanation.partOfSpeech
       });
     },
@@ -99,6 +100,9 @@ export default {
   computed: {
     hasNoWords() {
       return !(this.wordsList && this.wordsList.length > 0);
+    },
+    ids() {
+      return this.wordsList.map(word => word.wordId);
     }
   }
 };
@@ -112,34 +116,40 @@ export default {
 
   <div class="">
 
-    <div class="d-flex justify-content-between p-4">
-      <span class="d-inline-flex align-items-center p-1 editable-name"
-            ref="editableEl"
-            contenteditable="true"
-            v-on:blur="onNameEdit">
-        {{ name }}
-      </span>
-      <span :class="['p-1', 'd-inline-flex', 'align-items-center', isShared ? 'text-success' : 'text-secondary']">
-        {{ isShared ? 'Shared on: ' + formatDateTime(updateTime) : 'Not shared' }}
-      </span>
-    </div>
-
-    <search @add-to-vocabulary="handleAddToVocabulary" :vocab-id="this.vocabId"/>
-
-    <div class="p-4">
-      <div class="d-flex flex-column align-items-end">
-        <button class="btn" v-on:click="" title="Save as template">
-          <i class="bi bi-plus-square me-1"></i>
-          <span>Save as template</span>
-        </button>
-        <button class="btn" v-on:click="" title="Print pdf">
-          <i class="bi bi-file-earmark-pdf me-1"></i>
-          <span>Print pdf</span>
-        </button>
+    <div class="p-4 py-3">
+      <!-- top row: shared date aligned right -->
+      <div class="d-flex justify-content-end">
+        <span :class="['p-1', 'd-inline-flex', 'align-items-center',
+        isShared ? 'text-success' : 'text-secondary']">
+          {{ isShared ? 'Shared on: ' + formatDateTime(updateTime) : 'Not shared' }}
+        </span>
+      </div>
+      <!-- second row: name left / words total right -->
+      <div class="d-flex justify-content-between align-items-center py-2">
+        <span class="h5 d-inline-flex align-items-center editable-name"
+              ref="editableEl"
+              contenteditable="true"
+              @blur="onNameEdit">
+          {{ name }}
+        </span>
+        <p class="fw-light mb-0">Words total: {{ wordsList.length }}</p>
+      </div>
+      <div class="py-2 border-bottom">
+        <div class="d-flex justify-content-end gap-2">
+          <button class="btn btn-md p-0 m-0" v-on:click="" title="Print pdf">
+            <i class="bi bi-file-earmark-pdf me-1"></i>
+            <span>Print pdf</span>
+          </button>
+          <button class="btn btn-md p-0 m-0" v-on:click="" title="Save as template">
+            <i class="bi bi-plus-square me-1"></i>
+            <span>Save as template</span>
+          </button>
+        </div>
       </div>
     </div>
 
-    <wordsheet-table class="p-4" v-bind="{items: this.wordsList}">
+    <search class="p-4" @add-to-vocabulary="handleAddToVocabulary" :vocab-word-ids="this.ids"/>
+    <wordsheet-table class="p-4 pt-5" v-bind="{items: this.wordsList}">
       <template #actions="{ row }">
         <router-link
             :to="{ name: 'edit-explanation', params: { vocabId: vocabId, wordId: row?.wordId } }"

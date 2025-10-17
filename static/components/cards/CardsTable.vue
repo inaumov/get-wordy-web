@@ -42,7 +42,7 @@ export default {
 </script>
 
 <template>
-  <div class="container p-4" id="cards-table-panel">
+  <div class="container p-4 pt-5" id="cards-table-panel">
     <table class="table">
       <thead>
       <tr>
@@ -58,7 +58,7 @@ export default {
       </thead>
       <tbody>
       <tr v-for="card in cards">
-        <td>{{ card.value }} ({{ card.explanation.partOfSpeech }})</td>
+        <td>{{ card.lemma }} ({{ card.explanation.partOfSpeech }})</td>
         <td>{{ card.transcription }}</td>
         <td>{{ card.explanation.meaning }}</td>
         <td class="text-nowrap">{{ toReadableStatus(card.status) }}</td>

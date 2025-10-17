@@ -27,7 +27,7 @@ export default {
       </thead>
       <tbody>
       <tr v-for="item in items">
-        <td>{{ item.value }} ({{ item.explanation?.partOfSpeech }})</td>
+        <td>{{ item.lemma }} ({{ item.explanation?.partOfSpeech }})</td>
         <td>{{ item.transcription }}</td>
         <td>{{ item.explanation?.meaning }}</td>
         <td>

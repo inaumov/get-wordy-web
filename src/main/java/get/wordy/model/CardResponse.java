@@ -9,7 +9,7 @@ public record CardResponse(
         Integer wordId,
         CardStatus status,
         int score,
-        String value,
+        String lemma,
         String transcription,
         Explanation explanation
 ) {
@@ -21,7 +21,7 @@ public record CardResponse(
                 card.getWordId(),
                 progress == null ? CardStatus.UNSEEN : progress.getStatus(),
                 progress == null ? 0 : progress.getScore(),
-                word.getValue(),
+                word.getLemma(),
                 word.getTranscription(),
                 Explanation.builder()
                         .partOfSpeech(word.getPartOfSpeech())

@@ -2,7 +2,7 @@ package get.wordy.model;
 
 public record WordResponse(
         int wordId,
-        String value,
+        String lemma,
         String transcription,
         Explanation explanation
 ) {

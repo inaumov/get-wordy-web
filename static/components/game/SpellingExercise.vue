@@ -16,7 +16,7 @@ export default {
     answer: {
       handler(input) {
         let wordId = this.displayed['wordId'];
-        let allAnswers = new Set([this.displayed.value, this.spellingExercise['matchedWords']]);
+        let allAnswers = new Set([this.displayed.lemma, this.spellingExercise['matchedWords']]);
         if (allAnswers.has(input)) {
           this.highlightAnswer(true);
           this.enableNextButton();

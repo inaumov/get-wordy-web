@@ -111,7 +111,7 @@ public class UserVocabulariesController {
                                                         @PathVariable("vocabId") int vocabId,
                                                         @Valid @RequestBody WordIdRequest wordId, UriComponentsBuilder ucBuilder) {
 
-        LOG.info("Adding new word to user vocabulary, id = {}, user = {}", vocabId, user.getName());
+        LOG.info("Adding new word id = {} to vocabId = {}, user = {}", wordId.wordId(), vocabId, user.getName());
 
         Word addedToVocabulary = vocabularyService.addToVocabulary(createOwnerId(user), vocabId, wordId.wordId());
 
@@ -166,7 +166,7 @@ public class UserVocabulariesController {
     private WordResponse toWordResponse(Word word) {
         return new WordResponse(
                 word.getId(),
-                word.getValue(),
+                word.getLemma(),
                 word.getTranscription(),
                 Explanation.builder()
                         .partOfSpeech(word.getPartOfSpeech())

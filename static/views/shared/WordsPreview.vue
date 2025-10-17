@@ -58,8 +58,9 @@ export default {
       <p class="text-end fw-light">Words total: {{vocabulary.wordsTotal}}</p>
       <div v-for="item in cards" class="word-card">
         <div class="word-info">
-          <p><strong>Word:</strong> {{ item.value }} ({{ item.explanation.partOfSpeech }})</p>
-          <p><strong>Status:</strong> {{ toReadableStatus(item.status) }} <strong>Score:</strong> {{ item.score }}</p>
+          <p><strong>Word:</strong> {{ item.lemma }} ({{ item.explanation.partOfSpeech }})</p>
+          <p><strong>Status:</strong> {{ toReadableStatus(item.status) }} </p>
+          <p><strong>Score:</strong> {{ item.score }}</p>
           <p><strong>Transcription:</strong> {{ item.transcription }}</p>
           <p><strong>Meaning:</strong> {{ item.explanation.meaning }}</p>
           <div v-if="item.explanation?.inContext" class="sentences">

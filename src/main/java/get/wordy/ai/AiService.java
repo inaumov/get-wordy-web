@@ -6,7 +6,7 @@ import org.springframework.stereotype.Service;
 @Service
 public class AiService {
 
-    public GetExplanationResult requestWordSearch(String searchRequest) {
+    public GetExplanationResult search(String input) {
         return null;
     }
 

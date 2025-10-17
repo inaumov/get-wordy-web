@@ -14,7 +14,7 @@ import java.util.List;
 @AllArgsConstructor
 public class GetExplanationResult {
 
-    private String value;
+    private String lemma;
     private String transcription;
     private List<Explanation> explanations;
 
@@ -26,6 +26,8 @@ public class GetExplanationResult {
         @JsonProperty("part_of_speech")
         private String partOfSpeech;
         private String meaning;
+        private String register;
+        private String domain;
         private List<String> sentences;
         private List<String> collocations;
     }

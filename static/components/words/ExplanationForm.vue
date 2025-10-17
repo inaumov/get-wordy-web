@@ -5,7 +5,7 @@ export default {
     model: {
       type: Object,
       default: {
-        value: "",
+        lemma: "",
         transcription: "",
         explanation: {
           partOfSpeech: "",
@@ -60,7 +60,7 @@ export default {
                 class="form-control"
                 name="word"
                 id="word"
-                :value="model?.value || ''"
+                :value="model?.lemma || ''"
                 autocomplete="off"
                 required
             />

@@ -320,7 +320,7 @@ public class ClassController {
     private WordResponse toWordResponse(Word word) {
         return new WordResponse(
                 word.getId(),
-                word.getValue(),
+                word.getLemma(),
                 word.getTranscription(),
                 Explanation.builder()
                         .partOfSpeech(word.getPartOfSpeech())

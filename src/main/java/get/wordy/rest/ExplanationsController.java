@@ -101,7 +101,7 @@ public class ExplanationsController extends HttpServlet {
 
     private Word toEntity(WordRequest wordRequest) {
         Word word = new Word(
-                wordRequest.getValue(),
+                wordRequest.getLemma(),
                 wordRequest.getExplanation().getPartOfSpeech(),
                 wordRequest.getTranscription(),
                 wordRequest.getExplanation().getMeaning()
@@ -114,9 +114,10 @@ public class ExplanationsController extends HttpServlet {
     private WordResponse toWordResponse(Word word) {
         return new WordResponse(
                 word.getId(),
-                word.getValue(),
+                word.getLemma(),
                 word.getTranscription(),
                 Explanation.builder()
+                        .wordId(word.getId())
                         .partOfSpeech(word.getPartOfSpeech())
                         .meaning(word.getMeaning())
                         .collocations(word.getCollocations())

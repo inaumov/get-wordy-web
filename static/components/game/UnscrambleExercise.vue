@@ -21,7 +21,7 @@ export default {
           let clearedInput = inputLetters
               .join('')
               .replace('\xa0', ' ');
-          let isAnswerCorrect = clearedInput === this.displayed.value;
+          let isAnswerCorrect = clearedInput === this.displayed.lemma;
           // pre save card id
           if (isAnswerCorrect) {
             let currentCardId = this.displayed['wordId'];

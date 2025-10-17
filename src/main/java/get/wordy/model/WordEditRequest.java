@@ -11,8 +11,8 @@ public class WordEditRequest extends WordRequest {
     @Min(value = 1)
     private int wordId;
 
-    public WordEditRequest(int wordId, String value, String transcription, Explanation explanation) {
-        super(value, transcription, explanation);
+    public WordEditRequest(int wordId, String lemma, String transcription, Explanation explanation) {
+        super(lemma, transcription, explanation);
         this.wordId = wordId;
     }
 

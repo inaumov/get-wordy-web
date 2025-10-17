@@ -34,12 +34,12 @@ public class ClassVocabularyService {
 
         List<Sentence> exerciseSentences = entity.getStrSentences()
                 .stream()
-                .map(strSentence -> withClosestMatch(strSentence, entity.getValue()))
+                .map(strSentence -> withClosestMatch(strSentence, entity.getLemma()))
                 .toList();
 
         // custom word
         Word wordAdded = explanationsService.addWordExplanation(entity);
-
+        wordAdded.setSentences(exerciseSentences);
         vocabularyService.addToVocabulary(ownerId, vocabId, wordAdded.getId());
         return wordAdded;
     }
@@ -49,7 +49,7 @@ public class ClassVocabularyService {
 
         List<Sentence> exerciseSentences = entity.getStrSentences()
                 .stream()
-                .map(strSentence -> withClosestMatch(strSentence, entity.getValue()))
+                .map(strSentence -> withClosestMatch(strSentence, entity.getLemma()))
                 .toList();
 
         return explanationsService.updateWordExplanation(entity);
@@ -64,7 +64,7 @@ public class ClassVocabularyService {
     }
 
     private static Sentence withClosestMatch(String strSentence, String keyword) {
-        Sentence sentence = new Sentence(strSentence);
+        Sentence sentence = Sentence.of(strSentence);
         Optional<SentenceSplitter.Chunks> sentenceChunks = SentenceSplitter.splitByClosestMatch(strSentence, keyword);
         return sentenceChunks
                 .map(chunks -> {
