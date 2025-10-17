@@ -44,6 +44,13 @@ class GetExplanationSchema {
         );
     }
 
+    private static Map<String, String> getSourceDefinition() {
+        return Map.of(
+                "type", "string",
+                "description", "source (e.g., Oxford, Cambridge, Merriam-Webster)"
+        );
+    }
+
     private static Map<String, String> getTranscriptionDefinition() {
         return Map.of(
                 "type", "string"
@@ -58,7 +65,7 @@ class GetExplanationSchema {
                         "properties", Map.of(
                                 "part_of_speech", Map.of(
                                         "type", "string",
-                                        "enum", new String[]{"noun", "pronoun", "verb", "adjective", "adverb", "phrasal verb", "phrase"}
+                                        "enum", new String[]{"noun", "pronoun", "verb", "adjective", "adverb", "phrasal verb", "phrase", "idiom"}
                                 ),
                                 "meaning", Map.of("type", "string"),
                                 "register", getRegisterDefinition(),
@@ -72,10 +79,11 @@ class GetExplanationSchema {
                                         "type", "array",
                                         "items", Map.of("type", "string"),
                                         "additionalProperties", false
-                                )
+                                ),
+                                "source", getSourceDefinition()
                         ),
                         "additionalProperties", false,
-                        "required", new String[]{"part_of_speech", "meaning", "register", "domain", "sentences", "collocations"}
+                        "required", new String[]{"part_of_speech", "meaning", "register", "domain", "sentences", "collocations", "source"}
                 )
         );
     }
