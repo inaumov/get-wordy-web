@@ -18,7 +18,7 @@ public class ChatRequest {
     private String model;
     private List<Message> messages;
     private int n = 1;
-    private double temperature = 0.7;
+    private double temperature;
     @JsonProperty("response_format")
     private Map<String, Object> responseFormat;
 

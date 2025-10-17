@@ -16,6 +16,7 @@ import java.util.List;
 public class ChatResponse {
 
     private List<Choice> choices;
+    private Usage usage;
 
     @Getter
     @Setter
@@ -26,6 +27,7 @@ public class ChatResponse {
 
         private int index;
         private Message message;
+        private String finishReason;
     }
 
     @Getter
@@ -38,6 +40,17 @@ public class ChatResponse {
         private String role;
         private String content;
         private String refusal;
+    }
+
+    @Getter
+    @Setter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    @JsonIgnoreProperties(ignoreUnknown = true)
+    public static class Usage {
+        private int promptTokens;
+        private int completionTokens;
+        private int totalTokens;
     }
 
 }

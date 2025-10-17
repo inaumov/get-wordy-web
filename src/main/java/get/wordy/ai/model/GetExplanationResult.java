@@ -30,6 +30,7 @@ public class GetExplanationResult {
         private String domain;
         private List<String> sentences;
         private List<String> collocations;
+        private String source;
     }
 
 }
