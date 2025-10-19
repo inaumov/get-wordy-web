@@ -1,0 +1,60 @@
+{
+  "lemma": "run",
+  "transcription": "rʌn",
+  "explanations": [
+    {
+      "part_of_speech": "noun",
+      "meaning": "a period of continuous running, often as a form of exercise",
+      "sentences": [
+        "I went for a run this morning.",
+        "He enjoyed his daily run."
+      ],
+      "collocations": [
+        "go for a run",
+        "take a run",
+        "have a run"
+      ]
+    },
+    {
+      "part_of_speech": "verb",
+      "meaning": "to move at a speed faster than a walk, never having both or all feet on the ground at the same time",
+      "register": "neutral",
+      "domain": "general",
+      "sentences": [
+        "She runs every morning to stay fit.",
+        "He ran to catch the bus."
+      ],
+      "collocations": [
+        "run fast",
+        "run a race",
+        "run a business"
+      ]
+    },
+    {
+      "part_of_speech": "verb",
+      "meaning": "to operate or function",
+      "sentences": [
+        "The car is running smoothly.",
+        "This system runs on Linux."
+      ],
+      "collocations": [
+        "run smoothly",
+        "run on",
+        "run efficiently"
+      ]
+    },
+    {
+      "part_of_speech": "noun",
+      "meaning": "a continuous flow of something, often liquid",
+      "sentences": [
+        "The river has a strong run after the rain.",
+        "There is a run of bad luck in the team."
+      ],
+      "collocations": [
+        "a run of",
+        "a lucky run",
+        "a run of bad luck"
+      ]
+    }
+  ]
+}
