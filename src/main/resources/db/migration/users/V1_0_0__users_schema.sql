@@ -6,7 +6,7 @@ CREATE TABLE IF NOT EXISTS users
     PRIMARY KEY (username)
 );
 
-CREATE TABLE user_profiles
+CREATE TABLE IF NOT EXISTS user_profiles
 (
     username   VARCHAR(50) NOT NULL,
     first_name VARCHAR(50) NOT NULL,
@@ -24,15 +24,15 @@ CREATE TABLE IF NOT EXISTS authorities
         ON UPDATE CASCADE ON DELETE CASCADE
 );
 
-CREATE UNIQUE INDEX ix_auth_username ON authorities (username, authority);
+CREATE UNIQUE INDEX IF NOT EXISTS ix_auth_username ON authorities (username, authority);
 
-CREATE TABLE groups
+CREATE TABLE IF NOT EXISTS groups
 (
     id         BIGINT PRIMARY KEY,
     group_name VARCHAR(50) NOT NULL
 );
 
-CREATE TABLE group_members
+CREATE TABLE IF NOT EXISTS group_members
 (
     group_id BIGINT,
     username VARCHAR(50),
@@ -40,7 +40,7 @@ CREATE TABLE group_members
     FOREIGN KEY (username) REFERENCES users (username)
 );
 
-CREATE TABLE group_authorities
+CREATE TABLE IF NOT EXISTS group_authorities
 (
     group_id  BIGINT,
     authority VARCHAR(50),
@@ -48,25 +48,8 @@ CREATE TABLE group_authorities
 );
 
 INSERT INTO groups (id, group_name)
-VALUES (1, 'individual_users');
+VALUES (11, 'individual_users');
 INSERT INTO groups (id, group_name)
-VALUES (2, 'learners');
+VALUES (12, 'learners');
 INSERT INTO groups (id, group_name)
-VALUES (3, 'teachers');
-
-INSERT INTO group_authorities (group_id, authority)
-VALUES (1, 'P_MANAGE_OWN_CARDS');
-INSERT INTO group_authorities (group_id, authority)
-VALUES (1, 'P_MANAGE_OWN_VOCAB');
-INSERT INTO group_authorities (group_id, authority)
-VALUES (3, 'P_MANAGE_CLASSES');
-
-CREATE TABLE schools
-(
-    id            BIGSERIAL PRIMARY KEY,
-    school_name   VARCHAR(255) NOT NULL,
-    logo_filename VARCHAR(500),
-    created_at    TIMESTAMP DEFAULT now(),
-    owner_id      VARCHAR(50) UNIQUE, -- 1:1 link
-    CONSTRAINT fk_school_user FOREIGN KEY (owner_id) REFERENCES users (username) ON DELETE CASCADE
-);
+VALUES (13, 'teachers');
