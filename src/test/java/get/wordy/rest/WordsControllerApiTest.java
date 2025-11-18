@@ -13,7 +13,7 @@ import java.net.http.HttpResponse;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class WordsControllerTest extends BaseApiTest {
+class WordsControllerApiTest extends BaseApiTest {
 
     @Test
     void testSearchRequest() throws URISyntaxException, IOException, InterruptedException {
@@ -21,7 +21,7 @@ class WordsControllerTest extends BaseApiTest {
             HttpRequest httpRequest = HttpRequest.newBuilder()
                     .header("Cookie", jSessionIdHolder.get())
                     .headers("Content-Type", MediaType.APPLICATION_JSON_VALUE)
-                    .uri(new URI("http://localhost:8080/api/v1/words?value=tomato"))
+                    .uri(new URI("http://localhost:8080/api/v1/words?input=tomato"))
                     .build();
 
             HttpResponse<String> httpResponse = httpClient.send(httpRequest, HttpResponse.BodyHandlers.ofString());
