@@ -1,5 +1,5 @@
 <script>
-import {searchWordData} from "@/js/words-search-api.js";
+import {searchWordData} from "@/js/search-api.js";
 
 export default {
   name: "Search",

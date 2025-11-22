@@ -2,7 +2,7 @@
 import WordsheetTable from "@/components/classes/WordsheetTable.vue";
 import SearchInput from "@/components/search/SearchInput.vue";
 
-import {fetchTemplate, saveTemplate, updateTemplateName} from '@/js/templates-api.js';
+import {fetchTemplate, saveTemplate, updateTemplateName} from '@/js/themes-api.js';
 
 export default {
   components: {WordsheetTable, SearchInput},

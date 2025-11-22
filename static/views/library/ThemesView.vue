@@ -1,5 +1,5 @@
 <script>
-import {fetchTemplates} from '@/js/templates-api.js';
+import {fetchTemplates} from '@/js/themes-api.js';
 
 export default {
   name: 'TemplatesView',
