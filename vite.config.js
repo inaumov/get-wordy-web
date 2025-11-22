@@ -89,6 +89,10 @@ export default defineConfig(({mode}) => {
         }
       },
 
+
+      // ... class & vocabulary rewrites start ...
+
+
       // Base: /api/v1/classes → /classes
       '^/api/v1/classes$': {
         target: 'http://localhost:3000',
@@ -122,7 +126,10 @@ export default defineConfig(({mode}) => {
           return `/vocabularies/${vocabId}`;
         }
       },
+
+
       // ... class & vocabulary rewrites end ...
+
 
       // GET/POST explanations for vocabulary (list or create)
       '^/api/v1/vocabularies/([^/]+)/explanations/?$': {
@@ -145,27 +152,6 @@ export default defineConfig(({mode}) => {
         }
       },
 
-      // Base: /api/v1/themes → /themes
-      '^/api/v1/themes$': {
-        target: 'http://localhost:3000',
-        changeOrigin: true,
-        rewrite: path => path.replace(/^\/api\/v1/, '')
-      },
-
-      // Search: /api/v1/words → /search
-      '^/api/v1/words': {
-        target: 'http://localhost:3000',
-        changeOrigin: true,
-        rewrite: () => '/search'
-      },
-
-      // Search: /api/v1/themes → /themes-search
-      '^/api/v1/themes': {
-        target: 'http://localhost:3000',
-        changeOrigin: true,
-        rewrite: () => '/themes-search'
-      },
-
       // User flow: /user/my-vocabularies/:vocabId/cards → /cards
       '^/api/v1/user/my-vocabularies/([^/]+)/cards/?$': {
         target: 'http://localhost:3000',
@@ -184,7 +170,44 @@ export default defineConfig(({mode}) => {
           const vocabId = path.match(/\/my-vocabularies\/([^/]+)\/exercise/)?.[1];
           return `/exercise?vocabId=${vocabId}`;
         }
+      },
+
+      // Base: /api/v1/themes → /themes
+      '^/api/v1/themes$': {
+        target: 'http://localhost:3000',
+        changeOrigin: true,
+        rewrite: path => path.replace(/^\/api\/v1/, '')
+      },
+
+      // Single theme info → /themes/:id
+      '^/api/v1/themes/([^/]+)$': {
+        target: 'http://localhost:3000',
+        changeOrigin: true,
+        rewrite: path => path.replace(/^\/api\/v1/, '')
+      },
+
+
+      // ... search words & themes rewrites start ...
+
+
+      // Search: /api/v1/words → /search
+      '^/api/v1/words\\?input=': {
+        target: 'http://localhost:3000',
+        changeOrigin: true,
+        rewrite: path =>
+            '/search' + path.substring(path.indexOf('?'))
+      },
+
+      // Search: /api/v1/themes → /themes-search
+      '^/api/v1/themes\\?input=': {
+        target: 'http://localhost:3000',
+        changeOrigin: true,
+        rewrite: path =>
+            '/themes-search' + path.substring(path.indexOf('?'))
       }
+
+      // ... search words & themes rewrites end ...
+
     }
   }
 }})

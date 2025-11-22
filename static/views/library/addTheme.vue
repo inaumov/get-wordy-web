@@ -8,8 +8,8 @@ export default {
     /**
      * Parent decides how to save
      */
-    async onReady(themeId, themeName, wordIds) {
-      const resp = await saveTheme(themeId, themeName, wordIds);
+    async onReady(themeName, wordIds) {
+      const resp = await saveTheme({themeName, wordIds});
       if (resp.ok) {
         console.log("Saved successfully");
       }
@@ -19,7 +19,7 @@ export default {
 </script>
 
 <template>
-  <div class="d-flex justify-content-start p-4">
+  <div class="d-flex justify-content-start m-4">
     <router-link
         :to="{ name: 'themes' }"
         class="btn btn-secondary"
@@ -29,7 +29,7 @@ export default {
     </router-link>
   </div>
 
-  <div class="container">
+  <div class="p-4">
 
     <!-- Child emits: save-theme and save-selected -->
     <search-theme

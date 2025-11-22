@@ -69,11 +69,11 @@ export default {
 </script>
 
 <template>
-  <div class="word-search-panel">
+  <div id="word-search-panel">
 
     <!-- search input -->
     <div class="d-flex justify-content-center">
-      <div style="padding-top:7px;" class="col-md-4 form-group pull-right">
+      <div class="col-md-4">
         <form id="search-words-form" class="form-inline" @submit.prevent="onSearch">
           <div class="form-group">
             <div class="input-group">

@@ -126,7 +126,7 @@ export default {
       </div>
       <!-- second row: name left / words total right -->
       <div class="d-flex justify-content-between align-items-center py-2">
-        <span class="h5 d-inline-flex align-items-center editable-name"
+        <span class="h5 d-inline-flex align-items-center editable-name p-1"
               ref="editableEl"
               contenteditable="true"
               @blur="onNameEdit">

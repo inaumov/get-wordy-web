@@ -1,5 +1,5 @@
 <script>
-import {createTheme, fetchThemes} from '@/js/themes-api.js';
+import {fetchThemes} from '@/js/themes-api.js';
 
 export default {
   name: 'Themes',
@@ -22,18 +22,6 @@ export default {
         console.error('Failed to load themes:', err);
       }
     },
-    async addTheme(name) {
-      let response = await createTheme(name);
-
-      if (!response.ok) {
-        const err = await response.json();
-        const error = new Error(err.message);
-        Object.assign(error, {status: response.status});
-        throw error;
-      }
-      const created = await response.json();
-      this.themes.unshift(created);
-    },
     formatDate(dateStr) {
       if (!dateStr) return '';
       return new Date(dateStr).toLocaleDateString();
@@ -52,16 +40,18 @@ export default {
 
 <template>
   <!-- header -->
+  <div class="p-4 d-flex justify-content-start">
+    <h4>Library</h4>
+  </div>
   <div v-if="hasThemes === false" class="p-4 text-center mt-5">
     <p class="lead">You haven’t created any theme yet.</p>
     <router-link
         :to="{ name: 'theme-new' }"
         class="btn btn-sm btn-outline-primary"
-    >Create Your First Theme
+    >Create First Theme
     </router-link>
   </div>
-  <div v-else class="p-4 d-flex justify-content-between align-items-center my-3">
-    <h4 class="m-0">Library</h4>
+  <div v-else class="p-4 d-flex justify-content-end">
     <router-link
         :to="{ name: 'theme-new' }"
         class="btn btn-sm btn-outline-primary">
@@ -99,14 +89,8 @@ export default {
       </div>
     </div>
 
-    <!-- empty state -->
-    <div v-else class="text-center py-5">
-      <p class="lead mb-3">No themes yet. Create one!</p>
-      <button class="btn btn-sm btn-outline-secondary" @click="addTheme">
-        Create Theme
-      </button>
-    </div>
   </div>
+
 </template>
 
 <style scoped>

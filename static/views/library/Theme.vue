@@ -2,7 +2,7 @@
 import WordsheetTable from "@/components/classes/WordsheetTable.vue";
 import Search from "@/components/Search.vue";
 
-import {fetchTheme, saveTheme, updateThemeName} from '@/js/themes-api.js';
+import {fetchTheme, addToTheme, updateThemeName, removeFromTheme, deleteTheme} from '@/js/themes-api.js';
 
 export default {
   components: {WordsheetTable, Search},
@@ -10,7 +10,8 @@ export default {
   data() {
     return {
       name: '',
-      wordsList: [],
+      words: [],
+      deleted: false
     }
   },
   methods: {
@@ -18,62 +19,97 @@ export default {
       const response = await fetchTheme(this.themeId);
       const template = await response.json();
       this.name = template['name'];
-      this.wordsList = template['words'] || [];
+      this.words = template['words'] || [];
     },
-    onNameEdit(event) {
-      let currVal = event.target.innerText.trim();
-      const actualVal = this.name;
-      if (currVal !== actualVal) {
-        updateThemeName(this.themeId, currVal)
-            .then(response => {
-              if (response.ok) {
-                this.name = currVal; // update model
-                console.log('Property [name] has been changed to:', currVal, ', for template id =', this.themeId);
-              }
-              console.log("PATCH template has been requested. Response.status =", response.status);
-            });
-        return;
+    async onNameEdit() {
+      const editedText = this.$refs.editableEl.innerText.trim();
+      if (editedText && editedText !== this.name) {
+        let response = await updateThemeName(this.themeId, editedText);
+        if (response.ok) {
+          this.name = editedText; // update model
+          console.log('Name has been changed to:', editedText, ', for vocabulary id =', this.vocabId);
+          // todo success notification
+        } else {
+          alert('Failed')
+          // todo failure notification
+        }
+      } else {
+        this.$refs.editableEl.innerText = this.name // restore original if cleared
       }
-      console.log('No changes detected in property [name] for template id =', this.themeId);
     },
-    onSearch(result) {
-      console.log(result);
+    async handleAddToTheme(wordExplanation) {
+      if (!this.vocabularyContains(wordExplanation)) {
+        let response = await addToTheme(this.themeId, wordExplanation.wordId)
+        if (response.ok) {
+          let itemAdded = await response.json();
+          if (itemAdded.wordId) {
+            console.log(itemAdded)
+            this.wordsList.push(itemAdded);
+          }
+        } else {
+          alert('Error');
+        }
+      } else {
+        alert('This word is already added.');
+      }
     },
-    onReady() {
-      saveTheme(this.themeId, this.name, this.wordsList.map((value) => value.themeId))
-          .then(response => {
-            if (response.ok) {
-            }
-          });
+    async handleRemoveItemAction(wordId) {
+      let response = await removeFromTheme(this.themeId, wordId);
+      if (response.ok) {
+        const index = this.words.findIndex(obj => obj['wordId'] === wordId)
+        this.words.splice(index, 1)
+      } else {
+        alert('Error');
+      }
     },
-    handleRemoveItemAction(wordId) {
-      const index = this.wordsList.findIndex(obj => obj['wordId'] === wordId)
-      this.wordsList.splice(index, 1)
+    async deleteThemeAction() {
+      let response = await deleteTheme(this.themeId);
+      if (response.ok) {
+        this.deleted = true;
+      } else {
+        alert('Error');
+      }
     },
+    vocabularyContains(wordExplanation) {
+      return this.words.some((item) => {
+        return item.lemma === wordExplanation.lemma
+            && item.explanation.partOfSpeech === wordExplanation.explanation.partOfSpeech
+      });
+    }
   },
   mounted() {
     this.getData()
+  },
+  computed: {
+    ids() {
+      return this.words.map(word => word.wordId);
+    }
   }
 };
 
 </script>
 
 <template>
-  <div class="d-flex justify-content-start p-4">
+  <div class="d-flex justify-content-start m-4">
     <router-link :to="{name: 'themes'}" class="btn btn-secondary" title="Back">Back</router-link>
   </div>
 
-  <div class="container">
+  <div class="p-4">
 
-    <div class="d-flex justify-content-left p-2">
-      <span contenteditable="true" class="h4 p-1" v-text="this.name" v-on:blur="onNameEdit">
+    <!-- name left / words total right -->
+    <div class="d-flex justify-content-between align-items-center pt-2 pb-4">
+      <span class="h5 d-inline-flex align-items-center editable-name p-1"
+            ref="editableEl"
+            contenteditable="true"
+            @blur="onNameEdit">
+        {{ name }}
       </span>
+      <p class="fw-light mb-0">Words total: {{ words.length }}</p>
     </div>
 
-    <search :placeholder="'Enter a topic or theme'" @wordsheet-search-submit="onSearch"
-            v-bind="{onSearchEventName: 'wordsheet-search-submit'}"/>
+    <search @add-to-vocabulary="handleAddToTheme" :vocab-word-ids="this.ids"/>
 
-    <wordsheet-table class="p-2" v-bind="{items: this.wordsList}">
+    <wordsheet-table class="pt-5" v-bind="{items: this.words}">
       <template #actions="{ row }">
         <button
             class="btn btn-lg"
@@ -85,15 +121,22 @@ export default {
       </template>
     </wordsheet-table>
 
-    <!-- submit -->
-    <div class="d-flex justify-content-end p-2">
-      <button type="button" class="btn btn-primary border btn-md" v-on:click="onReady">
-        Save
+    <div class="d-flex justify-content-end mt-4 gap-2">
+      <button
+          class="btn btn-sm btn-danger"
+          :disabled="deleted"
+          @click="deleteThemeAction"
+      >
+        <i class="bi bi-trash"></i> Delete
       </button>
     </div>
-
   </div>
 </template>
 
 <style>
+.editable-name {
+  font-size: 1.25rem;
+  text-align: center;
+  white-space: nowrap;
+}
 </style>

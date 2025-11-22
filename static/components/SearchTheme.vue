@@ -17,7 +17,7 @@ export default {
       showMore: {}, // expanding context examples per explanation
       selectedWords: [], // selected wordIds
       loading: false, // SEARCH loading
-      toast: null // { type: "success" | "error", message: string }
+      toast: null // { type: "success" | "error", message: "text" }
     };
   },
   methods: {
@@ -70,7 +70,6 @@ export default {
         // trigger parent save
         this.$emit(
             "save-selected",
-            this.themeResults.themeId,
             this.themeResults.themeName,
             selected
         );
@@ -90,7 +89,6 @@ export default {
       try {
         this.$emit(
             "save-theme",
-            this.themeResults.themeId,
             this.themeResults.themeName,
             allIds
         );
@@ -107,19 +105,19 @@ export default {
 
       setTimeout(() => {
         this.toast = null;
-      }, 3000);
+      }, 5000);
     }
   }
 };
 </script>
 
 <template>
-  <div class="word-search-panel">
+  <div id="theme-search-panel">
 
     <!-- toast notification -->
     <div
         v-if="toast"
-        class="toast-box"
+        class="toast-box mb-4"
         :class="toast.type === 'success' ? 'toast-success' : 'toast-error'"
     >
       {{ toast.message }}
@@ -127,11 +125,9 @@ export default {
 
     <!-- search input -->
     <div class="d-flex justify-content-center">
-      <div class="col-md-4" style="padding-top: 7px;">
+      <div class="col-md-4">
         <form id="search-theme-form" class="form-inline" @submit.prevent="onSearch">
-
           <div class="input-group">
-
             <input
                 v-model="searchQuery"
                 id="search-input"
@@ -191,7 +187,7 @@ export default {
           <!-- top bar: lemma + checkbox -->
           <div class="d-flex justify-content-between align-items-center">
             <div>
-              <h4 class="mb-1">{{ word.lemma }}</h4>
+              <h5 class="mb-1">{{ word.lemma }}</h5>
               <span class="text-muted">{{ word.transcription }}</span>
             </div>
 
@@ -327,15 +323,12 @@ export default {
 
 .meaning {
   font-weight: 500;
+  color: #222;
 }
 
-/* collocations section */
-.collocations .label {
-  color: #555;
-}
-
-/* context section */
-.context em {
+.collocations,
+.context {
+  font-size: 0.9rem;
   color: #555;
 }
 
@@ -368,7 +361,6 @@ export default {
 .toast-box {
   padding: 10px 16px;
   border-radius: 6px;
-  margin-bottom: 1rem;
   text-align: center;
   font-weight: 500;
   animation: fadein 0.3s ease;
