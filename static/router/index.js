@@ -70,6 +70,11 @@ const router = createRouter({
             ),
         },
         {
+            path: '/Library/Search',
+            name: 'theme-new',
+            component: () => import('@/views/library/addTheme.vue')
+        },
+        {
             path: '/User/Vocabularies/:vocabId/Cards',
             name: 'view-cards',
             component: () => import('@/views/CardsView.vue'),

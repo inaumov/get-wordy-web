@@ -1,22 +1,21 @@
 <script>
 import WordsheetTable from "@/components/classes/WordsheetTable.vue";
-import SearchInput from "@/components/search/SearchInput.vue";
+import Search from "@/components/Search.vue";
 
-import {fetchTemplate, saveTemplate, updateTemplateName} from '@/js/themes-api.js';
+import {fetchTheme, saveTheme, updateThemeName} from '@/js/themes-api.js';
 
 export default {
-  components: {WordsheetTable, SearchInput},
-  props: ['templateId'],
+  components: {WordsheetTable, Search},
+  props: ['themeId'],
   data() {
     return {
       name: '',
-      isShared: false,
       wordsList: [],
     }
   },
   methods: {
     async getData() {
-      const response = await fetchTemplate(this.templateId);
+      const response = await fetchTheme(this.themeId);
       const template = await response.json();
       this.name = template['name'];
       this.wordsList = template['words'] || [];
@@ -25,23 +24,23 @@ export default {
       let currVal = event.target.innerText.trim();
       const actualVal = this.name;
       if (currVal !== actualVal) {
-        updateTemplateName(this.templateId, currVal)
+        updateThemeName(this.themeId, currVal)
             .then(response => {
               if (response.ok) {
                 this.name = currVal; // update model
-                console.log('Property [name] has been changed to:', currVal, ', for template id =', this.templateId);
+                console.log('Property [name] has been changed to:', currVal, ', for template id =', this.themeId);
               }
               console.log("PATCH template has been requested. Response.status =", response.status);
             });
         return;
       }
-      console.log('No changes detected in property [name] for template id =', this.templateId);
+      console.log('No changes detected in property [name] for template id =', this.themeId);
     },
-    onSearch(searchResult) {
-      console.log(searchResult);
+    onSearch(result) {
+      console.log(result);
     },
     onReady() {
-      saveTemplate(this.templateId, this.name, this.wordsList.map((value) => value.templateId))
+      saveTheme(this.themeId, this.name, this.wordsList.map((value) => value.themeId))
           .then(response => {
             if (response.ok) {
             }
@@ -61,7 +60,7 @@ export default {
 
 <template>
   <div class="d-flex justify-content-start p-4">
-    <router-link :to="{name: 'templates'}" class="btn btn-secondary" title="Back">Back</router-link>
+    <router-link :to="{name: 'themes'}" class="btn btn-secondary" title="Back">Back</router-link>
   </div>
 
   <div class="container">
@@ -71,12 +70,8 @@ export default {
       </span>
     </div>
 
-    <div class="d-flex justify-content-center p-2">
-      <div style="padding-top:7px;" class="col-md-4 form-group pull-right">
-        <search-input @wordsheet-search-submit="onSearch" v-bind="{onSearchEventName: 'wordsheet-search-submit'}"/>
-        <small class="text-muted">Enter a topic or theme and click search</small>
-      </div>
-    </div>
+    <search :placeholder="'Enter a topic or theme'" @wordsheet-search-submit="onSearch"
+            v-bind="{onSearchEventName: 'wordsheet-search-submit'}"/>
 
     <wordsheet-table class="p-2" v-bind="{items: this.wordsList}">
       <template #actions="{ row }">

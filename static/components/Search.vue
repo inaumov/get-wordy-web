@@ -13,27 +13,28 @@ export default {
   emits: ["add-to-vocabulary"],
   data() {
     return {
+      searchQuery: "",
       foundExplanations: null,
       selectedIndexes: [],
-      showMore: {}
+      showMore: {},
+      loading: false, // SEARCH loading
     };
   },
   methods: {
-    async onSearch(event) {
-      event.preventDefault();
-      const form = event.target;
-      const inputField = form.querySelector("#search-input");
-      const searchRequest = inputField.value.trim();
-      if (!searchRequest) return;
+    async onSearch() {
+      const input = this.searchQuery.trim();
+      if (!input) return;
 
-      const response = await searchWordData(searchRequest);
+      this.loading = true;
+      const response = await searchWordData(input);
       const result = await response.json();
 
       if (response.ok && result?.explanations?.length > 0) {
+        this.searchQuery = "";
         this.foundExplanations = result;
-        inputField.value = "";
         this.selectedIndexes = [];
         this.showMore = {};
+        this.loading = false;
       }
     },
     resetSearch() {
@@ -73,24 +74,34 @@ export default {
     <!-- search input -->
     <div class="d-flex justify-content-center">
       <div style="padding-top:7px;" class="col-md-4 form-group pull-right">
-        <form id="search-words-form" class="form-inline" @submit="onSearch">
+        <form id="search-words-form" class="form-inline" @submit.prevent="onSearch">
           <div class="form-group">
             <div class="input-group">
               <input
+                  v-model="searchQuery"
                   id="search-input"
                   type="text"
                   class="form-control"
-                  name="words"
                   placeholder="Search for a word or phrase..."
                   autocomplete="off"
+                  :disabled="loading"
                   required
               />
 
-              <button type="submit" class="btn btn-md btn-default border">
+              <button
+                  type="submit"
+                  class="btn btn-md btn-default border"
+                  :disabled="loading"
+              >
+              <span v-if="!loading">
                 <i class="bi bi-search"></i>
+              </span>
+                <span v-else>
+                <span class="spinner-border spinner-border-sm"></span>
+              </span>
               </button>
 
-              <!-- ✅ Reset button (only shown when results exist) -->
+              <!-- reset button (only shown when results exist) -->
               <button
                   v-if="foundExplanations"
                   type="button"

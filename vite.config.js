@@ -124,12 +124,12 @@ export default defineConfig(({mode}) => {
       },
       // ... class & vocabulary rewrites end ...
 
-      // GET/POST explanations for a vocabulary (list or create)
+      // GET/POST explanations for vocabulary (list or create)
       '^/api/v1/vocabularies/([^/]+)/explanations/?$': {
         target: 'http://localhost:3000',
         changeOrigin: true,
         rewrite: (path) => {
-          // This will route to /explanations — must include vocabularyId in query (for GET) or body (for POST)
+          // This will route to /explanations — must include vocabularyId in a query (for GET) or body (for POST)
           return '/explanations';
         }
       },
@@ -145,11 +145,11 @@ export default defineConfig(({mode}) => {
         }
       },
 
-      // Base: /api/v1/templates → /templates
-      '^/api/v1/templates$': {
+      // Base: /api/v1/themes → /themes
+      '^/api/v1/themes$': {
         target: 'http://localhost:3000',
         changeOrigin: true,
-        rewrite: path => '/templates'
+        rewrite: path => path.replace(/^\/api\/v1/, '')
       },
 
       // Search: /api/v1/words → /search
@@ -157,6 +157,13 @@ export default defineConfig(({mode}) => {
         target: 'http://localhost:3000',
         changeOrigin: true,
         rewrite: () => '/search'
+      },
+
+      // Search: /api/v1/themes → /themes-search
+      '^/api/v1/themes': {
+        target: 'http://localhost:3000',
+        changeOrigin: true,
+        rewrite: () => '/themes-search'
       },
 
       // User flow: /user/my-vocabularies/:vocabId/cards → /cards

@@ -1,79 +1,131 @@
 <script>
-import {fetchTemplates} from '@/js/themes-api.js';
+import {createTheme, fetchThemes} from '@/js/themes-api.js';
 
 export default {
-  name: 'TemplatesView',
+  name: 'Themes',
   data() {
     return {
-      vocabularies: [],
-    }
+      themes: [],
+    };
+  },
+  computed: {
+    hasThemes() {
+      return this.themes && this.themes.length > 0;
+    },
   },
   methods: {
     async getData() {
-      const response = await fetchTemplates();
-      this.vocabularies = await response.json();
-    }
+      try {
+        const response = await fetchThemes();
+        this.themes = await response.json();
+      } catch (err) {
+        console.error('Failed to load themes:', err);
+      }
+    },
+    async addTheme(name) {
+      let response = await createTheme(name);
+
+      if (!response.ok) {
+        const err = await response.json();
+        const error = new Error(err.message);
+        Object.assign(error, {status: response.status});
+        throw error;
+      }
+      const created = await response.json();
+      this.themes.unshift(created);
+    },
+    formatDate(dateStr) {
+      if (!dateStr) return '';
+      return new Date(dateStr).toLocaleDateString();
+    },
+    randomColor(id) {
+      const colors = ['#ffd6a5', '#fdffb6', '#caffbf', '#9bf6ff', '#a0c4ff', '#bdb2ff', '#ffc6ff'];
+      const index = id.toString().split('').reduce((sum, c) => sum + c.charCodeAt(0), 0) % colors.length;
+      return colors[index];
+    },
   },
   mounted() {
-    this.getData()
+    this.getData();
   },
-  computed: {
-    hasTemplates() {
-      return this.vocabularies && this.vocabularies.length > 0;
-    }
-  }
 };
 </script>
 
 <template>
-
-  <div class="p-3" id="templates">
-    <h4 class="p-2">Prepared vocabularies</h4>
-
-        <div class="d-flex flex-column align-items-end">
-          <button class="btn" v-on:click="" title="Add template vocabulary">
-            <i class="bi bi-file-plus"></i>
-            Add template
-          </button>
-        </div>
-
-  <div class="container" v-if="hasTemplates">
-    <div
-        v-for="template in vocabularies"
-        :key="template['templateId']"
-        class="my-2 bg-light bg-opacity-10 border border-danger-subtle rounded">
-
-      <!-- make the whole element as clickable-->
-      <router-link :to="{ name: 'template-preview', params: { templateId : template['templateId']}, query: { name: template['name'] }}"
-                   class="row p-3 text-decoration-none text-dark">
-
-        <span class="col-8">
-          {{ template['name'] }}
-        </span>
-
-        <!-- displaying total count as a badge in a separate column -->
-        <div class="col-4 text-end">
-          <span class="badge bg-info rounded-pill">{{ template['wordsTotal'] }} words</span>
-        </div>
-
-      </router-link>
-
-    </div>
+  <!-- header -->
+  <div v-if="hasThemes === false" class="p-4 text-center mt-5">
+    <p class="lead">You haven’t created any theme yet.</p>
+    <router-link
+        :to="{ name: 'theme-new' }"
+        class="btn btn-sm btn-outline-primary"
+    >Create Your First Theme
+    </router-link>
+  </div>
+  <div v-else class="p-4 d-flex justify-content-between align-items-center my-3">
+    <h4 class="m-0">Library</h4>
+    <router-link
+        :to="{ name: 'theme-new' }"
+        class="btn btn-sm btn-outline-primary">
+      <i class="bi bi-plus"></i> New Theme
+    </router-link>
   </div>
 
-    <div v-else class="d-flex justify-content-center align-items-center">
-      <div class="text-center w-50">
-        <p class="lead">No vocabulary template has been prepared so far. Please create one.</p>
+  <!-- card grid -->
+  <div id="themes" class="p-4">
+    <div v-if="hasThemes" class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+      <div v-for="theme in themes" :key="theme.themeId" class="col">
+        <router-link
+            :to="{ name: 'theme-preview', params: { themeId: theme.themeId } }"
+            class="card h-100 border-0 shadow-sm text-decoration-none text-dark theme-card"
+        >
+          <div class="card-body d-flex flex-column">
+            <div class="d-flex align-items-center mb-2">
+              <div
+                  class="theme-icon me-3 flex-shrink-0"
+                  :style="{ backgroundColor: theme.color || randomColor(theme.themeId) }"
+              ></div>
+              <h5 class="card-title mb-0 flex-grow-1">{{ theme.name }}</h5>
+            </div>
+
+            <div class="mt-auto d-flex justify-content-between align-items-center">
+              <span class="badge bg-info-subtle text-dark">
+                {{ theme.wordsTotal ? theme.wordsTotal : 0 }} words
+              </span>
+              <small class="text-muted">
+                {{ theme.lastModified ? `Updated ${formatDate(theme.lastModified)}` : '' }}
+              </small>
+            </div>
+          </div>
+        </router-link>
       </div>
     </div>
 
+    <!-- empty state -->
+    <div v-else class="text-center py-5">
+      <p class="lead mb-3">No themes yet. Create one!</p>
+      <button class="btn btn-sm btn-outline-secondary" @click="addTheme">
+        Create Theme
+      </button>
+    </div>
   </div>
-
 </template>
 
-<style>
-#templates > a:hover {
-  background-color: #f8f9fa;
-  cursor: pointer;
+<style scoped>
+.theme-card {
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  border-radius: 1rem;
+}
+
+.theme-card:hover {
+  transform: translateY(-3px);
+}
+
+.theme-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+}
+
+.badge.bg-info-subtle {
+  background-color: #d0ebff;
 }
 </style>
