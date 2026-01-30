@@ -30,7 +30,7 @@ export function updateThemeName(themeId, name) {
         .catch(handleError);
 }
 
-export function saveTheme(theme) {
+export function createTheme(theme) {
     return fetch(themesApi, {
         method: 'PUT',
         headers: jsonHeaders,

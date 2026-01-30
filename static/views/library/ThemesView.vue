@@ -1,8 +1,10 @@
 <script>
-import {fetchThemes} from '@/js/themes-api.js';
+import {createTheme, fetchThemes} from '@/js/themes-api.js';
+import CreateVocabularyModal from "@/components/modal/CreateVocabulary.vue";
 
 export default {
   name: 'Themes',
+  components: {CreateVocabularyModal},
   data() {
     return {
       themes: [],
@@ -22,6 +24,21 @@ export default {
         console.error('Failed to load themes:', err);
       }
     },
+    async addTheme(name) {
+      let response = await createTheme(name);
+
+      if (!response.ok) {
+        const err = await response.json();
+        const error = new Error(err.message);
+        Object.assign(error, {status: response.status});
+        throw error;
+      }
+      const created = await response.json();
+      this.themes.unshift(created);
+    },
+    showCreateModal() {
+      this.$refs.createModal.open();
+    },
     formatDate(dateStr) {
       if (!dateStr) return '';
       return new Date(dateStr).toLocaleDateString();
@@ -39,29 +56,17 @@ export default {
 </script>
 
 <template>
-  <!-- header -->
   <div class="p-4 d-flex justify-content-start">
-    <h4>Library</h4>
+    <h4 class="m-0">Library</h4>
   </div>
-  <div v-if="hasThemes === false" class="p-4 text-center mt-5">
-    <p class="lead">You haven’t created any theme yet.</p>
-    <router-link
-        :to="{ name: 'theme-new' }"
-        class="btn btn-sm btn-outline-primary"
-    >Create First Theme
-    </router-link>
-  </div>
-  <div v-else class="p-4 d-flex justify-content-end">
-    <router-link
-        :to="{ name: 'theme-new' }"
-        class="btn btn-sm btn-outline-primary">
-      <i class="bi bi-plus"></i> New Theme
-    </router-link>
-  </div>
-
   <!-- card grid -->
-  <div id="themes" class="p-4">
-    <div v-if="hasThemes" class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+  <div v-if="hasThemes" id="themes" class="p-4">
+    <div class="d-flex justify-content-end" style="gap: 20px">
+      <button class="btn btn-sm btn-outline-primary" @click="showCreateModal">
+        <i class="bi bi-plus"></i> New Theme
+      </button>
+    </div>
+    <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
       <div v-for="theme in themes" :key="theme.themeId" class="col">
         <router-link
             :to="{ name: 'theme-preview', params: { themeId: theme.themeId } }"
@@ -88,8 +93,12 @@ export default {
         </router-link>
       </div>
     </div>
-
   </div>
+  <div v-else class="p-4 text-center mt-5">
+    <p class="lead">You haven’t created any theme yet.</p>
+    <button class="btn btn-sm btn-outline-primary" @click="showCreateModal">Create first theme</button>
+  </div>
+  <CreateVocabularyModal ref="createModal" :createAction="addTheme"/>
 
 </template>
 
