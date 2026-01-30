@@ -127,10 +127,10 @@ export default {
   <div class="p-4 d-flex justify-content-start">
     <h4>Groups</h4>
   </div>
-  <div class="p-4 d-flex justify-content-end" style="gap: 20px">
-    <router-link :to="{name: 'add-new-class'}" class="btn btn-light" title="Create group">Create group</router-link>
+  <div v-if="hasClasses" class="p-4 d-flex justify-content-end" style="gap: 20px">
+    <router-link :to="{name: 'add-new-class'}" class="btn btn-sm btn-outline-primary" title="Create group">Create group</router-link>
   </div>
-  <div class="px-4 d-flex justify-content-start" style="gap: 40px">
+  <div v-if="hasClasses" class="px-4 d-flex justify-content-start" style="gap: 40px">
     <!-- format filter -->
     <div>
       <select
@@ -254,10 +254,9 @@ export default {
       </div>
     </div>
   </div>
-  <div v-else class="d-flex justify-content-center align-items-center">
-    <div class="text-center w-50">
-      <p class="lead">No vocabulary streamlining group has been registered yet. Please create one.</p>
-    </div>
+  <div v-else class="p-4 text-center mt-5">
+    <p class="lead">No group has been started yet. Please create.</p>
+    <router-link :to="{name: 'add-new-class'}" class="btn btn-sm btn-outline-primary" title="Create group">Create first group</router-link>
   </div>
 </template>
 
