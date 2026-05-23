@@ -21,6 +21,20 @@ export function fetchTheme(themeId) {
         .catch(handleError);
 }
 
+export function createTheme(themeName) {
+    return fetch(themesApi, {
+        method: 'POST',
+        headers: jsonHeaders,
+        body: JSON.stringify({name: themeName})
+    })
+        .catch(handleError);
+}
+
+export function getWords(themeId) {
+    return fetch(`${themesApi}/${themeId}/words`)
+        .catch(handleError);
+}
+
 export function updateThemeName(themeId, name) {
     return fetch(`${themesApi}/${themeId}`, {
         method: 'PATCH',
@@ -30,8 +44,8 @@ export function updateThemeName(themeId, name) {
         .catch(handleError);
 }
 
-export function createTheme(theme) {
-    return fetch(themesApi, {
+export function saveTheme(themeId, theme) {
+    return fetch(`${themesApi}/${themeId}`, {
         method: 'PUT',
         headers: jsonHeaders,
         body: JSON.stringify(theme)
@@ -51,8 +65,8 @@ export function deleteTheme(themeId) {
 }
 
 export function addToTheme(themeId, wordId) {
-    return fetch(`${themesApi}/${themeId}`, {
-        method: 'PUT',
+    return fetch(`${themesApi}/${themeId}/words`, {
+        method: 'POST',
         headers: jsonHeaders,
         body: JSON.stringify({wordId})
     })
@@ -60,9 +74,10 @@ export function addToTheme(themeId, wordId) {
 }
 
 export function removeFromTheme(themeId, wordId) {
-    return fetch(`${themesApi}/${themeId}/words/${wordId}`, {
+    return fetch(`${themesApi}/${themeId}/words`, {
         method: 'DELETE',
-        headers: jsonHeaders
+        headers: jsonHeaders,
+        body: JSON.stringify({wordId})
     })
         .catch(handleError);
 }

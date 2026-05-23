@@ -48,6 +48,12 @@ export default {
       const index = id.toString().split('').reduce((sum, c) => sum + c.charCodeAt(0), 0) % colors.length;
       return colors[index];
     },
+    themeRoute(theme) {
+      return {
+        name: 'theme-preview',
+        params: { themeId: theme.themeId }
+      }
+    }
   },
   mounted() {
     this.getData();
@@ -61,7 +67,7 @@ export default {
   </div>
   <!-- card grid -->
   <div v-if="hasThemes" id="themes" class="p-4">
-    <div class="d-flex justify-content-end" style="gap: 20px">
+    <div class="d-flex justify-content-end mb-3" style="gap: 20px">
       <button class="btn btn-sm btn-outline-primary" @click="showCreateModal">
         <i class="bi bi-plus"></i> New Theme
       </button>
@@ -69,7 +75,7 @@ export default {
     <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
       <div v-for="theme in themes" :key="theme.themeId" class="col">
         <router-link
-            :to="{ name: 'theme-preview', params: { themeId: theme.themeId } }"
+            :to="themeRoute(theme)"
             class="card h-100 border-0 shadow-sm text-decoration-none text-dark theme-card"
         >
           <div class="card-body d-flex flex-column">
