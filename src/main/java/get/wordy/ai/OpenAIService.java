@@ -2,6 +2,7 @@ package get.wordy.ai;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.json.JsonMapper;
+import get.wordy.ai.logger.openai.UsageLogger;
 import get.wordy.ai.model.*;
 import get.wordy.ai.schema.openai.ChatRequest;
 import get.wordy.ai.schema.openai.ChatResponse;
@@ -62,7 +63,7 @@ public class OpenAIService implements IVocabularyEnrichmentService {
         ResponseEntity<ChatResponse> response = restTemplate.postForEntity(apiUrl, request, ChatResponse.class);
         watch.stop();
 
-        log.debug("Request completed in={} ms", watch.getTotalTimeMillis());
+        UsageLogger.log(response, watch);
 
         if (response.getStatusCode() == HttpStatus.OK) {
             var content = extractContent(response);
