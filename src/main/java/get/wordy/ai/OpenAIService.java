@@ -2,19 +2,27 @@ package get.wordy.ai;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.json.JsonMapper;
-import get.wordy.ai.model.ChatRequest;
-import get.wordy.ai.model.ChatResponse;
+import get.wordy.ai.model.*;
+import get.wordy.ai.schema.openai.ChatRequest;
+import get.wordy.ai.schema.openai.ChatResponse;
 import get.wordy.ai.model.GetExplanationResult;
+import get.wordy.core.api.bean.WordKey;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.NotImplementedException;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StopWatch;
 import org.springframework.web.client.RestTemplate;
 
+import java.util.List;
+
 @Slf4j
+@ConditionalOnProperty(name = "ai.provider", havingValue = "openai")
 @Service
-public class AiService {
+public class OpenAIService implements IVocabularyEnrichmentService {
 
     @Value("${openai.model}")
     private String model;
@@ -25,14 +33,14 @@ public class AiService {
     @Value("${openai.model.temperature:0.2}")
     private double temperature;
 
-    @Value("${openai.prompt_template}")
+    @Value("${openai.get_explanation_prompt}")
     private String systemPrompt;
 
     private final RestTemplate restTemplate;
 
     private final JsonMapper jsonMapper;
 
-    public AiService(JsonMapper jsonMapper, @Qualifier("openaiRestTemplate") RestTemplate restTemplate) {
+    public OpenAIService(JsonMapper jsonMapper, @Qualifier("openaiRestTemplate") RestTemplate restTemplate) {
         this.jsonMapper = jsonMapper;
         this.restTemplate = restTemplate;
     }
@@ -49,25 +57,33 @@ public class AiService {
         headers.setContentType(MediaType.APPLICATION_JSON);
         HttpEntity<ChatRequest> request = new HttpEntity<>(chatRequest, headers);
 
+        StopWatch watch = new StopWatch();
+        watch.start();
         ResponseEntity<ChatResponse> response = restTemplate.postForEntity(apiUrl, request, ChatResponse.class);
-        ChatResponse body = response.getBody();
+        watch.stop();
+
+        log.debug("Request completed in={} ms", watch.getTotalTimeMillis());
+
         if (response.getStatusCode() == HttpStatus.OK) {
-            if (body != null && body.getUsage() != null) {
-                int total = body.getUsage().getTotalTokens();
-                int prompt = body.getUsage().getPromptTokens();
-                int completion = body.getUsage().getCompletionTokens();
-                log.info("AI token usage — total: {}, prompt: {}, completion: {}", total, prompt, completion);
-            }
             var content = extractContent(response);
             try {
                 return jsonMapper.readValue(content, GetExplanationResult.class);
             } catch (JsonProcessingException e) {
-                log.error("Failed to parse AI response: {}", content, e);
-                throw new RuntimeException("Could not read message.content from AI");
+                log.error("Failed to parse OpenAI response: {}", content, e);
+                throw new RuntimeException("Could not read message.content from OpenAI response");
             }
         }
 
         throw new RuntimeException("OK status from AI expected, but not received. Actual status = " + response.getStatusCode());
+    }
+
+    public ThemeResult generate(String theme) {
+        throw new NotImplementedException("Not implemented yet");
+    }
+
+    @Override
+    public List<GetExplanationResult> enrich(List<WordKey> words) {
+        return List.of();
     }
 
     private String extractContent(ResponseEntity<ChatResponse> response) {

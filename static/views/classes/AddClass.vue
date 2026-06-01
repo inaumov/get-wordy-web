@@ -40,7 +40,7 @@ export default {
 </script>
 
 <template>
-  <div class="p-4 d-flex flex-column align-items-start">
+  <div class="p-4 d-flex justify-content-start">
     <router-link :to="{name: 'day-classes'}" class="btn btn-secondary" title="Back">Back</router-link>
   </div>
   <ClassInfoForm :classInfo="this.classInfo" @classInfoSubmit="onSubmit"/>

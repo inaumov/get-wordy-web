@@ -30,11 +30,11 @@ import static org.springframework.test.web.client.response.MockRestResponseCreat
 
 @SpringBootTest
 @ActiveProfiles("test")
-@ContextConfiguration(classes = {AiService.class, RestTemplateConfiguration.class, LoggingRestTemplateCustomizer.class, JacksonConfiguration.class})
+@ContextConfiguration(classes = {OpenAIService.class, RestTemplateConfiguration.class, LoggingRestTemplateCustomizer.class, JacksonConfiguration.class})
 class AiServiceIntegrationTest {
 
     @Autowired
-    private AiService aiService;
+    private OpenAIService openAiService;
 
     @Autowired
     @Qualifier("openaiRestTemplate")
@@ -81,7 +81,7 @@ class AiServiceIntegrationTest {
                 .andRespond(withSuccess(mockResponse, MediaType.APPLICATION_JSON));
 
         // when
-        GetExplanationResult result = aiService.search(searchRequest);
+        GetExplanationResult result = openAiService.search(searchRequest);
 
         // then
         assertThat(result).isNotNull();
@@ -116,7 +116,7 @@ class AiServiceIntegrationTest {
                 .andExpect(method(HttpMethod.POST))
                 .andRespond(withSuccess(mockResponse, MediaType.APPLICATION_JSON));
 
-        assertThatThrownBy(() -> aiService.search("bomb"))
+        assertThatThrownBy(() -> openAiService.search("bomb"))
                 .isInstanceOf(RuntimeException.class)
                 .hasMessageContaining("Safety policy triggered");
 
@@ -131,7 +131,7 @@ class AiServiceIntegrationTest {
                 .andExpect(method(HttpMethod.POST))
                 .andRespond(withSuccess(invalidResponse, MediaType.APPLICATION_JSON));
 
-        assertThatThrownBy(() -> aiService.search("test"))
+        assertThatThrownBy(() -> openAiService.search("test"))
                 .isInstanceOf(RuntimeException.class)
                 .hasMessageContaining("No adequate response from AI");
 

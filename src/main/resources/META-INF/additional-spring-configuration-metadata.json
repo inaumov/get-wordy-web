@@ -1,9 +1,9 @@
 {
   "properties": [
     {
-      "name": "openai.search.enabled",
+      "name": "ai.search.enabled",
       "type": "java.lang.String",
-      "description": "Description for openai.search.enabled."
+      "description": "Description for ai.search.enabled."
     },
     {
       "name": "openai.client.logging.http.enabled",

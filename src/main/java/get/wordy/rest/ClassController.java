@@ -248,7 +248,7 @@ public class ClassController {
                                                         @PathVariable("vocabId") int vocabId,
                                                         @Valid @RequestBody WordIdRequest wordId, UriComponentsBuilder ucBuilder) {
 
-        LOG.info("Adding new word = {} to class vocabulary, id = {}, user = {}, class id = {}", wordId, vocabId, user.getName(), classId);
+        LOG.info("Adding new word id = {} to class vocabulary id = {}, for user = {}, class id = {}", wordId.wordId(), vocabId, user.getName(), classId);
 
         Word addedToVocabulary = vocabularyService.addToVocabulary(createClassOwnerId(classId), vocabId, wordId.wordId());
 

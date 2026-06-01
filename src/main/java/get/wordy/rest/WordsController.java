@@ -1,6 +1,6 @@
 package get.wordy.rest;
 
-import get.wordy.ai.AiService;
+import get.wordy.ai.IVocabularyEnrichmentService;
 import get.wordy.ai.model.GetExplanationResult;
 import get.wordy.core.api.IWordExplanationService;
 import get.wordy.core.api.bean.Word;
@@ -22,14 +22,14 @@ import java.util.Optional;
 @RequestMapping("/words")
 public class WordsController {
 
-    private final AiService aiService;
+    private final IVocabularyEnrichmentService vocabularyEnrichmentService;
     private final IWordExplanationService wordExplanationService;
 
-    @Value("${openai.search.enabled}")
+    @Value("${ai.search.enabled}")
     private Boolean aiSearchEnabled;
 
-    public WordsController(AiService aiService, IWordExplanationService wordExplanationService) {
-        this.aiService = aiService;
+    public WordsController(IVocabularyEnrichmentService vocabularyEnrichmentService, IWordExplanationService wordExplanationService) {
+        this.vocabularyEnrichmentService = vocabularyEnrichmentService;
         this.wordExplanationService = wordExplanationService;
     }
 
@@ -38,8 +38,6 @@ public class WordsController {
         if (input == null || input.isBlank()) {
             return ResponseEntity.badRequest().build();
         }
-
-        long start = System.currentTimeMillis();
 
         List<Word> explanations = wordExplanationService.findExplanations(input);
         if (!explanations.isEmpty()) {
@@ -53,10 +51,9 @@ public class WordsController {
                     .body(Map.of("error", "AI search feature is disabled"));
         }
 
-        String username = user != null ? user.getName() : "anonymous";
-        log.info("Initiating AI search for user '{}', input '{}'", username, input);
+        log.info("Initiating AI search for user '{}', input '{}'", user.getName(), input);
 
-        GetExplanationResult searchResult = aiService.search(input);
+        GetExplanationResult searchResult = vocabularyEnrichmentService.search(input);
 
         List<GetExplanationResult.Explanation> explanationsFromAi =
                 Optional.ofNullable(searchResult.getExplanations()).orElse(List.of());
@@ -68,9 +65,6 @@ public class WordsController {
 
         log.info("{} explanations returned from AI for input '{}'", explanationsFromAi.size(), input);
         WordSearchResponse wordSearchResponse = processAiResult(searchResult);
-
-        long took = System.currentTimeMillis() - start;
-        log.debug("Search completed in {} ms", took);
 
         return ResponseEntity.ok(wordSearchResponse);
     }

@@ -75,12 +75,12 @@ export default {
 </script>
 
 <template>
-  <div v-if="!this.isEditMode" class="p-4 d-flex flex-column align-items-start">
+  <div v-if="!this.isEditMode" class="p-4 d-flex justify-content-start">
     <router-link :to="{name: 'day-classes', params: {day: this.day}}" class="btn btn-secondary" title="Back">
       Back
     </router-link>
   </div>
-  <div v-else class="px-4 d-flex flex-column align-items-start">
+  <div v-else class="px-4 d-flex justify-content-start">
     <button @click="hideEditForm" class="btn btn-secondary" title="Back">Back</button>
   </div>
   <ClassInfoCard v-if="!isEditMode" :class-info="this.classInfo" class="px-4"

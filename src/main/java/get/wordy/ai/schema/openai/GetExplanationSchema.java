@@ -1,4 +1,4 @@
-package get.wordy.ai.model;
+package get.wordy.ai.schema.openai;
 
 import lombok.Getter;
 import lombok.Setter;

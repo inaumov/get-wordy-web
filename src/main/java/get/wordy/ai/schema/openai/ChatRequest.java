@@ -1,4 +1,4 @@
-package get.wordy.ai.model;
+package get.wordy.ai.schema.openai;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;

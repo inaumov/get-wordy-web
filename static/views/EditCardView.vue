@@ -22,16 +22,17 @@ export default {
       let formData = new FormData(form);
 
       let requestModel = {
-        value: formData.get('word'),
+        wordId: this.wordId,
+        lemma: formData.get('word'),
         transcription: formData.get('transcription'),
         explanation: {
           partOfSpeech: formData.get('parts'),
           meaning: formData.get('meaning'),
-          sentences: textToArray(formData.get('sentences')),
+          inContext: textToArray(formData.get('sentences')),
           collocations: textToArray(formData.get('collocations'))
         }
       };
-      editExplanation(this.vocabId, this.wordId, requestModel);
+      editExplanation(this.vocabId, requestModel);
     }
   },
   created() {

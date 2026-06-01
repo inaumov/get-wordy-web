@@ -71,7 +71,7 @@ public class ExplanationsController extends HttpServlet {
 
         LOG.info("Update a word explanation for the user = {}, vocabulary id = {}", user.getName(), vocabId);
 
-        Word entity = toEntity(wordRequest)
+        Word entity = toEntity(wordRequest.getWordId(), wordRequest)
                 .withId(wordRequest.getWordId());
 
         Word wordUpdated = vocabularyService.updateWordExplanation(createOwnerId(user), vocabId, entity);
@@ -101,6 +101,19 @@ public class ExplanationsController extends HttpServlet {
 
     private Word toEntity(WordRequest wordRequest) {
         Word word = new Word(
+                wordRequest.getLemma(),
+                wordRequest.getExplanation().getPartOfSpeech(),
+                wordRequest.getTranscription(),
+                wordRequest.getExplanation().getMeaning()
+        );
+        word.setStrSentences(wordRequest.getExplanation().getInContext());
+        word.setCollocations(wordRequest.getExplanation().getCollocations());
+        return word;
+    }
+
+    private Word toEntity(int wordId, WordEditRequest wordRequest) {
+        Word word = new Word(
+                wordId,
                 wordRequest.getLemma(),
                 wordRequest.getExplanation().getPartOfSpeech(),
                 wordRequest.getTranscription(),

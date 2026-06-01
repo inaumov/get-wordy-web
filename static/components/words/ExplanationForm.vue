@@ -44,7 +44,7 @@ export default {
 </script>
 
 <template>
-  <div class="p-4 d-flex flex-column align-items-start">
+  <div class="p-4 d-flex justify-content-start">
     <router-link :to="{ name: 'vocabulary' }" class="btn btn-secondary" title="Back">Back</router-link>
   </div>
   <div class="container p-4 d-flex justify-content-center">
@@ -163,9 +163,10 @@ export default {
 
         <!-- Submit Button -->
         <div class="row py-4">
-          <div class="col-12 text-end">
+          <div class="d-flex justify-content-end gap-2">
+            <router-link :to="{ name: 'vocabulary' }" class="btn btn-secondary" title="Back">Cancel</router-link>
             <button type="submit" class="btn btn-primary">
-              {{ labels.formHeader }}
+              {{ labels.btnName }}
             </button>
           </div>
         </div>

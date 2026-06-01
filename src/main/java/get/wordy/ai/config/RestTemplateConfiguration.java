@@ -11,7 +11,7 @@ import org.springframework.web.client.RestTemplate;
 @Slf4j
 public class RestTemplateConfiguration {
 
-    @Value("${openai.api.key}")
+    @Value("${openai.api-key}")
     private String openaiApiKey;
 
     @Bean
