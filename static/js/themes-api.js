@@ -30,6 +30,28 @@ export function createTheme(themeName) {
         .catch(handleError);
 }
 
+export function generateTheme(themeId, candidatesLimit) {
+    return fetch(`${themesApi}/${themeId}/generate-draft?candidatesLimit=${candidatesLimit}`, {
+        method: 'POST',
+        headers: jsonHeaders
+    })
+        .catch(handleError);
+}
+
+export function getDraft(themeId) {
+    return fetch(`${themesApi}/${themeId}/candidate-words`)
+        .catch(handleError);
+}
+
+export function removeCandidateWord(themeId, lemma, partOfSpeech) {
+    return fetch(`${themesApi}/${themeId}/candidate-words`, {
+        method: 'DELETE',
+        headers: jsonHeaders,
+        body: JSON.stringify({lemma, partOfSpeech})
+    })
+        .catch(handleError);
+}
+
 export function getWords(themeId) {
     return fetch(`${themesApi}/${themeId}/words`)
         .catch(handleError);
@@ -44,11 +66,10 @@ export function updateThemeName(themeId, name) {
         .catch(handleError);
 }
 
-export function saveTheme(themeId, theme) {
-    return fetch(`${themesApi}/${themeId}`, {
+export function confirmTheme(themeId) {
+    return fetch(`${themesApi}/${themeId}/confirm`, {
         method: 'PUT',
-        headers: jsonHeaders,
-        body: JSON.stringify(theme)
+        headers: jsonHeaders
     })
         .catch(handleError);
 }

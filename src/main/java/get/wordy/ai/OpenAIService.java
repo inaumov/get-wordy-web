@@ -7,7 +7,6 @@ import get.wordy.ai.model.*;
 import get.wordy.ai.schema.openai.ChatRequest;
 import get.wordy.ai.schema.openai.ChatResponse;
 import get.wordy.ai.model.GetExplanationResult;
-import get.wordy.core.api.bean.WordKey;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.NotImplementedException;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -78,13 +77,13 @@ public class OpenAIService implements IVocabularyEnrichmentService {
         throw new RuntimeException("OK status from AI expected, but not received. Actual status = " + response.getStatusCode());
     }
 
-    public ThemeResult generate(String theme) {
+    public ThemeResult generateTheme(String theme, int candidatesLimit) {
         throw new NotImplementedException("Not implemented yet");
     }
 
     @Override
-    public List<GetExplanationResult> enrich(List<WordKey> words) {
-        return List.of();
+    public List<GetExplanationResult> multisearch(List<String> words) {
+        throw new NotImplementedException("Not implemented yet");
     }
 
     private String extractContent(ResponseEntity<ChatResponse> response) {

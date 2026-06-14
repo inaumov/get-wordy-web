@@ -1,8 +1,11 @@
 package get.wordy.rest;
 
+import get.wordy.ai.model.WordDto;
+import get.wordy.core.ThemeServiceWrapper;
 import get.wordy.core.ThemeService;
 import get.wordy.core.api.bean.Theme;
 import get.wordy.core.api.bean.Word;
+import get.wordy.core.api.bean.WordKey;
 import get.wordy.core.api.id.OwnerId;
 import get.wordy.model.Explanation;
 import get.wordy.model.WordIdRequest;
@@ -28,9 +31,11 @@ import java.util.*;
 public class ThemeController {
 
     private final ThemeService themeService;
+    private final ThemeServiceWrapper themeServiceWrapper;
 
-    public ThemeController(ThemeService themeService) {
+    public ThemeController(ThemeService themeService, ThemeServiceWrapper themeServiceWrapper) {
         this.themeService = themeService;
+        this.themeServiceWrapper = themeServiceWrapper;
     }
 
     @GetMapping
@@ -40,7 +45,7 @@ public class ThemeController {
         return ResponseEntity.ok(
                 themeService.getAllThemes(ownerId)
                         .stream()
-                        .map(this::toTheme)
+                        .map(this::toResponse)
                         .toList()
         );
     }
@@ -54,7 +59,7 @@ public class ThemeController {
         if (theme == null) {
             return ResponseEntity.notFound().build();
         }
-        return ResponseEntity.ok(toTheme(theme));
+        return ResponseEntity.ok(toResponse(theme));
     }
 
     @PostMapping
@@ -63,7 +68,7 @@ public class ThemeController {
 
         OwnerId ownerId = createUserOwnerId(principal);
         var created = themeService.createTheme(ownerId, request.name());
-        return ResponseEntity.ok(toTheme(created));
+        return ResponseEntity.ok(toResponse(created));
     }
 
     @PatchMapping("/{themeId}")
@@ -76,7 +81,7 @@ public class ThemeController {
         if (updated == null) {
             return ResponseEntity.notFound().build();
         }
-        return ResponseEntity.ok(toTheme(updated));
+        return ResponseEntity.ok(toResponse(updated));
     }
 
     @DeleteMapping("/{themeId}")
@@ -84,7 +89,7 @@ public class ThemeController {
                                             @PathVariable int themeId) {
 
         OwnerId ownerId = createUserOwnerId(principal);
-        boolean deleted = themeService.deleteTheme(ownerId, themeId);
+        boolean deleted = themeServiceWrapper.deleteTheme(ownerId, themeId);
         if (!deleted) {
             return ResponseEntity.notFound().build();
         }
@@ -114,7 +119,7 @@ public class ThemeController {
 
         log.info("Adding new word id = {} to themeId = {}, user = {}", wordId.wordId(), themeId, user.getName());
 
-        Word addedToTheme = themeService.addWordToTheme(createUserOwnerId(user), themeId, wordId.wordId());
+        Word addedToTheme = themeServiceWrapper.addWordToTheme(createUserOwnerId(user), themeId, wordId.wordId());
 
         HttpHeaders headers = new HttpHeaders();
         headers.setLocation(ucBuilder
@@ -133,8 +138,51 @@ public class ThemeController {
 
         log.info("Deleting a word = {} from user theme, id = {}, user = {}", wordId, themeId, user.getName());
 
-        themeService.removeWordFromTheme(createUserOwnerId(user), themeId, wordId.wordId());
+        themeServiceWrapper.removeWordFromTheme(createUserOwnerId(user), themeId, wordId.wordId());
 
+        return ResponseEntity
+                .noContent()
+                .build();
+    }
+
+    @PostMapping("/{themeId}/generate-draft")
+    public ResponseEntity<ThemeResponse> generateDraft(Principal user,
+                                                       @PathVariable int themeId,
+                                                       @RequestParam(value = "candidatesLimit", required = false, defaultValue = "5") int candidatesLimit) {
+        OwnerId ownerId = createUserOwnerId(user);
+        log.info("Requested to generate {} words draft for themeId='{}', user='{}'", candidatesLimit, themeId, user.getName());
+        themeServiceWrapper.generateDraft(ownerId, themeId, candidatesLimit);
+        return ResponseEntity.accepted().build();
+    }
+
+    @PutMapping("/{themeId}/confirm")
+    public ResponseEntity<ThemeResponse> confirmTheme(Principal user,
+                                                      @PathVariable int themeId) {
+        OwnerId ownerId = createUserOwnerId(user);
+        log.info("Confirming words for themeId='{}', user='{}'", themeId, user.getName());
+        themeServiceWrapper.confirmTheme(ownerId, themeId);
+        return ResponseEntity.accepted().build();
+    }
+
+    @GetMapping(value = "/{themeId}/candidate-words")
+    public ResponseEntity<List<WordDto>> getDraft(Principal user,
+                                                  @PathVariable("themeId") int themeId) {
+
+        log.info("Getting candidate words (draft) for the user = {}, theme id = {}", user.getName(), themeId);
+
+        OwnerId ownerId = createUserOwnerId(user);
+        List<WordDto> wordCandidates = themeServiceWrapper.getCandidateWords(ownerId, themeId);
+        return new ResponseEntity<>(wordCandidates, HttpStatus.OK);
+    }
+
+    @DeleteMapping(value = "/{themeId}/candidate-words")
+    public ResponseEntity<Void> removeFromTheme(Principal user,
+                                                @PathVariable("themeId") int themeId,
+                                                @Valid @RequestBody WordKey wordKey) {
+
+        log.info("Deleting a candidate word = [{}:{}] from user theme, id = {}, user = {}", wordKey.partOfSpeech(), wordKey.partOfSpeech(), themeId, user.getName());
+
+        themeServiceWrapper.removeCandidateWordsFromTheme(createUserOwnerId(user), themeId, wordKey);
         return ResponseEntity
                 .noContent()
                 .build();
@@ -144,8 +192,13 @@ public class ThemeController {
         return new OwnerId(user.getName(), "user");
     }
 
-    private ThemeResponse toTheme(Theme entity) {
-        return new ThemeResponse(entity.themeId(), entity.name(), entity.wordsTotal());
+    private ThemeResponse toResponse(Theme entity) {
+        return new ThemeResponse(
+                entity.themeId(),
+                entity.name(),
+                entity.notes(),
+                entity.status(),
+                entity.wordsTotal());
     }
 
     private WordResponse toWordResponse(Word word) {

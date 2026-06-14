@@ -8,8 +8,43 @@ import java.util.Map;
 
 public class GetExplanationSchema {
 
-    public static Schema build() {
+    public static Schema buildSingle() {
+        return Schema.builder()
+                .type(Type.Known.OBJECT)
+                .properties(Map.of(
+                        "lemma",
+                        Schema.builder()
+                                .type(Type.Known.STRING)
+                                .description(
+                                        "Requested word or phrase (lemma)"
+                                )
+                                .build(),
+                        "transcription",
+                        Schema.builder()
+                                .type(Type.Known.STRING)
+                                .description(
+                                        "IPA phonetic transcription"
+                                )
+                                .build(),
+                        "explanations",
+                        explanationsSchema()
+                ))
+                .required(List.of(
+                        "lemma",
+                        "transcription",
+                        "explanations"
+                ))
+                .build();
+    }
 
+    public static Schema buildMultiple() {
+        return Schema.builder()
+                .type(Type.Known.ARRAY)
+                .items(buildSingle())
+                .build();
+    }
+
+    private static Schema explanationsSchema() {
         Schema explanationItemSchema =
                 Schema.builder()
                         .type(Type.Known.OBJECT)
@@ -94,40 +129,12 @@ public class GetExplanationSchema {
                                 "source"
                         ))
                         .build();
-        Schema explanationsSchema =
-                Schema.builder()
-                        .type(Type.Known.ARRAY)
-                        .description(
-                                "List of explanations for the lemma"
-                        )
-                        .items(explanationItemSchema)
-                        .build();
-
         return Schema.builder()
-                .type(Type.Known.OBJECT)
-                .properties(Map.of(
-                        "lemma",
-                        Schema.builder()
-                                .type(Type.Known.STRING)
-                                .description(
-                                        "Requested word or phrase (lemma)"
-                                )
-                                .build(),
-                        "transcription",
-                        Schema.builder()
-                                .type(Type.Known.STRING)
-                                .description(
-                                        "IPA phonetic transcription"
-                                )
-                                .build(),
-                        "explanations",
-                        explanationsSchema
-                ))
-                .required(List.of(
-                        "lemma",
-                        "transcription",
-                        "explanations"
-                ))
+                .type(Type.Known.ARRAY)
+                .description(
+                        "List of explanations for the lemma"
+                )
+                .items(explanationItemSchema)
                 .build();
     }
 

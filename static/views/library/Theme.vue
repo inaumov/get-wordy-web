@@ -8,11 +8,16 @@ import {
   updateThemeName,
   removeFromTheme,
   deleteTheme,
-  getWords
+  getWords,
+  generateTheme,
+  getDraft,
+  confirmTheme, removeCandidateWord
 } from "@/js/themes-api.js";
+import CandidateWords from "@/views/library/CandidateWords.vue";
 
 export default {
   components: {
+    CandidateWords,
     WordsheetTable,
     Search
   },
@@ -21,10 +26,10 @@ export default {
 
   data() {
     return {
-      name: "",
+      theme: {},
       words: [],
-      deleted: false,
-      loadingWords: false
+      candidateWords: [],
+      deleted: false
     };
   },
 
@@ -33,8 +38,20 @@ export default {
       return this.words.map(word => word.wordId);
     },
 
-    hasWords() {
-      return this.words.length > 0;
+    isEmpty() {
+      return this.theme.status === "NEW" //|| this.theme.wordsTotal === 0;
+    },
+
+    isGenerating() {
+      return this.theme.status === "GENERATING";
+    },
+
+    isDraft() {
+      return this.theme.status === "DRAFT";
+    },
+
+    isReady() {
+      return this.theme.status === "READY";
     }
   },
 
@@ -42,165 +59,114 @@ export default {
 
     async getData() {
       const response = await fetchTheme(this.themeId);
-      const theme = await response.json();
+      this.theme = await response.json();
 
-      this.name = theme.name;
+      if (this.theme.status === "READY") {
+        const wordsResponse = await getWords(this.themeId);
+        this.words = await wordsResponse.json();
+      }
 
-      const wordsResponse = await getWords(this.themeId);
-      const words = await wordsResponse.json();
+      if (this.theme.status === "DRAFT") {
+        const candidateWordsResponse = await getDraft(this.themeId);
+        this.candidateWords = await candidateWordsResponse.json();
+      }
+    },
 
-      this.words = theme.words || words || [];
+    async generateThemeAction(candidatesLimit) {
+      const response = await generateTheme(this.themeId, candidatesLimit);
+      if (response.ok) {
+        this.theme.status = "GENERATING" // to show spinner immediately
+        await this.pollThemeStatus();
+      } else {
+        alert("Error");
+      }
+    },
+
+    async confirmDraftAction() {
+      const response = await confirmTheme(this.themeId);
+      if (response.ok) {
+      } else {
+        alert("Error");
+      }
     },
 
     async onNameEdit() {
-      const editedText =
-          this.$refs.editableEl.innerText.trim();
-
-      if (
-          editedText &&
-          editedText !== this.name
-      ) {
-
-        const response =
-            await updateThemeName(
-                this.themeId,
-                editedText
-            );
-
+      const editedText = this.$refs.editableEl.innerText.trim();
+      if (editedText && editedText !== this.theme.name) {
+        const response = await updateThemeName(this.themeId, editedText);
         if (response.ok) {
-
-          this.name = editedText;
-
-          console.log(
-              "Name changed:",
-              editedText
-          );
-
+          this.theme = await response.json();
+          console.log("Name changed:", editedText);
         } else {
-
           alert("Failed");
-
         }
-
       } else {
-
-        this.$refs.editableEl.innerText =
-            this.name;
-
+        this.$refs.editableEl.innerText = this.theme.name;
       }
     },
 
     async handleAddToTheme(wordExplanation) {
-
       if (this.themeContains(wordExplanation)) {
         alert("This word already exists");
         return;
       }
 
-      const response =
-          await addToTheme(
-              this.themeId,
-              wordExplanation.wordId
-          );
-
+      const response = await addToTheme(this.themeId, wordExplanation.wordId);
       if (response.ok) {
-
-        const added =
-            await response.json();
-
+        const added = await response.json();
         this.words.push(added);
-
       } else {
-
         alert("Error");
-
       }
     },
 
     async handleRemoveItemAction(wordId) {
 
-      const response =
-          await removeFromTheme(
-              this.themeId,
-              wordId
-          );
-
+      const response = await removeFromTheme(this.themeId, wordId);
       if (response.ok) {
-
-        this.words =
-            this.words.filter(
-                w => w.wordId !== wordId
-            );
-
+        this.words = this.words.filter(w => w.wordId !== wordId);
       } else {
-
         alert("Error");
-
       }
     },
 
     async deleteThemeAction() {
 
-      const response =
-          await deleteTheme(
-              this.themeId
-          );
-
+      const response = await deleteTheme(this.themeId);
       if (response.ok) {
-
         this.deleted = true;
-
       } else {
-
         alert("Error");
+      }
+    },
 
+    async removeCandidateWord(index, lemma, partOfSpeech) {
+      let response = await removeCandidateWord(this.themeId, lemma, partOfSpeech);
+      if (response.ok) {
+        this.candidateWords.splice(index, 1);
       }
     },
 
     themeContains(wordExplanation) {
-
       return this.words.some(item => {
-
         return (
             item.lemma ===
             wordExplanation.lemma &&
             item.explanation.partOfSpeech ===
             wordExplanation.explanation.partOfSpeech
         );
-
       });
     },
 
-    async findWords() {
-
-      this.loadingWords = true;
-
-      try {
-
-        // TODO:
-        // Replace later with search engine request
-
-        await new Promise(resolve =>
-            setTimeout(resolve, 2000)
-        );
-
-        /*
-        Example later:
-
-        const response =
-            await searchWords(
-                this.themeId
-            );
-
-        this.words =
-            await response.json();
-        */
-
-      } finally {
-
-        this.loadingWords = false;
-
-      }
+    async pollThemeStatus() {
+      const interval = setInterval(async () => {
+        const response = await fetchTheme(this.themeId);
+        this.theme = await response.json();
+        if (this.theme.status !== "GENERATING") {
+          clearInterval(interval);
+          await this.getData();
+        }
+      }, 3000);
     }
   },
 
@@ -213,121 +179,141 @@ export default {
 <template>
 
   <div class="d-flex justify-content-start m-4">
-
-    <router-link
-        :to="{name:'themes'}"
-        class="btn btn-secondary">
-
-      Back
-
-    </router-link>
-
+    <router-link :to="{name:'themes'}" class="btn btn-secondary">Back</router-link>
   </div>
 
   <div class="p-4">
 
     <!-- Name / total -->
 
-    <div
-        class="d-flex justify-content-between align-items-center pb-4">
+    <div class="d-flex justify-content-between align-items-center pb-4">
 
       <span
           class="h5 editable-name p-1"
           ref="editableEl"
           contenteditable="true"
           @blur="onNameEdit">
-
-        {{ name }}
-
+        {{ theme.name }}
       </span>
 
-      <p class="fw-light mb-0">
-
+      <p v-if="isReady" class="fw-light mb-0">
         Words total:
-        {{ words.length }}
-
+        {{ theme.wordsTotal }}
+      </p>
+      <p v-if="isDraft" class="fw-light mb-0">
+        Candidate words total:
+        {{ candidateWords.length || theme.wordsTotal }}
       </p>
 
     </div>
 
     <!-- Populated state -->
 
-    <template v-if="hasWords">
+    <template v-if="isReady">
 
-      <search
-          @add-to-vocabulary="handleAddToTheme"
-          :vocab-word-ids="ids"
-      />
+      <search @add-to-vocabulary="handleAddToTheme" :vocab-word-ids="ids"/>
 
-      <wordsheet-table
-          class="pt-5"
-          :items="words">
-
+      <wordsheet-table class="pt-5" :items="words">
         <template #actions="{ row }">
-
           <button
               class="btn btn-lg"
-              @click="
-                handleRemoveItemAction(
-                  row.wordId
-                )
-              "
-              title="Delete">
-
+              @click="handleRemoveItemAction(row.wordId)">
             <i class="bi bi-x-lg"></i>
-
+            Delete
           </button>
-
         </template>
-
       </wordsheet-table>
 
     </template>
 
     <!-- Empty draft state -->
 
-    <template v-else>
+    <template v-if="isEmpty">
 
       <div class="empty-state">
 
-        <i
-            class="bi bi-journal-text empty-icon">
-        </i>
-
+        <i class="bi bi-stars empty-icon"></i>
         <h5 class="mt-3">
-
           This theme has no words yet
-
         </h5>
-
         <p class="text-muted">
-
-          Search and populate this
-          theme automatically
-
+          Generate candidate words for this theme
         </p>
 
-        <button
-            class="btn btn-primary"
-            :disabled="loadingWords"
-            @click="findWords">
+        <div class="d-flex justify-content-between align-items-center gap-2 pt-2">
+          <button class="btn btn-primary"
+                  @click="generateThemeAction(5)">
+            <i class="bi bi-search"></i>
+            Get 5 words
+          </button>
+          <button class="btn btn-primary"
+                  @click="generateThemeAction(10)">
+            <i class="bi bi-search"></i>
+            Get 10 words
+          </button>
+          <button class="btn btn-primary"
+                  @click="generateThemeAction(15)">
+            <i class="bi bi-search"></i>
+            Get 15 words
+          </button>
+          <button class="btn btn-danger"
+                  :disabled="deleted"
+                  @click="deleteThemeAction">
+            <i class="bi bi-trash"></i>
+            Delete
+          </button>
+        </div>
+      </div>
 
-          <span
-              v-if="loadingWords"
-              class="
-                spinner-border
-                spinner-border-sm
-                me-2
-              ">
-          </span>
+    </template>
 
-          {{
-            loadingWords
-                ? "Searching..."
-                : "Find words"
-          }}
+    <!-- Working process -->
+    <template v-if="isGenerating">
+      <div class="empty-state">
+        <div class="spinner-border" role="status"></div>
+        <h5 class="mt-3">
+          Generating words...
+        </h5>
+        <p class="text-muted">
+          This may take up to a minute
+        </p>
+      </div>
+    </template>
 
-        </button>
+    <template v-if="isDraft">
+      <candidate-words
+          :words="candidateWords"
+          @remove-word="removeCandidateWord"
+      />
+    </template>
+
+    <template v-if="theme.status === 'FAILED'">
+
+      <div class="empty-state">
+        <i
+            class="bi bi-exclamation-octagon text-danger empty-icon">
+        </i>
+        <h5 class="mt-3">
+          Generation failed
+        </h5>
+        <p class="text-muted text-center">
+          We couldn't generate candidate words for this theme.
+          Please try again.
+        </p>
+        <div class="d-flex gap-2 mt-2">
+          <button
+              class="btn btn-primary"
+              @click="generateThemeAction">
+            <i class="bi bi-arrow-clockwise"></i>
+            Try again
+          </button>
+          <button
+              class="btn btn-outline-danger"
+              @click="deleteThemeAction">
+            <i class="bi bi-trash"></i>
+            Delete
+          </button>
+        </div>
 
       </div>
 
@@ -335,20 +321,22 @@ export default {
 
     <!-- Footer -->
 
-    <div
-        class="d-flex justify-content-end mt-4">
-
-      <button
-          class="btn btn-danger"
-          :disabled="deleted"
-          @click="deleteThemeAction">
-
+    <div v-if="isReady" class="d-flex justify-content-end mt-4">
+      <button class="btn btn-danger" :disabled="deleted" @click="deleteThemeAction">
         <i class="bi bi-trash"></i>
-
         Delete
-
       </button>
+    </div>
 
+    <div v-if="isDraft" class="d-flex justify-content-end gap-2 mt-4">
+      <button class="btn btn-primary" @click="confirmDraftAction">
+        <i class="bi bi-check"></i>
+        Confirm
+      </button>
+      <button class="btn btn-danger" :disabled="deleted" @click="deleteThemeAction">
+        <i class="bi bi-trash"></i>
+        Delete
+      </button>
     </div>
 
   </div>
@@ -364,10 +352,8 @@ export default {
 
 .empty-state {
   min-height: 300px;
-
   display: flex;
   flex-direction: column;
-
   justify-content: center;
   align-items: center;
 }

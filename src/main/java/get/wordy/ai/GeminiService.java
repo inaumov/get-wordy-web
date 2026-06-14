@@ -1,6 +1,7 @@
 package get.wordy.ai;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.json.JsonMapper;
 import com.google.genai.Client;
 import com.google.genai.types.GenerateContentConfig;
@@ -10,7 +11,6 @@ import get.wordy.ai.schema.gemini.GetExplanationSchema;
 import get.wordy.ai.model.GetExplanationResult;
 import get.wordy.ai.schema.gemini.ThemeGenerateSchema;
 import get.wordy.ai.model.ThemeResult;
-import get.wordy.core.api.bean.WordKey;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -48,20 +48,10 @@ public class GeminiService implements IVocabularyEnrichmentService {
         GenerateContentConfig config =
                 GenerateContentConfig.builder()
                         .responseMimeType("application/json")
-                        .responseSchema(GetExplanationSchema.build())
+                        .responseSchema(GetExplanationSchema.buildSingle())
                         .build();
 
-        StopWatch watch = new StopWatch();
-        GenerateContentResponse response;
-        try {
-            watch.start();
-            response = client.models.generateContent(model, prompt, config);
-            watch.stop();
-        } catch (Exception e) {
-            throw new RuntimeException("Failed to generate AI response");
-        }
-
-        UsageLogger.log(response, watch);
+        GenerateContentResponse response = call(prompt, config);
         String jsonContent = response.text();
         try {
             return jsonMapper.readValue(jsonContent, GetExplanationResult.class);
@@ -72,13 +62,13 @@ public class GeminiService implements IVocabularyEnrichmentService {
     }
 
     @Override
-    public ThemeResult generate(String theme) {
+    public ThemeResult generateTheme(String theme, int candidatesLimit) {
 
         String prompt = """
-                Generate exactly 15 English vocabulary words for theme:
+                Generate exactly %d most popular English vocabulary words for theme:
                 "%s".
                 """
-                .formatted(theme);
+                .formatted(candidatesLimit, theme);
 
         GenerateContentConfig config =
                 GenerateContentConfig.builder()
@@ -89,9 +79,11 @@ public class GeminiService implements IVocabularyEnrichmentService {
         StopWatch watch = new StopWatch();
         GenerateContentResponse response;
         try {
+            watch.start();
             response = client.models.generateContent(model, prompt, config);
             watch.stop();
         } catch (Exception e) {
+            log.error("Failed to generate gemini AI response", e);
             throw new RuntimeException("Failed to generate AI response");
         }
 
@@ -107,8 +99,48 @@ public class GeminiService implements IVocabularyEnrichmentService {
     }
 
     @Override
-    public List<GetExplanationResult> enrich(List<WordKey> words) {
-        return List.of();
+    public List<GetExplanationResult> multisearch(List<String> lemmas) {
+        String prompt = """
+                %s
+                
+                Requested lemmas:
+                %s
+                """
+                .formatted(getExplanationPrompt, lemmas);
+
+        GenerateContentConfig config =
+                GenerateContentConfig.builder()
+                        .responseMimeType("application/json")
+                        .responseSchema(GetExplanationSchema.buildMultiple())
+                        .build();
+
+        GenerateContentResponse response = call(prompt, config);
+        String jsonContent = response.text();
+        try {
+            return jsonMapper.readValue(
+                    jsonContent,
+                    new TypeReference<List<GetExplanationResult>>() {
+                    }
+            );
+        } catch (JsonProcessingException e) {
+            log.error("Failed to parse gemini response: {}", jsonContent, e);
+            throw new RuntimeException("Could not read json content from gemini response");
+        }
+    }
+
+    private GenerateContentResponse call(String prompt, GenerateContentConfig config) {
+        StopWatch watch = new StopWatch();
+        GenerateContentResponse response;
+        try {
+            watch.start();
+            response = client.models.generateContent(model, prompt, config);
+            watch.stop();
+        } catch (Exception e) {
+            log.error("Failed to generate AI response", e);
+            throw new RuntimeException("Failed to generate AI response");
+        }
+        UsageLogger.log(response, watch);
+        return response;
     }
 
 }

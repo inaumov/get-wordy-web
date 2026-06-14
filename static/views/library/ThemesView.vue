@@ -89,7 +89,7 @@ export default {
 
             <div class="mt-auto d-flex justify-content-between align-items-center">
               <span class="badge bg-info-subtle text-dark">
-                {{ theme.wordsTotal ? theme.wordsTotal : 0 }} words
+                {{ theme.wordsTotal }} words
               </span>
               <small class="text-muted">
                 {{ theme.lastModified ? `Updated ${formatDate(theme.lastModified)}` : '' }}
