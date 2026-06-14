@@ -198,6 +198,7 @@ public class ThemeController {
                 entity.name(),
                 entity.notes(),
                 entity.status(),
+                entity.generatedAt(),
                 entity.wordsTotal());
     }
 

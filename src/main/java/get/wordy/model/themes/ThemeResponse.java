@@ -2,5 +2,14 @@ package get.wordy.model.themes;
 
 import get.wordy.core.api.bean.ThemeStatus;
 
-public record ThemeResponse(int themeId, String name, String notes, ThemeStatus status, int wordsTotal) {
+import java.time.Instant;
+
+public record ThemeResponse(
+        int themeId,
+        String name,
+        String notes,
+        ThemeStatus status,
+        Instant lastModified,
+        int wordsTotal
+) {
 }

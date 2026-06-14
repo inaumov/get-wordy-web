@@ -91,8 +91,14 @@ export default {
               <span class="badge bg-info-subtle text-dark">
                 {{ theme.wordsTotal }} words
               </span>
+              <span v-if="theme.status === 'READY'" class="badge bg-success-subtle text-dark">
+                {{ theme.status }}
+              </span>
+              <span v-else class="badge bg-secondary-subtle text-dark">
+                {{ theme.status }}
+              </span>
               <small class="text-muted">
-                {{ theme.lastModified ? `Updated ${formatDate(theme.lastModified)}` : '' }}
+                {{ `Last Modified: ${formatDate(theme.lastModified)}` }}
               </small>
             </div>
           </div>
