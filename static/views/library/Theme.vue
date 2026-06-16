@@ -53,8 +53,20 @@ export default {
       return this.theme.status === "DRAFT";
     },
 
+    isConfirmed() {
+      return this.theme.status === "CONFIRMED";
+    },
+
+    isProcessing() {
+      return this.theme.status === "PROCESSING";
+    },
+
     isReady() {
       return this.theme.status === "READY";
+    },
+
+    isFailed() {
+      return this.theme.status === "FAILED";
     }
   },
 
@@ -91,6 +103,8 @@ export default {
       const response = await confirmTheme(this.themeId);
       if (response.ok) {
         this.confirmed = true;
+        this.theme.status = "CONFIRMED" // to show message immediately
+        await this.pollThemeStatus();
       } else {
         alert("Error");
       }
@@ -282,15 +296,18 @@ export default {
 
     </template>
 
-    <!-- Working process -->
+    <!-- AI generation -->
     <template v-if="isGenerating">
       <div class="empty-state">
-        <div class="spinner-border" role="status"></div>
+        <div
+            class="spinner-border"
+            role="status">
+        </div>
         <h5 class="mt-3">
           Generating words...
         </h5>
         <p class="text-muted">
-          This may take up to a minute
+          This may take a few seconds
         </p>
       </div>
     </template>
@@ -302,8 +319,42 @@ export default {
       />
     </template>
 
-    <template v-if="theme.status === 'FAILED'">
+    <!-- Confirmed / waiting for service -->
+    <template v-if="isConfirmed">
+      <div class="empty-state">
+        <i class="bi bi-check-circle text-success empty-icon"></i>
+        <h5 class="mt-3">
+          Theme confirmed
+        </h5>
+        <p class="text-muted">
+          Preparation will start soon
+        </p>
+      </div>
+    </template>
 
+    <!-- Working process -->
+    <template v-if="isProcessing">
+      <div class="empty-state">
+        <div
+            class="spinner-border"
+            role="status">
+        </div>
+        <h5 class="mt-3">
+          Processing theme...
+        </h5>
+        <p class="text-muted">
+          <span>
+            We are preparing your vocabulary cards
+          </span>
+          <br>
+          <span>
+            This may take up to a minute
+          </span>
+        </p>
+      </div>
+    </template>
+
+    <template v-if="isFailed">
       <div class="empty-state">
         <i
             class="bi bi-exclamation-octagon text-danger empty-icon">
@@ -329,12 +380,10 @@ export default {
             Delete
           </button>
         </div>
-
       </div>
-
     </template>
 
-    <!-- Footer -->
+    <!-- Action buttons -->
 
     <div v-if="isReady" class="d-flex justify-content-end mt-4">
       <button class="btn btn-danger" :disabled="deleted || confirmed" @click="deleteThemeAction">
@@ -344,7 +393,7 @@ export default {
     </div>
 
     <div v-if="isDraft" class="d-flex justify-content-end gap-2 mt-4">
-      <button class="btn btn-primary" :disabled="confirmed || confirmed" @click="confirmDraftAction">
+      <button class="btn btn-primary" :disabled="deleted || confirmed" @click="confirmDraftAction">
         <i class="bi bi-check"></i>
         Confirm
       </button>

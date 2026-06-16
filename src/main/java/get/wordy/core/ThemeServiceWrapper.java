@@ -50,6 +50,7 @@ public class ThemeServiceWrapper {
             if (theme.status() != ThemeStatus.DRAFT) {
                 throw new IllegalStateException("Theme draft is not generated yet");
             }
+            themeService.updateThemeStatus(ownerId, themeId, ThemeStatus.CONFIRMED);
             publisher.publishEvent(new ThemeDraftConfirmedEvent(ownerId, themeId, theme.name()));
         } catch (Exception e) {
             log.error("Failed populating words for theme '{}'", themeId, e);
