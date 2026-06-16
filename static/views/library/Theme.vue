@@ -1,6 +1,8 @@
 <script>
+import {formatDateTime} from "@/js/utils.js";
 import WordsheetTable from "@/components/classes/WordsheetTable.vue";
 import Search from "@/components/Search.vue";
+import CandidateWords from "@/views/library/CandidateWords.vue";
 
 import {
   fetchTheme,
@@ -11,9 +13,9 @@ import {
   getWords,
   generateTheme,
   getDraft,
-  confirmTheme, removeCandidateWord
+  confirmTheme,
+  removeCandidateWord
 } from "@/js/themes-api.js";
-import CandidateWords from "@/views/library/CandidateWords.vue";
 
 export default {
   components: {
@@ -29,6 +31,7 @@ export default {
       theme: {},
       words: [],
       candidateWords: [],
+      confirmed: false,
       deleted: false
     };
   },
@@ -56,6 +59,8 @@ export default {
   },
 
   methods: {
+
+    formatDateTime,
 
     async getData() {
       const response = await fetchTheme(this.themeId);
@@ -85,6 +90,7 @@ export default {
     async confirmDraftAction() {
       const response = await confirmTheme(this.themeId);
       if (response.ok) {
+        this.confirmed = true;
       } else {
         alert("Error");
       }
@@ -186,7 +192,7 @@ export default {
 
     <!-- Name / total -->
 
-    <div class="d-flex justify-content-between align-items-center pb-4">
+    <div class="d-flex justify-content-between align-items-center pb-2">
 
       <span
           class="h5 editable-name p-1"
@@ -207,6 +213,15 @@ export default {
 
     </div>
 
+    <div class="d-flex justify-content-end pb-4">
+        <small v-if="theme.lastModifiedAt" class="text-success">
+            {{ `Last Modified: ${formatDateTime(theme.lastModifiedAt)}` }}
+        </small>
+        <small v-else class="text-muted">
+            {{ `Generated: ${formatDateTime(theme.generatedAt)}` }}
+        </small>
+    </div>
+
     <!-- Populated state -->
 
     <template v-if="isReady">
@@ -215,11 +230,11 @@ export default {
 
       <wordsheet-table class="pt-5" :items="words">
         <template #actions="{ row }">
-          <button
-              class="btn btn-lg"
-              @click="handleRemoveItemAction(row.wordId)">
+          <button class="btn"
+              @click="handleRemoveItemAction(row.wordId)"
+              title="Remove"
+          >
             <i class="bi bi-x-lg"></i>
-            Delete
           </button>
         </template>
       </wordsheet-table>
@@ -322,18 +337,18 @@ export default {
     <!-- Footer -->
 
     <div v-if="isReady" class="d-flex justify-content-end mt-4">
-      <button class="btn btn-danger" :disabled="deleted" @click="deleteThemeAction">
+      <button class="btn btn-danger" :disabled="deleted || confirmed" @click="deleteThemeAction">
         <i class="bi bi-trash"></i>
         Delete
       </button>
     </div>
 
     <div v-if="isDraft" class="d-flex justify-content-end gap-2 mt-4">
-      <button class="btn btn-primary" @click="confirmDraftAction">
+      <button class="btn btn-primary" :disabled="confirmed || confirmed" @click="confirmDraftAction">
         <i class="bi bi-check"></i>
         Confirm
       </button>
-      <button class="btn btn-danger" :disabled="deleted" @click="deleteThemeAction">
+      <button class="btn btn-danger" :disabled="deleted || confirmed" @click="deleteThemeAction">
         <i class="bi bi-trash"></i>
         Delete
       </button>

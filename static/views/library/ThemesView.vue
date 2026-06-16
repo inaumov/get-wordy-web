@@ -39,10 +39,6 @@ export default {
     showCreateModal() {
       this.$refs.createModal.open();
     },
-    formatDate(dateStr) {
-      if (!dateStr) return '';
-      return new Date(dateStr).toLocaleDateString();
-    },
     randomColor(id) {
       const colors = ['#ffd6a5', '#fdffb6', '#caffbf', '#9bf6ff', '#a0c4ff', '#bdb2ff', '#ffc6ff'];
       const index = id.toString().split('').reduce((sum, c) => sum + c.charCodeAt(0), 0) % colors.length;
@@ -97,9 +93,6 @@ export default {
               <span v-else class="badge bg-secondary-subtle text-dark">
                 {{ theme.status }}
               </span>
-              <small class="text-muted">
-                {{ `Last Modified: ${formatDate(theme.lastModified)}` }}
-              </small>
             </div>
           </div>
         </router-link>

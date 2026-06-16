@@ -9,7 +9,8 @@ public record ThemeResponse(
         String name,
         String notes,
         ThemeStatus status,
-        Instant lastModified,
+        Instant generatedAt,
+        Instant lastModifiedAt,
         int wordsTotal
 ) {
 }
