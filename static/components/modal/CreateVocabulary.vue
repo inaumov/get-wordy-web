@@ -1,8 +1,12 @@
 <script>
 export default {
-  name: 'CreateVocabularyModal',
+  name: 'CreateModal',
   props: {
-    createAction: {
+    modalName: {
+      type: String,
+      required: true
+    },
+    onSubmit: {
       type: Function,
       required: true
     }
@@ -10,66 +14,130 @@ export default {
   data() {
     return {
       visible: false,
-      vocabName: '',
-      error: ''
+      name: '',
+      error: '',
+      loading: false
     };
   },
   methods: {
     open() {
       this.visible = true;
-      this.vocabName = '';
-      this.error = '';
+      this.reset();
+      this.$nextTick(() => {
+        this.$refs.nameInput?.focus();
+      });
     },
     close() {
       this.visible = false;
+    },
+    reset() {
+      this.name = '';
+      this.error = '';
+      this.loading = false;
     },
     clearError() {
       this.error = '';
     },
     async submit() {
-      if (!this.vocabName) {
-        this.error = 'Vocabulary name is required.';
+      const name = this.name.trim();
+      if (!name) {
+        this.error = 'Name is required.';
         return;
       }
+      this.loading = true;
+      this.error = '';
       try {
-        await this.createAction(this.vocabName);
+        await this.onSubmit(name);
         this.close();
       } catch (err) {
-        if (err.status === 409) {
-          this.error = err.message || 'Duplicate vocabulary name.';
+        const status = err.status ?? err.response?.status;
+        if (status === 409) {
+          this.error = err.message || 'A record with this name already exists.';
         } else {
-          this.error = 'Unexpected error. Please try again.';
+          this.error = err.message || 'Unexpected error. Please try again.';
           console.error(err);
         }
+      } finally {
+        this.loading = false;
+      }
+    },
+
+    handleKeydown(event) {
+      if (event.key === 'Escape') {
+        this.close();
+      }
+      if (event.key === 'Enter') {
+        this.submit();
       }
     }
+  },
+
+  computed: {
+    title() {
+      return `Create new ${this.modalName}`;
+    }
+  },
+
+  mounted() {
+    window.addEventListener('keydown', this.handleKeydown);
+  },
+
+  beforeUnmount() {
+    window.removeEventListener('keydown', this.handleKeydown);
   }
 };
 </script>
 
 <template>
-  <div v-if="visible" class="modal-backdrop">
-    <div class="modal-box">
-      <h5 class="modal-title">Create New Vocabulary</h5>
+  <div
+      v-if="visible"
+      class="modal-backdrop"
+      @click.self="close"
+  >
+    <div
+        class="modal-box"
+        role="dialog"
+        aria-modal="true"
+    >
 
-      <div class="my-3">
-        <input
-            id="vocabName"
-            v-model="vocabName"
-            type="text"
-            class="form-control"
-            :class="{ 'is-invalid': error }"
-            placeholder="Enter vocabulary name"
-            @input="clearError"
-            autocomplete="off"
-            required
-        />
-        <div v-if="error" class="form-text text-danger">{{ error }}</div>
+      <h5 class="modal-title mb-3">
+        {{ title }}
+      </h5>
+
+      <input
+          ref="nameInput"
+          v-model="name"
+          type="text"
+          class="form-control"
+          :class="{ 'is-invalid': error }"
+          placeholder="Enter name"
+          autocomplete="off"
+          @input="clearError"
+      />
+
+      <div
+          v-if="error"
+          class="invalid-feedback d-block"
+      >
+        {{ error }}
       </div>
 
-      <div class="mt-4 text-end">
-        <button class="btn btn-sm btn-outline-secondary me-2" @click="close">Cancel</button>
-        <button class="btn btn-sm btn-outline-primary" @click="submit">Create</button>
+      <div class="modal-actions">
+        <button
+            class="btn btn-sm btn-outline-secondary"
+            :disabled="loading"
+            @click="close"
+        >
+          Cancel
+        </button>
+
+        <button
+            class="btn btn-sm btn-primary"
+            :disabled="loading"
+            @click="submit"
+        >
+          Create
+        </button>
       </div>
     </div>
   </div>
@@ -78,11 +146,8 @@ export default {
 <style scoped>
 .modal-backdrop {
   position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-color: rgba(0, 0, 0, 0.3);
+  inset: 0;
+  background: rgb(0 0 0 / 35%);
   display: flex;
   justify-content: center;
   align-items: center;
@@ -93,13 +158,16 @@ export default {
   background: white;
   border-radius: 8px;
   padding: 24px;
-  width: 100%;
-  max-width: 400px;
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+  width: min(400px, calc(100% - 32px));
+  box-shadow:
+      0 20px 40px rgb(0 0 0 / 20%);
 }
 
-.is-invalid {
-  border-color: #dc3545;
+.modal-actions {
+  margin-top: 24px;
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
 }
 
 </style>
