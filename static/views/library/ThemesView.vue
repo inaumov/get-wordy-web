@@ -1,10 +1,10 @@
 <script>
 import {createTheme, fetchThemes} from '@/js/themes-api.js';
-import CreateVocabularyModal from "@/components/modal/CreateVocabulary.vue";
+import CreateModal from "@/components/modal/CreateVocabulary.vue";
 
 export default {
   name: 'Themes',
-  components: {CreateVocabularyModal},
+  components: {CreateModal},
   data() {
     return {
       themes: [],
@@ -103,7 +103,7 @@ export default {
     <p class="lead">You haven’t created any theme yet.</p>
     <button class="btn btn-sm btn-outline-primary" @click="showCreateModal">Create first theme</button>
   </div>
-  <CreateVocabularyModal ref="createModal" :createAction="addTheme"/>
+  <CreateModal ref="createModal" :on-submit="addTheme" modal-name="theme"/>
 
 </template>
 
