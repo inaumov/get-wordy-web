@@ -2,13 +2,13 @@
 import {createVocabulary, fetchUserVocabularies} from "@/js/dictionaries.js";
 import {getSharedVocabularies} from '@/js/shared-vocabs-api.js';
 import {formatDateTime} from "@/js/utils.js";
-import CreateVocabularyModal from "@/components/modal/CreateVocabulary.vue";
+import CreateModal from "@/components/modal/CreateVocabulary.vue";
 import {getUserClasses} from "@/js/auth-check.js";
 
 export default {
   name: 'AllUserVocabularies',
   components: {
-    CreateVocabularyModal
+    CreateModal
   },
   data() {
     return {
@@ -105,7 +105,7 @@ export default {
         <i class="bi bi-plus"></i> New Vocabulary
       </button>
     </div>
-    <CreateVocabularyModal ref="createModal" :createAction="handleCreateVocabulary"/>
+    <CreateModal ref="createModal" :on-submit="handleCreateVocabulary" modal-name="vocabulary"/>
     <!-- all user own and shared vocabularies -->
     <div
         v-for="vocab in vocabularies"
