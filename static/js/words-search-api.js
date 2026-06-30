@@ -22,8 +22,6 @@ function getRequest(url) {
  * GET /words?input=car
  */
 export function search(input) {
-    console.log("Search words:", input);
-
     const url = `${apiBase}/words?input=${encodeURIComponent(input)}`;
     return getRequest(url);
 }

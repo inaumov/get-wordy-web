@@ -13,7 +13,7 @@ export default {
   emits: ["add-to-vocabulary"],
   data() {
     return {
-      searchQuery: "",
+      searchInput: "",
       foundExplanations: null,
       selectedIndexes: [],
       showMore: {},
@@ -22,7 +22,7 @@ export default {
   },
   methods: {
     async onSearch() {
-      const input = this.searchQuery.trim();
+      const input = this.searchInput.trim();
       if (!input) return;
 
       this.loading = true;
@@ -30,7 +30,7 @@ export default {
       const result = await response.json();
 
       if (response.ok && result?.explanations?.length > 0) {
-        this.searchQuery = "";
+        this.searchInput = "";
         this.foundExplanations = result;
         this.selectedIndexes = [];
         this.showMore = {};
@@ -78,7 +78,7 @@ export default {
           <div class="form-group">
             <div class="input-group">
               <input
-                  v-model="searchQuery"
+                  v-model="searchInput"
                   id="search-input"
                   type="text"
                   class="form-control"
