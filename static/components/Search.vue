@@ -146,6 +146,7 @@ export default {
             <span class="chip pos">{{ explanation.partOfSpeech }}</span>
             <span v-if="explanation.register" class="chip register">{{ explanation.register }}</span>
             <span v-if="explanation.domain" class="chip domain">{{ explanation.domain }}</span>
+            <span v-if="explanation.level" class="chip level">{{ explanation.level }}</span>
           </div>
 
           <p class="meaning">{{ explanation.meaning }}</p>

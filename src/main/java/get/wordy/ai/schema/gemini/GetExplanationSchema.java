@@ -117,6 +117,14 @@ public class GetExplanationSchema {
                                         .description(
                                                 "Dictionary source, e.g. Oxford, Cambridge, Merriam-Webster"
                                         )
+                                        .build(),
+                                "level",
+                                Schema.builder()
+                                        .type(Type.Known.STRING)
+                                        .description(
+                                                "CEFR level"
+                                        )
+                                        .enum_("A1", "A2", "B1", "B2", "C1", "C2")
                                         .build()
                         ))
                         .required(List.of(
@@ -126,7 +134,8 @@ public class GetExplanationSchema {
                                 "domain",
                                 "sentences",
                                 "collocations",
-                                "source"
+                                "source",
+                                "level"
                         ))
                         .build();
         return Schema.builder()

@@ -80,7 +80,8 @@ public class ThemeDraftConfirmationService {
                     result.getLemma(),
                     explanation.getPartOfSpeech(),
                     result.getTranscription(),
-                    explanation.getMeaning()
+                    explanation.getMeaning(),
+                    explanation.getLevel()
             );
             entity.setRegister(explanation.getRegister());
             entity.setDomain(explanation.getDomain());
