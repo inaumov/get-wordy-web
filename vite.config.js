@@ -187,7 +187,7 @@ export default defineConfig(({mode}) => {
       },
 
 
-      // ... search words & themes rewrites start ...
+      // ... search words rewrites start ...
 
 
       // Search: /api/v1/words → /search
@@ -198,15 +198,7 @@ export default defineConfig(({mode}) => {
             '/search' + path.substring(path.indexOf('?'))
       },
 
-      // Search: /api/v1/themes → /themes-search
-      '^/api/v1/themes\\?input=': {
-        target: 'http://localhost:3000',
-        changeOrigin: true,
-        rewrite: path =>
-            '/themes-search' + path.substring(path.indexOf('?'))
-      }
-
-      // ... search words & themes rewrites end ...
+      // ... search words rewrites end ...
 
     }
   }
