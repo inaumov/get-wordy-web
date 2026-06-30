@@ -50,7 +50,7 @@ export default {
       button.setAttribute('disabled', 'true');
     },
     prepareLetters() {
-      let str = this.displayed['value'];
+      let str = this.displayed['lemma'];
       const actualArr = [...str];
       let shuffledArr = [];
       do {
@@ -108,7 +108,7 @@ export default {
       </div>
     </div>
     <div class="col pb-5 text-center">
-      <button type="button" id="nextCardBtn" class="btn btn-sm btn-secondary text-white" v-on:click="next()" disabled="disabled">
+      <button type="button" id="nextCardBtn" class="btn btn-md btn-secondary text-white" v-on:click="next()" disabled="disabled">
         <i class="bi bi-arrow-right-square"></i> Continue
       </button>
     </div>

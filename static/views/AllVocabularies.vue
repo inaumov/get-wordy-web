@@ -173,7 +173,7 @@ export default {
         <router-link
             v-if="vocab.wordsTotal > 0"
             class="btn btn-md btn-success text-white"
-            :to="{ name : 'play-game', params: { vocabId: vocab.vocabId }}"
+            :to="{ name : 'shared-vocabulary-play-game', params: { classId: vocab.classId, vocabId: vocab.vocabId }}"
             title="You wanna play? let's play"
         >
           <i :class="['bi', vocab.learningProgress > 0 ? 'bi-repeat' : 'bi-arrow-90deg-right']"></i>

@@ -43,7 +43,7 @@ export default {
       </div>
     </div>
     <div class="col pb-5 text-center">
-      <button type="button" class="btn btn-sm btn-secondary text-white" v-on:click="start()">
+      <button type="button" class="btn btn-md btn-secondary text-white" v-on:click="start()">
         <i class="bi bi-arrow-right-square"></i> Start
       </button>
     </div>

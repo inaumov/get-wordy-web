@@ -14,7 +14,7 @@ export default {
       Your answer is {{ result[1] }} out of {{ result[2] }}
     </p>
     <div class="col pb-5 text-center">
-      <button type="button" class="btn btn-sm btn-secondary text-white" v-on:click="nextAction.onAction()">
+      <button type="button" class="btn btn-md btn-secondary text-white" v-on:click="nextAction.onAction()">
         <i class="bi bi-box-arrow-right"></i> {{ nextAction['caption'] }}
       </button>
     </div>

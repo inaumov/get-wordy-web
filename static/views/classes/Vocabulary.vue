@@ -126,7 +126,7 @@ export default {
       </div>
       <!-- second row: name left / words total right -->
       <div class="d-flex justify-content-between align-items-center py-2">
-        <span class="h5 d-inline-flex align-items-center editable-name"
+        <span class="h5 d-inline-flex align-items-center editable-name p-1"
               ref="editableEl"
               contenteditable="true"
               @blur="onNameEdit">
@@ -153,16 +153,16 @@ export default {
       <template #actions="{ row }">
         <router-link
             :to="{ name: 'edit-explanation', params: { vocabId: vocabId, wordId: row?.wordId } }"
-            class="btn btn-lg"
+            class="btn btn-md"
             title="Edit word explanation"
         >
           <i class="bi bi-pencil-square"></i>
         </router-link>
 
         <button
-            class="btn btn-lg"
+            class="btn btn-md"
             @click="handleRemoveItemAction(row?.wordId)"
-            title="Delete"
+            title="Remove"
         >
           <i class="bi bi-x-lg"></i>
         </button>

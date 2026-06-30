@@ -134,13 +134,24 @@ const router = createRouter({
             ),
         },
         {
-            path: '/Settings',
-            name: 'settings',
-            // route level code-splitting
-            // this generates a separate chunk (Settings.[hash].js) for this route
-            // which is lazy-loaded when the route is visited.
-            component: () => import('@/views/SettingsView.vue')
+            path: '/User/MyClasses/:classId/Vocabularies/:vocabId/Exercise',
+            name: 'shared-vocabulary-play-game',
+            component: () => import('@/views/PlayGameView.vue'),
+            props: (route) => (
+                {
+                    classId: route.params.classId,
+                    vocabId: route.params.vocabId
+                }
+            ),
         },
+        // {
+        //     path: '/Settings',
+        //     name: 'settings',
+        //     // route level code-splitting
+        //     // this generates a separate chunk (Settings.[hash].js) for this route
+        //     // which is lazy-loaded when the route is visited.
+        //     component: () => import('@/views/SettingsView.vue')
+        // },
         // finish children components declaration
             ],
         },
