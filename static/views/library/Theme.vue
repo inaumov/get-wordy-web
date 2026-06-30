@@ -228,11 +228,11 @@ export default {
     </div>
 
     <div class="d-flex justify-content-end pb-4">
+        <small v-if="isEmpty" class="text-muted">
+            {{ `Created: ${formatDateTime(theme.generatedAt)}` }}
+        </small>
         <small v-if="theme.lastModifiedAt" class="text-success">
             {{ `Last Modified: ${formatDateTime(theme.lastModifiedAt)}` }}
-        </small>
-        <small v-else class="text-muted">
-            {{ `Generated: ${formatDateTime(theme.generatedAt)}` }}
         </small>
     </div>
 

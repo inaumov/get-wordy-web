@@ -1,5 +1,5 @@
 <script>
-import {searchWordData} from "@/js/search-api.js";
+import {search} from "@/js/words-search-api.js";
 
 export default {
   name: "Search",
@@ -251,7 +251,7 @@ export default {
 }
 
 .chip {
-  font-size: 0.75rem;
+  font-size: 0.85rem;
   padding: 2px 6px;
   border-radius: 4px;
   font-weight: 500;
@@ -272,6 +272,11 @@ export default {
 .chip.domain {
   background: #eef2ff;
   color: #4455aa;
+}
+
+.chip.level {
+  background: #eafaf1;
+  color: #198754;
 }
 
 .meaning {

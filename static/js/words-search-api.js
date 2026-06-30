@@ -21,21 +21,9 @@ function getRequest(url) {
  * Search words explanations
  * GET /words?input=car
  */
-export function searchWordData(input) {
+export function search(input) {
     console.log("Search words:", input);
 
     const url = `${apiBase}/words?input=${encodeURIComponent(input)}`;
-    return getRequest(url);
-}
-
-/**
- * Search themes
- * GET /themes?input=travel
- */
-export function searchThemeData(input) {
-    console.log("Search themes:", input);
-
-    const url = `${apiBase}/themes?input=${encodeURIComponent(input)}`;
-
     return getRequest(url);
 }
