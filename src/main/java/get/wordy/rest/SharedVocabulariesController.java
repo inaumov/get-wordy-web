@@ -99,7 +99,7 @@ public class SharedVocabulariesController {
         return new ResponseEntity<>(cards, HttpStatus.OK);
     }
 
-    private OwnerId createClassOwnerId(String classId) {
+    private static OwnerId createClassOwnerId(String classId) {
         return new OwnerId(classId, "class");
     }
 

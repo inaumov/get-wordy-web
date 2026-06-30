@@ -153,14 +153,14 @@ export default {
       <template #actions="{ row }">
         <router-link
             :to="{ name: 'edit-explanation', params: { vocabId: vocabId, wordId: row?.wordId } }"
-            class="btn"
+            class="btn btn-md"
             title="Edit word explanation"
         >
           <i class="bi bi-pencil-square"></i>
         </router-link>
 
         <button
-            class="btn"
+            class="btn btn-md"
             @click="handleRemoveItemAction(row?.wordId)"
             title="Remove"
         >

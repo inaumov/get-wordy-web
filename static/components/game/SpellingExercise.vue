@@ -36,7 +36,11 @@ export default {
     },
     getRandomSentence(card) {
       let arr = card['exerciseSentences'];
-      return shuffle(arr)[0];
+      if (arr.length > 0) {
+        return shuffle(arr)[0];
+      } else {
+        return {}; // quick fix
+      }
     },
     finish: function () {
       this.$emit("nextStep", 'PlayGame');
@@ -75,7 +79,7 @@ export default {
       </div>
     </div>
     <div class="col pb-5 text-center">
-      <button type="button" id="nextCardBtn" class="btn btn-sm btn-secondary text-white" v-on:click="next()" disabled="disabled">
+      <button type="button" id="nextCardBtn" class="btn btn-md btn-secondary text-white" v-on:click="next()" disabled="disabled">
         <i class="bi bi-arrow-right-square"></i> Continue
       </button>
     </div>

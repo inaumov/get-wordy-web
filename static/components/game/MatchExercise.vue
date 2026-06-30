@@ -83,13 +83,13 @@ export default {
         <div class="col" v-for="answer in preparedMatches">
           <button class="btn btn-lg border-0" v-on:click="onAnswered(answer['id'])"
                   v-bind:id="`answerBtn_${answer['id']}`">
-            {{ answer['value'] }}
+            {{ answer['lemma'] }}
           </button>
         </div>
       </div>
     </div>
     <div class="col pb-5 text-center">
-      <button type="button" id="nextCardBtn" class="btn btn-sm btn-secondary" v-on:click="next()" disabled="disabled">
+      <button type="button" id="nextCardBtn" class="btn btn-md btn-secondary" v-on:click="next()" disabled="disabled">
         <i class="bi bi-arrow-right-square"></i> Continue
       </button>
     </div>
