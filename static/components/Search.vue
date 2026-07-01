@@ -26,7 +26,7 @@ export default {
       if (!input) return;
 
       this.loading = true;
-      const response = await searchWordData(input);
+      const response = await search(input);
       const result = await response.json();
 
       if (response.ok && result?.explanations?.length > 0) {
