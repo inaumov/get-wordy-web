@@ -2,7 +2,7 @@
 import {formatDateTime} from "@/js/utils.js";
 import WordsheetTable from "@/components/classes/WordsheetTable.vue";
 import Search from "@/components/Search.vue";
-import CandidateWords from "@/views/library/CandidateWords.vue";
+import DraftWords from "@/views/library/DraftWords.vue";
 
 import {
   fetchTheme,
@@ -19,7 +19,7 @@ import {
 
 export default {
   components: {
-    CandidateWords,
+    DraftWords,
     WordsheetTable,
     Search
   },
@@ -313,7 +313,7 @@ export default {
     </template>
 
     <template v-if="isDraft">
-      <candidate-words
+      <draft-words
           :words="candidateWords"
           @remove-word="removeCandidateWord"
       />
@@ -412,6 +412,11 @@ export default {
 .editable-name {
   font-size: 1.25rem;
   white-space: nowrap;
+}
+
+.editable-name:focus {
+  outline: 2px solid var(--bs-primary);
+  background: white;
 }
 
 .empty-state {

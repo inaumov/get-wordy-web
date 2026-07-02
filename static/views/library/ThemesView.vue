@@ -76,13 +76,8 @@ export default {
         >
           <div class="card-body d-flex flex-column">
             <div class="d-flex align-items-center mb-2">
-              <div
-                  class="theme-icon me-3 flex-shrink-0"
-                  :style="{ backgroundColor: theme.color || randomColor(theme.themeId) }"
-              ></div>
-              <h5 class="card-title mb-0 flex-grow-1">{{ theme.name }}</h5>
+              <h5 class="card-title mb-0">{{ theme.name }}</h5>
             </div>
-
             <div class="mt-auto d-flex justify-content-between align-items-center">
               <span class="badge bg-info-subtle text-dark">
                 {{ theme.wordsTotal }} words
@@ -115,12 +110,6 @@ export default {
 
 .theme-card:hover {
   transform: translateY(-3px);
-}
-
-.theme-icon {
-  width: 36px;
-  height: 36px;
-  border-radius: 50%;
 }
 
 .badge.bg-info-subtle {
