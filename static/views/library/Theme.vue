@@ -229,7 +229,7 @@ export default {
 
     <div class="d-flex justify-content-end pb-4">
         <small v-if="isEmpty" class="text-muted">
-            {{ `Created: ${formatDateTime(theme.generatedAt)}` }}
+            {{ `Created: ${formatDateTime(theme.createdAt)}` }}
         </small>
         <small v-if="theme.lastModifiedAt" class="text-success">
             {{ `Last Modified: ${formatDateTime(theme.lastModifiedAt)}` }}
