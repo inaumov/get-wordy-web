@@ -15,12 +15,18 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.EnumSet;
 import java.util.List;
+import java.util.Set;
+
+import static get.wordy.core.api.bean.ThemeStatus.*;
 
 @Service
 @RequiredArgsConstructor
 @Slf4j
 public class ThemeServiceWrapper {
+
+    private final static Set<ThemeStatus> finalStatuses = EnumSet.of(CONFIRMED, PROCESSING, READY);
 
     private final ThemeService themeService;
     private final IWordExplanationService wordExplanationService;
@@ -33,13 +39,17 @@ public class ThemeServiceWrapper {
         try {
             Theme theme = themeService.getTheme(ownerId, themeId);
             if (theme.status() == ThemeStatus.GENERATING) {
-                throw new IllegalStateException("Theme already generating");
+                throw new IllegalStateException("Theme draft is already being generated");
             }
+            if (theme.status() != ThemeStatus.NEW) {
+                throw new IllegalStateException("Theme draft has been already generated");
+            }
+            themeService.updateThemeStatus(ownerId, themeId, ThemeStatus.GENERATING);
             publisher.publishEvent(new ThemePopulationRequestedEvent(ownerId, themeId, candidatesLimit));
         } catch (Exception e) {
             log.error("Failed populating words for theme '{}'", themeId, e);
             themeService.updateThemeStatus(ownerId, themeId, ThemeStatus.FAILED);
-            throw new IllegalStateException("Theme population failed");
+            throw new IllegalStateException("Theme draft generation failed");
         }
     }
 
@@ -47,15 +57,18 @@ public class ThemeServiceWrapper {
     public void confirmTheme(OwnerId ownerId, int themeId) {
         try {
             Theme theme = themeService.getTheme(ownerId, themeId);
+            if (finalStatuses.contains(theme.status())) {
+                throw new IllegalStateException("Theme draft has been already confirmed");
+            }
             if (theme.status() != ThemeStatus.DRAFT) {
                 throw new IllegalStateException("Theme draft is not generated yet");
             }
-            themeService.updateThemeStatus(ownerId, themeId, ThemeStatus.CONFIRMED);
-            publisher.publishEvent(new ThemeDraftConfirmedEvent(ownerId, themeId, theme.name()));
+            themeService.updateThemeStatus(ownerId, themeId, CONFIRMED);
+            publisher.publishEvent(new ThemeDraftConfirmedEvent(ownerId, themeId));
         } catch (Exception e) {
             log.error("Failed populating words for theme '{}'", themeId, e);
             themeService.updateThemeStatus(ownerId, themeId, ThemeStatus.FAILED);
-            throw new IllegalStateException("Theme population failed");
+            throw new IllegalStateException("Theme completion failed");
         }
     }
 
@@ -63,7 +76,7 @@ public class ThemeServiceWrapper {
         if (draftCacheService.containsDraft(themeId)) {
             List<WordDto> cached = draftCacheService.getDraft(themeId);
             if (!cached.isEmpty()) {
-                return draftCacheService.getDraft(themeId);
+                return cached;
             }
         }
         try {

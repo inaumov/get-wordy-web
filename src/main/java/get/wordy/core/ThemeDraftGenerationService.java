@@ -25,7 +25,7 @@ public class ThemeDraftGenerationService {
 
     public void generateDraft(OwnerId ownerId, int themeId, int candidatesLimit) {
         try {
-            Theme theme = themeService.updateThemeStatus(ownerId, themeId, ThemeStatus.GENERATING);
+            Theme theme = themeService.getTheme(ownerId, themeId);
             log.info("Generating candidate words for theme={}", themeId);
             List<WordDto> candidateWords = enrichmentService
                     .generateTheme(theme.name(), candidatesLimit)

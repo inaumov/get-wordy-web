@@ -28,8 +28,8 @@ public class ThemeDraftConfirmationService {
     private final IWordExplanationService wordExplanationService;
 
     public void confirmDraft(OwnerId ownerId, int themeId) {
-        themeService.updateThemeStatus(ownerId, themeId, ThemeStatus.PROCESSING);
         try {
+            themeService.updateThemeStatus(ownerId, themeId, ThemeStatus.PROCESSING);
             List<WordDto> draftWords = themeServiceWrapper.getCandidateWords(ownerId, themeId);
             log.info("Vocabulary enrichment for theme={} has been requested", themeId);
 
