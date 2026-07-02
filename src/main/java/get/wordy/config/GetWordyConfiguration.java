@@ -3,6 +3,7 @@ package get.wordy.config;
 import get.wordy.core.ClassAccessService;
 import get.wordy.core.ClassService;
 import get.wordy.core.GetWordyService;
+import get.wordy.core.ThemeService;
 import get.wordy.core.WordsExplanationService;
 import get.wordy.core.api.*;
 import get.wordy.core.dao.impl.*;
@@ -87,6 +88,17 @@ public class GetWordyConfiguration implements WebMvcConfigurer {
         LOG.info("Creating words service for data source = {}", dataSource);
         return new WordsExplanationService(
                 new WordDao(jdbcTemplate),
+                txManager
+        );
+    }
+
+    @Bean
+    public ThemeService themeService(DataSource dataSource, NamedParameterJdbcTemplate jdbcTemplate) {
+        LocalTxManager txManager = LocalTxManager.withDataSource(dataSource);
+        LOG.info("Creating theme service for data source = {}", dataSource);
+        return new ThemeService(
+                new ThemeDao(jdbcTemplate),
+                new WordDao(jdbcTemplate.getJdbcTemplate()),
                 txManager
         );
     }

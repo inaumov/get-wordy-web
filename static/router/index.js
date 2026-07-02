@@ -55,17 +55,17 @@ const router = createRouter({
             ),
         },
         {
-            path: '/Templates',
-            name: 'templates',
-            component: () => import('@/views/classes/TemplatesView.vue'),
+            path: '/Library',
+            name: 'themes',
+            component: () => import('@/views/library/ThemesView.vue'),
         },
         {
-            path: '/Templates/:templateId',
-            name: 'template-preview',
-            component: () => import('@/views/classes/Template.vue'),
+            path: '/Library/:themeId',
+            name: 'theme-preview',
+            component: () => import('@/views/library/Theme.vue'),
             props: (route) => (
                 {
-                    templateId: route.params.templateId
+                    themeId: route.params.themeId
                 }
             ),
         },

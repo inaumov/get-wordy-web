@@ -31,6 +31,7 @@ public class GetExplanationResult {
         private List<String> sentences;
         private List<String> collocations;
         private String source;
+        private String level;
     }
 
 }

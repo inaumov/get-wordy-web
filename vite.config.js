@@ -89,6 +89,10 @@ export default defineConfig(({mode}) => {
         }
       },
 
+
+      // ... class & vocabulary rewrites start ...
+
+
       // Base: /api/v1/classes → /classes
       '^/api/v1/classes$': {
         target: 'http://localhost:3000',
@@ -122,14 +126,17 @@ export default defineConfig(({mode}) => {
           return `/vocabularies/${vocabId}`;
         }
       },
+
+
       // ... class & vocabulary rewrites end ...
 
-      // GET/POST explanations for a vocabulary (list or create)
+
+      // GET/POST explanations for vocabulary (list or create)
       '^/api/v1/vocabularies/([^/]+)/explanations/?$': {
         target: 'http://localhost:3000',
         changeOrigin: true,
         rewrite: (path) => {
-          // This will route to /explanations — must include vocabularyId in query (for GET) or body (for POST)
+          // This will route to /explanations — must include vocabularyId in a query (for GET) or body (for POST)
           return '/explanations';
         }
       },
@@ -143,20 +150,6 @@ export default defineConfig(({mode}) => {
           const explanationId = match?.[1];
           return `/explanations/${explanationId}`;
         }
-      },
-
-      // Base: /api/v1/templates → /templates
-      '^/api/v1/templates$': {
-        target: 'http://localhost:3000',
-        changeOrigin: true,
-        rewrite: path => '/templates'
-      },
-
-      // Search: /api/v1/words → /search
-      '^/api/v1/words': {
-        target: 'http://localhost:3000',
-        changeOrigin: true,
-        rewrite: () => '/search'
       },
 
       // User flow: /user/my-vocabularies/:vocabId/cards → /cards
@@ -177,7 +170,36 @@ export default defineConfig(({mode}) => {
           const vocabId = path.match(/\/my-vocabularies\/([^/]+)\/exercise/)?.[1];
           return `/exercise?vocabId=${vocabId}`;
         }
-      }
+      },
+
+      // Base: /api/v1/themes → /themes
+      '^/api/v1/themes$': {
+        target: 'http://localhost:3000',
+        changeOrigin: true,
+        rewrite: path => path.replace(/^\/api\/v1/, '')
+      },
+
+      // Single theme info → /themes/:id
+      '^/api/v1/themes/([^/]+)$': {
+        target: 'http://localhost:3000',
+        changeOrigin: true,
+        rewrite: path => path.replace(/^\/api\/v1/, '')
+      },
+
+
+      // ... search words rewrites start ...
+
+
+      // Search: /api/v1/words → /search
+      '^/api/v1/words\\?input=': {
+        target: 'http://localhost:3000',
+        changeOrigin: true,
+        rewrite: path =>
+            '/search' + path.substring(path.indexOf('?'))
+      },
+
+      // ... search words rewrites end ...
+
     }
   }
 }})

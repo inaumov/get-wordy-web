@@ -24,4 +24,5 @@ public class Explanation {
     private String domain;
     private List<String> inContext;
     private List<String> collocations;
+    private String level;
 }

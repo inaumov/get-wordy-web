@@ -80,7 +80,11 @@ class GetExplanationSchema {
                                         "items", Map.of("type", "string"),
                                         "additionalProperties", false
                                 ),
-                                "source", getSourceDefinition()
+                                "source", getSourceDefinition(),
+                                "level", Map.of(
+                                        "type", "string",
+                                        "description", "CEFR level: A1, A2, B1, B2, C1, C2"
+                                )
                         ),
                         "additionalProperties", false,
                         "required", new String[]{"part_of_speech", "meaning", "register", "domain", "sentences", "collocations", "source"}

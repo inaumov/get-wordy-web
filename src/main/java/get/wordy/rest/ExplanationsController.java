@@ -104,7 +104,8 @@ public class ExplanationsController extends HttpServlet {
                 wordRequest.getLemma(),
                 wordRequest.getExplanation().getPartOfSpeech(),
                 wordRequest.getTranscription(),
-                wordRequest.getExplanation().getMeaning()
+                wordRequest.getExplanation().getMeaning(),
+                wordRequest.getExplanation().getLevel()
         );
         word.setStrSentences(wordRequest.getExplanation().getInContext());
         word.setCollocations(wordRequest.getExplanation().getCollocations());
@@ -117,7 +118,8 @@ public class ExplanationsController extends HttpServlet {
                 wordRequest.getLemma(),
                 wordRequest.getExplanation().getPartOfSpeech(),
                 wordRequest.getTranscription(),
-                wordRequest.getExplanation().getMeaning()
+                wordRequest.getExplanation().getMeaning(),
+                wordRequest.getExplanation().getLevel()
         );
         word.setStrSentences(wordRequest.getExplanation().getInContext());
         word.setCollocations(wordRequest.getExplanation().getCollocations());

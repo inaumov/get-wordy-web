@@ -47,12 +47,18 @@ export function dateHappened(endDate) {
     return endDate;
 }
 
-export function formatDateTime(dateTime) {
-    return new Date(dateTime).toLocaleString(undefined,{
+export function formatDateTime(dateTimeStr) {
+    if (!dateTimeStr) return '';
+    return new Date(dateTimeStr).toLocaleString(undefined, {
         year: 'numeric',
         month: 'short',
         day: 'numeric',
         hour: 'numeric',
         minute: 'numeric'
     });
+}
+
+export function formatDate(dateStr) {
+    if (!dateStr) return '';
+    return new Date(dateStr).toLocaleDateString();
 }

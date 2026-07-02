@@ -1,19 +1,27 @@
-const searchAPI = import.meta.env.VITE_BACKEND_API + "/words";
+const apiBase = import.meta.env.VITE_BACKEND_API;
 
-export function searchWordData(input) {
+const jsonHeaders = {
+    "Content-Type": "application/json"
+};
 
-    console.log('Search request, input =', input)
+const handleError = (err) => {
+    console.error("HTTP error:", err);
+    throw err;
+};
 
-    let headers = new Headers();
-    headers.append('Content-Type', 'application/json');
+/**
+ * Generic helper for GET requests
+ */
+function getRequest(url) {
+    return fetch(url, {method: "GET", headers: jsonHeaders})
+        .catch(handleError);
+}
 
-    let initObject = {
-        method: 'GET',
-        headers: headers,
-    };
-
-    let searchRequest = new Request(searchAPI + "?input=" + input, initObject);
-
-    return fetch(searchRequest)
-        .catch(err => console.log("HTTP error: ", err));
+/**
+ * Search words explanations
+ * GET /words?input=car
+ */
+export function search(input) {
+    const url = `${apiBase}/words?input=${encodeURIComponent(input)}`;
+    return getRequest(url);
 }

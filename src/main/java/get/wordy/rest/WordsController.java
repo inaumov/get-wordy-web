@@ -83,6 +83,7 @@ public class WordsController {
                                 .domain(word.getDomain())
                                 .inContext(word.getStrSentences())
                                 .collocations(word.getCollocations())
+                                .level(word.getLevel())
                                 .build()
                         )
                         .toList()
@@ -97,7 +98,8 @@ public class WordsController {
                             searchResult.getLemma(),
                             explanation.getPartOfSpeech(),
                             searchResult.getTranscription(),
-                            explanation.getMeaning()
+                            explanation.getMeaning(),
+                            explanation.getLevel()
                     );
                     entity.setRegister(explanation.getRegister());
                     entity.setDomain(explanation.getDomain());

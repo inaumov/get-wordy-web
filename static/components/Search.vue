@@ -1,5 +1,5 @@
 <script>
-import {searchWordData} from "@/js/words-search-api.js";
+import {search} from "@/js/words-search-api.js";
 
 export default {
   name: "Search",
@@ -13,27 +13,28 @@ export default {
   emits: ["add-to-vocabulary"],
   data() {
     return {
+      searchInput: "",
       foundExplanations: null,
       selectedIndexes: [],
-      showMore: {}
+      showMore: {},
+      loading: false, // SEARCH loading
     };
   },
   methods: {
-    async onSearch(event) {
-      event.preventDefault();
-      const form = event.target;
-      const inputField = form.querySelector("#search-input");
-      const searchRequest = inputField.value.trim();
-      if (!searchRequest) return;
+    async onSearch() {
+      const input = this.searchInput.trim();
+      if (!input) return;
 
-      const response = await searchWordData(searchRequest);
+      this.loading = true;
+      const response = await search(input);
       const result = await response.json();
 
       if (response.ok && result?.explanations?.length > 0) {
+        this.searchInput = "";
         this.foundExplanations = result;
-        inputField.value = "";
         this.selectedIndexes = [];
         this.showMore = {};
+        this.loading = false;
       }
     },
     resetSearch() {
@@ -68,29 +69,39 @@ export default {
 </script>
 
 <template>
-  <div class="word-search-panel">
+  <div id="word-search-panel">
 
     <!-- search input -->
     <div class="d-flex justify-content-center">
-      <div style="padding-top:7px;" class="col-md-4 form-group pull-right">
-        <form id="search-words-form" class="form-inline" @submit="onSearch">
+      <div class="col-md-4">
+        <form id="search-words-form" class="form-inline" @submit.prevent="onSearch">
           <div class="form-group">
             <div class="input-group">
               <input
+                  v-model="searchInput"
                   id="search-input"
                   type="text"
                   class="form-control"
-                  name="words"
                   placeholder="Search for a word or phrase..."
                   autocomplete="off"
+                  :disabled="loading"
                   required
               />
 
-              <button type="submit" class="btn btn-md btn-default border">
+              <button
+                  type="submit"
+                  class="btn btn-md btn-default border"
+                  :disabled="loading"
+              >
+              <span v-if="!loading">
                 <i class="bi bi-search"></i>
+              </span>
+                <span v-else>
+                <span class="spinner-border spinner-border-sm"></span>
+              </span>
               </button>
 
-              <!-- ✅ Reset button (only shown when results exist) -->
+              <!-- reset button (only shown when results exist) -->
               <button
                   v-if="foundExplanations"
                   type="button"
@@ -135,6 +146,7 @@ export default {
             <span class="chip pos">{{ explanation.partOfSpeech }}</span>
             <span v-if="explanation.register" class="chip register">{{ explanation.register }}</span>
             <span v-if="explanation.domain" class="chip domain">{{ explanation.domain }}</span>
+            <span v-if="explanation.level" class="chip level">{{ explanation.level }}</span>
           </div>
 
           <p class="meaning">{{ explanation.meaning }}</p>
@@ -240,7 +252,7 @@ export default {
 }
 
 .chip {
-  font-size: 0.75rem;
+  font-size: 0.85rem;
   padding: 2px 6px;
   border-radius: 4px;
   font-weight: 500;
@@ -261,6 +273,11 @@ export default {
 .chip.domain {
   background: #eef2ff;
   color: #4455aa;
+}
+
+.chip.level {
+  background: #eafaf1;
+  color: #198754;
 }
 
 .meaning {
