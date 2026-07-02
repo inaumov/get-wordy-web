@@ -277,11 +277,11 @@ public class ClassController {
                 .build();
     }
 
-    private OwnerId createUserOwnerId(Principal user) {
+    private static OwnerId createUserOwnerId(Principal user) {
         return new OwnerId(user.getName(), "user");
     }
 
-    private OwnerId createClassOwnerId(String classId) {
+    private static OwnerId createClassOwnerId(String classId) {
         return new OwnerId(classId, "class");
     }
 

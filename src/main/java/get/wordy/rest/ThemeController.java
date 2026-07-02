@@ -188,7 +188,7 @@ public class ThemeController {
                 .build();
     }
 
-    private OwnerId createUserOwnerId(Principal user) {
+    private static OwnerId createUserOwnerId(Principal user) {
         return new OwnerId(user.getName(), "user");
     }
 
