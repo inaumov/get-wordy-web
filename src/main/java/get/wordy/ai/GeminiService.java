@@ -11,6 +11,7 @@ import get.wordy.ai.schema.gemini.GetExplanationSchema;
 import get.wordy.ai.model.GetExplanationResult;
 import get.wordy.ai.schema.gemini.ThemeGenerateSchema;
 import get.wordy.ai.model.ThemeResult;
+import get.wordy.core.api.bean.WordKey;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -19,6 +20,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.StopWatch;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -65,7 +67,7 @@ public class GeminiService implements IVocabularyEnrichmentService {
     public ThemeResult generateTheme(String theme, int candidatesLimit) {
 
         String prompt = """
-                Generate exactly %d most popular English vocabulary words for theme:
+                Generate exactly %d most popular English vocabulary words or phrases for theme:
                 "%s".
                 """
                 .formatted(candidatesLimit, theme);
@@ -99,14 +101,19 @@ public class GeminiService implements IVocabularyEnrichmentService {
     }
 
     @Override
-    public List<GetExplanationResult> multisearch(List<String> lemmas) {
+    public List<GetExplanationResult> multisearch(List<WordKey> words) {
+        String requestedWords = words.stream()
+                .map(word -> "- %s (%s)"
+                        .formatted(word.lemma(), word.partOfSpeech()))
+                .collect(Collectors.joining("\n"));
+
         String prompt = """
                 %s
                 
                 Requested lemmas:
                 %s
                 """
-                .formatted(getExplanationPrompt, lemmas);
+                .formatted(getExplanationPrompt, requestedWords);
 
         GenerateContentConfig config =
                 GenerateContentConfig.builder()

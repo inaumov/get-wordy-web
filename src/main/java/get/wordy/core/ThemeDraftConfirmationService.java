@@ -4,6 +4,7 @@ import get.wordy.ai.IVocabularyEnrichmentService;
 import get.wordy.ai.model.GetExplanationResult;
 import get.wordy.ai.model.WordDto;
 import get.wordy.core.api.IWordExplanationService;
+import get.wordy.core.api.bean.ExistingWordLookup;
 import get.wordy.core.api.bean.ThemeStatus;
 import get.wordy.core.api.bean.Word;
 import get.wordy.core.api.bean.WordKey;
@@ -14,8 +15,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.server.ServerErrorException;
 
 import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -34,23 +33,25 @@ public class ThemeDraftConfirmationService {
             log.info("Vocabulary enrichment for theme={} has been requested", themeId);
 
             List<WordKey> candidateKeys = draftWords.stream()
-                    .map(w -> new WordKey(w.lemma(), w.partOfSpeech()))
+                    .map(WordDto::getKey)
                     .toList();
 
-            List<WordKey> missingKeys = findMissingWords(candidateKeys);
+            List<ExistingWordLookup> lookup = wordExplanationService.lookupWords(candidateKeys);
+
+            List<WordKey> missingKeys = lookup.stream()
+                    .filter(l -> !l.exists())
+                    .map(ExistingWordLookup::key)
+                    .toList();
+
             if (!missingKeys.isEmpty()) {
-                List<String> missingLemmas = missingKeys
-                        .stream()
-                        .map(WordKey::lemma)
-                        .toList();
-                List<GetExplanationResult> results = enrichmentService.multisearch(missingLemmas);
+                List<GetExplanationResult> results = enrichmentService.multisearch(missingKeys);
                 results.forEach(this::saveExplanations);
             }
             log.info("AI multisearch has been finished for theme={}", themeId);
 
-            List<Integer> wordIds = themeService.findExistingWords(candidateKeys)
+            List<Integer> wordIds = wordExplanationService.findExistingWords(candidateKeys)
                     .stream()
-                    .map(Word::getId)
+                    .map(ExistingWordLookup::id)
                     .toList();
 
             themeService.addWordsToTheme(ownerId, themeId, wordIds);
@@ -60,18 +61,6 @@ public class ThemeDraftConfirmationService {
             log.error("Theme confirmation failed for theme={}", themeId, ex);
             throw new ServerErrorException("Theme confirmation failed for theme", ex);
         }
-    }
-
-    private List<WordKey> findMissingWords(List<WordKey> candidateKeys) {
-        Set<WordKey> existing = themeService.findExistingWords(candidateKeys)
-                .stream()
-                .map(word -> new WordKey(word.getLemma(), word.getPartOfSpeech()))
-                .collect(Collectors.toSet());
-
-        return candidateKeys
-                .stream()
-                .filter(key -> !existing.contains(key))
-                .toList();
     }
 
     private void saveExplanations(GetExplanationResult result) {

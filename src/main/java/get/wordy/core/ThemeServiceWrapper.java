@@ -107,7 +107,7 @@ public class ThemeServiceWrapper {
         themeService.removeCandidateWordsFromTheme(userOwnerId, themeId, wordKey.lemma(), wordKey.partOfSpeech());
         if (draftCacheService.containsDraft(themeId)) {
             List<WordDto> draft = draftCacheService.getDraft(themeId);
-            draft.removeIf(item -> item.lemma().equals(wordKey.lemma()) && item.partOfSpeech().equals(wordKey.partOfSpeech()));
+            draft.removeIf(item -> item.getKey().equals(wordKey));
         }
     }
 

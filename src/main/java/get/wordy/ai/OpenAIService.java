@@ -7,6 +7,7 @@ import get.wordy.ai.model.*;
 import get.wordy.ai.schema.openai.ChatRequest;
 import get.wordy.ai.schema.openai.ChatResponse;
 import get.wordy.ai.model.GetExplanationResult;
+import get.wordy.core.api.bean.WordKey;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.NotImplementedException;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -82,7 +83,7 @@ public class OpenAIService implements IVocabularyEnrichmentService {
     }
 
     @Override
-    public List<GetExplanationResult> multisearch(List<String> words) {
+    public List<GetExplanationResult> multisearch(List<WordKey> words) {
         throw new NotImplementedException("Not implemented yet");
     }
 
