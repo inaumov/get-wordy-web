@@ -1,5 +1,6 @@
 <script>
 import Search from "@/components/Search.vue";
+import RenameModal from "@/components/modal/RenameModal.vue";
 import WordsheetTable from "@/components/classes/WordsheetTable.vue";
 import {
   getVocabulary,
@@ -13,6 +14,7 @@ import {formatDateTime} from "@/js/utils.js";
 export default {
   components: {
     Search,
+    RenameModal,
     WordsheetTable
   },
   props: ['classId', 'vocabId'],
@@ -34,21 +36,25 @@ export default {
       this.updateTime = vocabulary['updateTime'];
       this.wordsList = vocabulary['words'] || [];
     },
-    async onNameEdit() {
-      const editedText = this.$refs.editableEl.innerText.trim();
-      if (editedText && editedText !== this.name) {
-        let response = await updateVocabularyName(this.classId, this.vocabId, editedText);
-        if (response.ok) {
-          this.name = editedText; // update model
-          console.log('Name has been changed to:', editedText, ', for vocabulary id =', this.vocabId);
-          // todo success notification
-        } else {
-          alert('Failed')
-          // todo failure notification
-        }
+    openRenameModal() {
+      this.$refs.renameModal.open();
+    },
+    async renameVocabulary(newName) {
+      let response = await updateVocabularyName(this.classId, this.vocabId, newName);
+      if (response.ok) {
+        this.name = newName; // update model
+        console.log('Name has been changed to:', newName, ', for vocabulary id =', this.vocabId);
+        // todo success notification
       } else {
-        this.$refs.editableEl.innerText = this.name // restore original if cleared
+        alert('Failed')
+        // todo failure notification
       }
+    },
+    async deleteVocabulary() {
+      // todo delete vocabulary implementation
+    },
+    async addToLibrary() {
+      // todo save vocabulary as theme into library
     },
     async updateActivation() {
       const newVal = !this.isShared;
@@ -111,39 +117,73 @@ export default {
 
 <template>
   <div class="d-flex justify-content-start p-4">
-    <router-link :to="{name: 'class-dashboard', params: {classId:this.classId}}" class="btn btn-secondary" title="Back">Back</router-link>
+    <router-link :to="{name: 'class-dashboard', params: {classId:this.classId}}" class="btn btn-secondary" title="Back">
+      Back
+    </router-link>
   </div>
 
   <div class="">
 
     <div class="p-4 py-3">
-      <!-- top row: shared date aligned right -->
-      <div class="d-flex justify-content-end">
-        <span :class="['p-1', 'd-inline-flex', 'align-items-center',
-        isShared ? 'text-success' : 'text-secondary']">
-          {{ isShared ? 'Shared on: ' + formatDateTime(updateTime) : 'Not shared' }}
-        </span>
-      </div>
-      <!-- second row: name left / words total right -->
-      <div class="d-flex justify-content-between align-items-center py-2">
-        <span class="h5 d-inline-flex align-items-center editable-name p-1"
-              ref="editableEl"
-              contenteditable="true"
-              @blur="onNameEdit">
-          {{ name }}
-        </span>
-        <p class="fw-light mb-0">Words total: {{ wordsList.length }}</p>
-      </div>
-      <div class="py-2 border-bottom">
-        <div class="d-flex justify-content-end gap-2">
-          <button class="btn btn-md p-0 m-0" v-on:click="" title="Print pdf">
-            <i class="bi bi-file-earmark-pdf me-1"></i>
-            <span>Print pdf</span>
+
+      <!-- vocab name left / actions dropdown right -->
+
+      <div class="d-flex justify-content-between align-items-start pb-5 border-bottom">
+
+        <div class="vocab-card p-3 rounded w-75">
+          <div class="d-flex align-items-center justify-content-between">
+            <!-- vocab name -->
+            <span class="name">{{ name }}</span>
+            <!-- shared date aligned right -->
+            <span v-if="isShared" class="text-success">
+              Shared<i class="bi bi-dot"></i>{{ formatDateTime(updateTime) }}
+            </span>
+            <span v-else class="text-secondary">
+              <i class="bi bi-dot"></i>Not shared
+            </span>
+          </div>
+          <!-- words total -->
+          <div v-if="wordsList.length" class="my-1">
+            <span class="text-muted">Words total: {{ wordsList.length }}</span>
+          </div>
+        </div>
+
+        <div class="ms-auto">
+          <button
+              class="btn btn-light dropdown-toggle"
+              type="button"
+              data-bs-toggle="dropdown"
+          >
+            Actions
           </button>
-          <button class="btn btn-md p-0 m-0" v-on:click="" title="Save as template">
-            <i class="bi bi-plus-square me-1"></i>
-            <span>Save as template</span>
-          </button>
+
+          <ul class="dropdown-menu">
+            <li>
+              <a class="dropdown-item" href="#" @click.prevent="addToLibrary">
+                Add to library
+              </a>
+            </li>
+
+            <li>
+              <a class="dropdown-item" href="#" @click.prevent="openRenameModal">
+                Rename
+              </a>
+            </li>
+
+            <li>
+              <a class="dropdown-item" href="#" @click.prevent="">
+                <span class="me-1">Print PDF</span>
+                <i class="bi bi-file-earmark-pdf"></i>
+              </a>
+            </li>
+
+            <li>
+              <a class="dropdown-item" style="color: firebrick" href="#" @click.prevent="deleteVocabulary">
+                Delete
+              </a>
+            </li>
+
+          </ul>
         </div>
       </div>
     </div>
@@ -177,13 +217,32 @@ export default {
         </button>
     </div>
 
+    <RenameModal
+        ref="renameModal"
+        modal-name="vocabulary"
+        :current-name="this.name"
+        :on-submit="renameVocabulary"
+    />
+
   </div>
 </template>
 
 <style scoped>
-.editable-name {
+.vocab-card {
+  border-radius: 0.5rem;
+  background: lightgrey;
+}
+
+.vocab-card .name {
   font-size: 1.25rem;
-  text-align: center;
-  white-space: nowrap;
+  font-weight: bold;
+}
+
+.dropdown-toggle {
+  background-color: #f8f9fa;
+}
+
+.dropdown-item:hover {
+  background-color: #e9ecef;
 }
 </style>

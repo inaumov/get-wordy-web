@@ -64,13 +64,7 @@ export default {
   },
   mounted() {
     this.getData()
-  },
-  computed: {
-    className() {
-      // access the state passed via the router
-      return this.classInfo['name'] || 'Error';
-    },
-  },
+  }
 };
 </script>
 

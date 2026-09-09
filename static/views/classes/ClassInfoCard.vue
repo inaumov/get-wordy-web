@@ -56,7 +56,7 @@ export default {
         <strong>Notes for student: </strong> {{ this.classInfo.notes }}
       </p>
     </div>
-    <!-- status and actions -->
+    <!-- actions -->
     <div class="ms-auto">
       <button class="btn btn-light dropdown-toggle" type="button" data-bs-toggle="dropdown">
         Actions
