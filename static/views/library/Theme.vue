@@ -4,6 +4,7 @@ import RenameModal from "@/components/modal/RenameModal.vue";
 import WordsheetTable from "@/components/classes/WordsheetTable.vue";
 import Search from "@/components/Search.vue";
 import DraftWords from "@/views/library/DraftWords.vue";
+import DeleteModal from "@/components/modal/DeleteModal.vue";
 
 import {
   fetchTheme,
@@ -23,6 +24,7 @@ export default {
     RenameModal,
     DraftWords,
     WordsheetTable,
+    DeleteModal,
     Search
   },
 
@@ -114,6 +116,9 @@ export default {
 
     openRenameModal() {
       this.$refs.renameModal.open();
+    },
+    openDeleteModal() {
+      this.$refs.deleteModal.open();
     },
 
     async renameTheme(newName) {
@@ -259,7 +264,7 @@ export default {
           </li>
 
           <li>
-            <a class="dropdown-item" style="color: firebrick" href="#" @click.prevent="deleteThemeAction">
+            <a class="dropdown-item" style="color: firebrick" href="#" @click.prevent="openDeleteModal">
               Delete
             </a>
           </li>
@@ -441,7 +446,7 @@ export default {
         <i class="bi bi-check"></i>
         Confirm
       </button>
-      <button class="btn btn-danger" :disabled="deleted || confirmed" @click="deleteThemeAction">
+      <button class="btn btn-danger" :disabled="deleted || confirmed" @click="openDeleteModal">
         <i class="bi bi-trash"></i>
         Delete
       </button>
@@ -452,6 +457,13 @@ export default {
         modal-name="theme"
         :current-name="this.theme.name"
         :on-submit="renameTheme"
+    />
+
+    <DeleteModal
+        ref="deleteModal"
+        modal-name="theme"
+        :item-name="theme.name"
+        :on-submit="deleteThemeAction"
     />
 
   </div>
