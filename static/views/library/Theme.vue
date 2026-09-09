@@ -1,5 +1,6 @@
 <script>
 import {formatDateTime} from "@/js/utils.js";
+import RenameModal from "@/components/modal/RenameModal.vue";
 import WordsheetTable from "@/components/classes/WordsheetTable.vue";
 import Search from "@/components/Search.vue";
 import DraftWords from "@/views/library/DraftWords.vue";
@@ -19,6 +20,7 @@ import {
 
 export default {
   components: {
+    RenameModal,
     DraftWords,
     WordsheetTable,
     Search
@@ -110,18 +112,19 @@ export default {
       }
     },
 
-    async onNameEdit() {
-      const editedText = this.$refs.editableEl.innerText.trim();
-      if (editedText && editedText !== this.theme.name) {
-        const response = await updateThemeName(this.themeId, editedText);
-        if (response.ok) {
-          this.theme = await response.json();
-          console.log("Name changed:", editedText);
-        } else {
-          alert("Failed");
-        }
+    openRenameModal() {
+      this.$refs.renameModal.open();
+    },
+
+    async renameTheme(newName) {
+      let response = await updateThemeName(this.themeId, newName);
+      if (response.ok) {
+        this.name = newName; // update model
+        console.log('Name has been changed to:', newName, ', for theme id =', this.themeId);
+        // todo success notification
       } else {
-        this.$refs.editableEl.innerText = this.theme.name;
+        alert('Failed')
+        // todo failure notification
       }
     },
 
@@ -204,36 +207,77 @@ export default {
 
   <div class="p-4">
 
-    <!-- Name / total -->
+    <div class="d-flex justify-content-between align-items-start pb-5">
 
-    <div class="d-flex justify-content-between align-items-center pb-2">
+      <div class="theme-card p-3 rounded w-75">
+        <div class="d-flex align-items-center justify-content-between">
+          <!-- theme name -->
+          <span class="name">{{ theme.name }}</span>
+          <!-- theme status -->
+          <span v-if="theme.status === 'READY'" class="text-success">
+            <i class="bi bi-dot"></i>{{ theme.status }}
+          </span>
+          <span v-else class="text-secondary">
+            <i class="bi bi-dot"></i>{{ theme.status }}
+          </span>
+        </div>
+        <!-- words total -->
+        <div v-if="isReady" class="my-1">
+          <span class="text-muted">
+            Words total: {{ theme.wordsTotal }}
+          </span>
+        </div>
+        <div v-if="isDraft" class="my-1">
+          <span class="text-muted">
+            Candidate words total: {{ candidateWords.length || theme.wordsTotal }}
+          </span>
+        </div>
+      </div>
 
-      <span
-          class="h5 editable-name p-1"
-          ref="editableEl"
-          contenteditable="true"
-          @blur="onNameEdit">
-        {{ theme.name }}
-      </span>
+      <div class="ms-auto">
+        <button
+            class="btn btn-light dropdown-toggle"
+            type="button"
+            data-bs-toggle="dropdown"
+        >
+          Actions
+        </button>
 
-      <p v-if="isReady" class="fw-light mb-0">
-        Words total:
-        {{ theme.wordsTotal }}
-      </p>
-      <p v-if="isDraft" class="fw-light mb-0">
-        Candidate words total:
-        {{ candidateWords.length || theme.wordsTotal }}
-      </p>
+        <ul class="dropdown-menu">
+
+          <li>
+            <a class="dropdown-item" href="#" @click.prevent="openRenameModal">
+              Rename
+            </a>
+          </li>
+
+          <li>
+            <a class="dropdown-item" href="#" @click.prevent="">
+              <span class="me-1">Print PDF</span>
+              <i class="bi bi-file-earmark-pdf"></i>
+            </a>
+          </li>
+
+          <li>
+            <a class="dropdown-item" style="color: firebrick" href="#" @click.prevent="deleteThemeAction">
+              Delete
+            </a>
+          </li>
+
+        </ul>
+      </div>
 
     </div>
 
-    <div class="d-flex justify-content-end pb-4">
+    <div class="pb-5">
+      <div class="d-flex justify-content-end pb-2 border-bottom">
         <small v-if="isEmpty" class="text-muted">
             {{ `Created: ${formatDateTime(theme.createdAt)}` }}
         </small>
         <small v-if="theme.lastModifiedAt" class="text-success">
             {{ `Last Modified: ${formatDateTime(theme.lastModifiedAt)}` }}
         </small>
+      </div>
     </div>
 
     <!-- Populated state -->
@@ -403,20 +447,35 @@ export default {
       </button>
     </div>
 
+    <RenameModal
+        ref="renameModal"
+        modal-name="theme"
+        :current-name="this.theme.name"
+        :on-submit="renameTheme"
+    />
+
   </div>
 
 </template>
 
-<style>
+<style scoped>
 
-.editable-name {
-  font-size: 1.25rem;
-  white-space: nowrap;
+.theme-card {
+  border-radius: 0.5rem;
+  background: lightgrey;
 }
 
-.editable-name:focus {
-  outline: 2px solid var(--bs-primary);
-  background: white;
+.theme-card .name {
+  font-size: 1.25rem;
+  font-weight: bold;
+}
+
+.dropdown-toggle {
+  background-color: #f8f9fa;
+}
+
+.dropdown-item:hover {
+  background-color: #e9ecef;
 }
 
 .empty-state {
